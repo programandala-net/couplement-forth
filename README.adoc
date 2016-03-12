@@ -1,0 +1,21 @@
+= Couplement Fortha
+:author: Marcos Cruz (programandala.net)
+:revdate: 2016-03-12
+
+== Description
+
+Couplement Forth is an STCfootnote:[Subroutine Threaded Code.] Forth
+system under development for ZX Spectrum 128 with G+DOS or Beta DOS.
+
+It was forked from
+http://programandala.net/en.program.forthcoupe.html[ForthCoupe].
+
+== Status
+
+Developed from 2014-12-30 to 2015-05-20.  Alpha state. Sleeping
+project.
+
+== Git repository
+
+The Git repository of Couplement Forth was created from development
+backups on 2016-03-12.
