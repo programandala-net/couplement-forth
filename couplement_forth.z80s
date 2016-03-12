@@ -4,7 +4,7 @@
 ; <http://programandala.net/en.program.couplement_forth.html>
 
   macro version
-    db "A-00-201501101819"
+    db "A-00-20150112331"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -24,7 +24,7 @@
 
 ; --------------------------------------------------------------
 
-; Couplement Forth is a fork of an abandoned project of the author:
+; Couplement Forth is a fork of an abandoned project by the author:
 ;   ForthCoupe (version A-00-20141227)
 ;   (<http://programandala.net/en.program.forthcoupe.html>)
 
@@ -120,23 +120,16 @@
 ; Only the input word is missing. Use 'key' or 'accept'?
 ; This way, all input and output could be redirected to files.
 
-; move error messages to a different page and print them with a ROM routine?
-; a BASIC program can create and save them to a file.
-; the BASIC loader would load the file.
-; this would make translations easy.
-
 ; }}} ----------------------------------------------------------
 ; Notes {{{
 
 ; About jumps
 
-; Jumps are being adapted: Since memory is not a
-; constraint, absolute jumps are used where speed is
-; important. Relative jumps are used otherwise (e.g.
-; keyboard input, printing, etc.). The conditional
-; jumps have different timings depending on the
-; condition's result. This adaptation is a work in
-; progress.
+; Jumps are being adapted: Since memory is not a constraint, absolute jumps
+; are used where speed is important. Relative jumps are used otherwise (e.g.
+; keyboard input, printing, etc.). The conditional jumps have different
+; timings depending on the result of the condition. This adaptation is a work
+; in progress.
 
 ;! Notes:
 
@@ -158,35 +151,7 @@
 
   include zx_spectrum_system_variables.z80s
   include zx_spectrum_rom_routines.z80s
-
-; Character codes
-
-; XXX TODO adapt.
-print_comma_char:           equ 0x06 ; when printed (tab) ; XXX OLD
-caps_lock_toggle_char:      equ 0x06 ; when coming directly from the keyboard
-edit_char:                  equ 0x07 ; when coming directly from the keyboard
-cursor_left_char:           equ 0x08
-backspace_char:             equ cursor_left_char
-cursor_right_char:          equ 0x09
-cursor_down_char:           equ 0x0a
-cursor_up_char:             equ 0x0b
-delete_left_char:           equ 0x0c
-form_feed_char:             equ 0x0c ; used for printing
-carriage_return_char:       equ 0x0d
-extended_mode_char:         equ 0x0e ; Fuse associates it to the host's Tab key
-graphics_char:              equ 0x0f ; when coming directly from the keyboard ; XXX TODO
-ink_char:                   equ 0x10
-paper_char:                 equ 0x11
-flash_char:                 equ 0x12
-brigth_char:                equ 0x13
-inverse_char:               equ 0x14
-over_char:                  equ 0x15
-at_char:                    equ 0x16
-tab_char:                   equ 0x17 ; XXX OLD
-;tab_char:                   equ 0x09 ; XXX TODO -- implement for source parsing
-cursor_left_word_char:      equ 0x18 ; XXX TODO -- implement
-cursor_right_word_char:     equ 0x19 ; XXX TODO -- implement
-space_char:                 equ 0x20
+  include zx_spectrum_char_codes.z80s
 
 ; }}} ----------------------------------------------------------
 ; Forth symbols {{{
@@ -976,7 +941,7 @@ keyboard_input.next_key:
 ;  jp z,keyboard_input.delete_right
 ;  cp 0x00 ; XXX TODO adapt, how?
 ;  jp z,keyboard_input.delete_until_end_of_line
-  cp caps_lock_toggle_char ; 6
+  cp caps_char ; 6
   jp z,toggle_caps_lock
   cp edit_char ; 7
   jp z,keyboard_input
@@ -1616,6 +1581,22 @@ _previous_nfa: defl 0
 
   ;.............................................................
   ;:
+  ;: clit   ( -- b )
+  ;:
+  ;: Push the content of the next address unit to the data stack as a literal.
+
+  header c_lit_,"clit",0
+
+  pop hl ; address of the literal
+  ld e,(hl)
+  ld d,0
+  inc hl
+  push hl ; return address
+  ex de,hl
+  jp push_hl
+
+  ;.............................................................
+  ;:
   ;: lit   ( -- x )  fig,comus,gforth
   ;:
   ;: Push the content of the next cell to the data stack as a literal.
@@ -1893,6 +1874,10 @@ quit.do:
 
   header question_branch_,"?branch",0
 
+branch_if_0_:
+branch_if_zero_:
+branch_if_false_:
+zero_branch_:
   call pop_hl
   ld a,l
   cp h
@@ -1944,6 +1929,18 @@ quit.do:
   ld a,h
   or l
   call nz,push_hl
+  jp push_hl
+
+  ;.............................................................
+  ;:
+  ;: nip ( x1 x2 -- x2 )
+
+  header nip_,"nip",0
+
+  call pop_hl
+  push hl
+  call pop_hl
+  pop hl
   jp push_hl
 
   ;.............................................................
@@ -2308,22 +2305,24 @@ l5330h:
 
   header within_,"within",0
 
-  ; XXX TODO -- copy from DZX-Forth
-  ; : within over - >r - r> u< ;
-  ret
+  ; DZX-Forth:
+  ;     pop hl
+  ;     pop de
+  ;     call hl_minus_de_to_hl
+  ;     ex (sp),hl
+  ;     call hl_minus_de_to_hl
+  ;     jp u_greater.1
+  ; Forth-94:
+  ;     OVER - >R - R>  U<
 
-  call pop_hl_de ; XXX TODO use pop_de_hl instead
-  ex de,hl
-  ; (ds) = test value
-  ; de = low value
-  ; hl = high value
-  sbc hl,de
-  push hl
-  call pop_hl
-  ex de,hl
-  ; de = low value
-  ; hl = test value
-  sbc hl,de
+  ; XXX checked
+  ; XXX TODO faster, in low level
+  call over_
+  call minus_
+  call to_r_
+  call minus_
+  call from_r_
+  jp u_less_
 
   ;.............................................................
   ;:
@@ -3688,6 +3687,30 @@ l5a4fh:
 
   ;.............................................................
   ;:
+  ;: u<   ( n1 n2 -- ff )
+
+  header u_less_,"uless",0 ; XXX TMP name
+
+  call pop_hl_de
+  ex de,hl
+  call compare_de_hl_unsigned
+  jp c,true_
+  jp false_
+
+compare_de_hl_unsigned:
+  ; Input:  de, hl
+  ; Output:
+  ;  flag C if hl < de
+  ;  flag Z if hl = de
+  ld a,h
+  cp d
+  ret nz
+  ld a,l
+  cp e
+  ret
+
+  ;.............................................................
+  ;:
   ;: rdrop   ( -- ) 
 
   header r_drop_,"rdrop",0
@@ -3720,7 +3743,7 @@ l5a4fh:
   ;:
   ;: >r   ( x -- ) 
 
-  header r_from_,">r",0
+  header from_r_,">r",0
 
   call pop_hl
   pop bc
@@ -3895,6 +3918,175 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   pop hl
   ld (tib_address),hl
   ret
+
+  ;.............................................................
+  ;:
+  ;: -cursor ( n -- ) ; XXX NEW
+  ;:
+  ;: Delete the cursor.
+
+  header minus_cursor_,"-cursor",0
+
+  call space_
+  call c_lit_
+  db left_char
+  jp emit_
+
+
+  ;.............................................................
+  ;:
+  ;: backspaces  ( +n -- )
+  ;:
+  ;: Delete +n chars at the left of the cursor.
+
+  header backspaces_,"backspaces",0
+
+  call c_lit_
+  db left_char
+  call dup_
+  call emit_
+  call space_
+  call emit_
+  call one_minus_
+  call dup_
+  call zero_equals_
+  call branch_if_false_
+  dw backspaces_
+  jp drop_
+
+
+  ;.............................................................
+  ;:
+  ;: (accept-control-char)  ( ca len len2 c -- ca len len2' )
+
+  header paren_accept_control_char_,"(accept-control-char)",0
+
+  ; check the delete key
+  call dup_
+  call c_lit_
+  db delete_char
+  call equals_ ; delete?
+  call branch_if_false_
+  dw paren_accept_control_char.edit
+  ; delete the last char
+  call drop_ ; c
+  call dup_ ; something to delete?
+  call branch_if_zero_
+  dw paren_accept_control_char.end
+  ; do it
+  call minus_cursor_
+  call one_minus_
+  call one_
+  jp backspaces_
+
+
+paren_accept_control_char.edit:
+  ; check the edit key
+  call c_lit_
+  db edit_char
+  call equals_ ; edit?
+  call branch_if_false_
+  dw paren_accept_control_char.end
+  ; delete the whole input
+  call dup_ ; something to delete?
+  call branch_if_zero_
+  dw paren_accept_control_char.end
+  ; do it
+  call minus_cursor_
+  call zero_
+  call swap_
+  call backspaces_
+
+paren_accept_control_char.end:
+  ret
+
+  ;.............................................................
+  ;:
+  ;: (accept-ascii-char)  ( ca len len2 c -- ca len len2' )
+
+  header paren_accept_ascii_char_,"(accept-ascii-char)",0
+
+paren_accept_ascii_char.0:
+  call to_r_
+  call two_dup_
+  call minus_
+  call from_r_
+  call swap_ ; space left
+  call branch_if_0_
+  dw paren_accept_ascii_char.no
+
+  ; there's space left for the char
+  call dup_
+  call emit_
+  call over_
+  call c_lit_
+  db 4
+  call pick_
+  call plus_
+  call c_store_
+  jp one_plus_
+
+paren_accept_ascii_char.no:
+  ; no space left for the char
+  jp drop_
+
+  ;.............................................................
+  ;:
+  ;: (accept-key)  ( ca len len2 c -- ca len len2' )
+
+  header paren_accept_key_,"(accept-key)",0
+
+  call dup_
+  call bl_
+  call c_lit_
+  db 127
+  call within_ ; ASCII?
+  call zero_equals_
+  call branch_if_false_
+  dw paren_accept_ascii_char.0 ; ASCII
+  ; not ASCII
+  jp paren_accept_control_char_
+
+
+  ;.............................................................
+  ;:
+  ;: (accept)  ( ca len -- len2 )
+
+  header paren_accept_,"(accept)",0
+
+  call zero_ ; len2
+paren_accept.begin:
+  call c_lit_
+  db 143 ; XXX TMP cursor
+  call emit_
+  call c_lit_
+  db bs_char
+  call emit_
+  call key_
+  call dup_
+  call c_lit_
+  db cr_char
+  call equals_  ; enter key?
+  call branch_if_false_
+  dw paren_accept.repeat
+  ; the end
+  call minus_cursor_
+  call space_
+  call drop_
+  call nip_
+  jp nip_
+paren_accept.repeat
+  call paren_accept_key_
+  call branch_
+  dw paren_accept.begin
+
+  ;.............................................................
+  ;:
+  ;: accept  ( ca +n1 -- +n2 )
+
+  header accept_,"accept",0
+
+  jp paren_accept_
 
   ;.............................................................
   ;:
@@ -4284,6 +4476,42 @@ l5d4bh:
 
   ;.............................................................
   ;:
+  ;: false   ( -- false )
+
+  header false_,"false",0
+
+  ld hl,0
+  jp push_hl
+
+  ;.............................................................
+  ;:
+  ;: true ( -- true )
+
+  header true_,"true",0
+
+  ld hl,-1
+  jp push_hl
+
+  ;.............................................................
+  ;:
+  ;: 0   ( -- 0 )
+
+  header zero_,"0",0
+
+  ld hl,0
+  jp push_hl
+
+  ;.............................................................
+  ;:
+  ;: 1   ( -- 1 )
+
+  header one_,"1",0
+
+  ld hl,1
+  jp push_hl
+
+  ;.............................................................
+  ;:
   ;: bl   ( -- c )  94
 
   header bl_,"bl",0
@@ -4498,16 +4726,16 @@ branch_5e39:
   jp hold_
 
 sub_5fc2h:
-  call r_from_
+  call from_r_
   ld hl,0x0000
   call push_hl
   call to_r_
   call dup_
-  call r_from_
+  call from_r_
   call u_slash_mod_
   call to_r_
   call swap_
-  call r_from_
+  call from_r_
   call u_slash_mod_
   call to_r_
   ret
