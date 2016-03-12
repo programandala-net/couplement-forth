@@ -3,8 +3,10 @@
 ; A subroutine-threaded Forth for the ZX Spectrum
 ; <http://programandala.net/en.program.couplement_forth.html>
 
+; Unfinished
+
   macro version
-    db "A-00-20150110032"
+    db "A-00-2015012123"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -24,22 +26,9 @@
 
 ; --------------------------------------------------------------
 
-; Couplement Forth is a fork of an abandoned project by the author:
+; Couplement Forth is a fork of an abandoned project:
 ;   ForthCoupe (version A-00-20141227)
 ;   (<http://programandala.net/en.program.forthcoupe.html>)
-
-; --------------------------------------------------------------
-; Links
-
-; Couplement Forth:
-; <http://programandala.net/en.program.couplement_forth.html>
-;
-; The ZX Spectrum:
-; <http://worldofspectrum.org>
-;
-; The Forth language:
-; <http://forth.org>
-; <http://forth.com>
 
 ; --------------------------------------------------------------
 ; Development history
@@ -121,7 +110,7 @@
 ; 'emit' is defered and pointed to a file when needed.
 ; 'cr' and 'type' are defered and use 'emit' by default.
 ; 'page' does 'cls' on screen, but prints a form feed char to printer or file.
-; Gforth and lina work this way (confirm it).
+; Gforth and lina work this way (confirm).
 ; 'open' and 'close' manage the files (they parse the names)
 ; 'opened' and 'closed' are the non-parsing versions.
 ; 'include' would be just 'open throw load'
@@ -129,7 +118,100 @@
 ; This way, all input and output could be redirected to files.
 
 ; }}} ----------------------------------------------------------
-; Notes {{{
+; Stack notation {{{
+
+; XXX TODO
+
+; }}} ----------------------------------------------------------
+; Symbols {{{
+
+; ..............................
+; Forth
+
+precedence_bit:       equ 6
+immediate:            equ 1 << precedence_bit ; bit mask
+compile_only_bit:     equ 7
+compile_only:         equ 1 << compile_only_bit ; bit mask
+interpret_only_bit:   equ 0
+interpret_only:       equ 1 << interpret_only_bit ; bit mask
+
+colon_structure_id:   equ 0x01
+do_structure_id:      equ 0x02
+begin_structure_id:   equ 0x03
+if_structure_id:      equ 0x04
+builds_structure_id:  equ 0x09
+
+; ..............................
+; ZX Spectrum
+
+  include zx_spectrum_system_variables.z80s
+  include zx_spectrum_rom_routines.z80s
+  include zx_spectrum_char_codes.z80s
+
+; ..............................
+; Other
+
+false:  equ 0x0000
+; XXX NOTE -- the legacy code uses 1 as true flag
+true:   equ 0xffff
+
+; }}} ----------------------------------------------------------
+; Assembling options {{{
+
+; ..............................
+; Data stack method 
+
+; Couplement Forth can use different methods to manage its data stack.
+; Every method has a constant identifier:
+
+sf_dsm:           equ %0001 ; SamForth's method: restore, check, use and save Z80 SP
+iy_unchecked_dsm: equ %0010 ; push, load, use, save and pop IX, without checks
+hl_unchecked_dsm: equ %0100 ; push, load, use, save and pop HL, without checks
+hl_dsm:           equ %1000 ; push, load, use, save and pop HL, with checks
+
+; The data stack method can be selected here, using one of the above
+; identifiers:
+
+data_stack_method:  equ sf_dsm
+any_dsm:            equ data_stack_method ; XXX TODO -- simpler
+
+; ..............................
+; Execution speed
+
+; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
+; default.  In fast mode, some stack checking is omited.  The words 'slow' and
+; 'fast' change the current mode.
+;
+; In order to save space, one of both modes can be omited in the kernel.  In
+; this case the words 'slow' and 'fast' are created as alias of 'noop'.
+
+slow_mode_available: equ true
+fast_mode_available: equ true
+
+; Some stack operations can be faster by manipulating the stack directly (thus
+; without any error checking) instead of calling the push/pop routines.  This
+; configuration is independent from the speed mode above.
+
+faster_stack_operations: equ true
+
+; ..............................
+; Size
+
+; You can save some bytes, but the code will be a bit slower.  The size
+; optimization uses relative jumps when possible, and substitutes some inline
+; code with calls.
+
+; XXX TODO
+size_optimization: equ false
+
+; ..............................
+; Screen
+
+; XXX TODO 
+whole_screen: equ false ; does the input line uses the whole screen?
+
+; }}} ----------------------------------------------------------
+; XXX TMP -- Notes {{{
 
 ; About jumps
 
@@ -150,77 +232,6 @@
 ;!  jp unstructured_error      ; error: 10; no error: 00
 
 ; }}} ----------------------------------------------------------
-; Stack notation {{{
-
-; XXX TODO
-
-; }}} ----------------------------------------------------------
-; ZX Spectrum {{{
-
-  include zx_spectrum_system_variables.z80s
-  include zx_spectrum_rom_routines.z80s
-  include zx_spectrum_char_codes.z80s
-
-; }}} ----------------------------------------------------------
-; Forth symbols {{{
-
-precedence_bit:       equ 6
-immediate:            equ 1 << precedence_bit ; bit mask
-compile_only_bit:     equ 7
-compile_only:         equ 1 << compile_only_bit ; bit mask
-interpret_only_bit:   equ 0
-interpret_only:       equ 1 << interpret_only_bit ; bit mask
-
-colon_structure_id:   equ 0x01
-do_structure_id:      equ 0x02
-begin_structure_id:   equ 0x03
-if_structure_id:      equ 0x04
-builds_structure_id:  equ 0x09
-
-; }}} ----------------------------------------------------------
-; Other symbols {{{
-
-false:  equ 0x0000
-; XXX NOTE -- the legacy code uses 1 as true flag
-true:   equ 0xffff
-
-
-; }}} ----------------------------------------------------------
-; Assembling options {{{
-
-; Data stack method identifiers:
-sf_dsm:           equ %00000001 ; SamForth's method: restore, check, use and save Z80 SP
-iy_unchecked_dsm: equ %00000010 ; push, load, use, save and pop IX, without checks
-hl_unchecked_dsm: equ %00000100 ; push, load, use, save and pop HL, without checks
-hl_dsm:           equ %00001000 ; push, load, use, save and pop HL, with checks
-
-; Data stack method used:
-data_stack_method:  equ sf_dsm
-any_dsm:            equ data_stack_method ; XXX TODO -- simpler
-
-; Execution speed:
-
-; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
-; default.  In fast mode, some stack checking is omited.  The words 'slow' and
-; 'fast' change the current mode.
-;
-; In order to save space, one of both modes can be omited in the kernel.  In
-; this case the words 'slow' and 'fast' are created as alias of 'noop'.
-
-slow_mode_available: equ true
-fast_mode_available: equ true
-
-; Some stack operations can be faster by manipulating the stack directly (thus
-; without any error checking) instead of calling the push/pop routines.  This
-; configuration is independent from the speed mode above.
-
-faster_stack_operations: equ true
-
-; Screen
-
-whole_screen: equ false ; does the input line uses the whole screen? ; XXX TODO 
-
-; }}} ----------------------------------------------------------
 ; Start {{{
 
 start: equ 25000
@@ -229,6 +240,31 @@ start: equ 25000
 
   jp cold_start 
   jp warm_start
+
+; }}} ----------------------------------------------------------
+; Interface to BASIC {{{
+
+filename_length equ 10
+
+drive:
+  db 1
+filename.0: ; main filename buffer
+  ds filename_length
+filename.1: ; secondary filename buffer
+  ds filename_length
+file_address:
+  dw 0
+file_length:
+  dw 0
+
+include fn_dpeek.z80s
+include fn_peeks.z80s
+
+basic_line_of_cat     equ 100
+basic_line_of_load    equ 110
+basic_line_of_save    equ 120
+basic_line_of_erase   equ 130
+basic_line_of_rename  equ 140
 
 ; }}} ----------------------------------------------------------
 ; Variables {{{
@@ -435,10 +471,10 @@ check.string.de_b:
 
   macro border,color
     ; change the border to color
-    if debug
+    if 0;debug
       push af
       ld a,color
-      call border.a
+      out (0xfe),a
       pop af
     endif
   endm
@@ -1196,7 +1232,6 @@ refresh_the_command_line:
 
   if whole_screen
 
-
     ld a,(chars_on_the_left_of_the_cursor)
     and a
     jr z,line_cleared
@@ -1305,7 +1340,6 @@ wrap_print_message_at_hl:
   ; The message has the bit 7 of its last char set.
 
   ; XXX TODO
-
 
 wrap_print_message_at_hl.next_word:
 
@@ -1496,7 +1530,7 @@ _previous_nfa: defl 0
   
     ; Create a word header in the dictionary
       
-    ; label = label-format name (with a "_" prefix)
+    ; label = label-format name (with a "_" suffix)
     ; name = string with the actual name
     ; flags = byte with the precedence and compile-only bits combined
     
@@ -1517,11 +1551,11 @@ _previous_nfa: defl 0
   ; 79      = Forth-79 (1979)
   ; 83      = Forth-83 (1983)
   ; ace     = Jupiter Ace's Ace Forth (1982)
-  ; af      = ZX Spectrum's Abersoft Forth (circa 1984)
+  ; af      = ZX Spectrum's Abersoft Forth (1983)
   ; 94      = Forth-94 (ANS Forth, ISO Forth) (1994)
   ; comus   = Common use
   ; cf      = Couplement Forth specific
-  ; fig     = FIG Forth (circa 1978)
+  ; fig     = FIG Forth 1.1 (1979)
   ; gforth  = Gforth
   ; hist    = historical: present in the language from the start ; XXX TODO -- remove?
   ; sf      = SamForth ; XXX TODO -- remove?
@@ -2340,7 +2374,7 @@ l5330h:
   call minus_
   call to_r_
   call minus_
-  call from_r_
+  call r_from_
   jp u_less_
 
   ;.............................................................
@@ -2550,9 +2584,9 @@ number.return:
   ;: In ANS Forth the parameter is a signed number (n) and the word's
   ;: description is: "If n is greater than zero, display n spaces.".
   ;:
-  ;: Couplement Forth's 'spaces' behaves like fig-Forth's. It's simpler and faster
-  ;: and 0..65535 spaces can be printed. When printing 0..32,767 spaces U uses an
-  ;: unsigned 16-bit number instead.
+  ;: Couplement Forth's 'spaces' behaves like fig-Forth's. It's simpler and
+  ;: faster and 0..65535 spaces can be printed. When printing 0..32,767 spaces
+  ;: U uses an unsigned 16-bit number instead.
 
   header spaces_,"spaces",0
 
@@ -2663,10 +2697,10 @@ de_hl_slash_mod:
   ld b,d
   ld c,e
   ld de,0xffff
-l5503h:
+de_hl_slash_mod.again:
   inc de
   sbc hl,bc
-  jr nc,l5503h
+  jr nc,de_hl_slash_mod.again
   add hl,bc
   ex de,hl
   jp push_de_hl
@@ -2680,11 +2714,11 @@ l5503h:
 
   header cls_,"cls",0
 
-  call rom_cl_all
-;  ld a,2
-;  call rom_chan_open
+  jp rom_cl_all
 
-  ret
+;  call rom_cl_all
+;  ld a,2
+;  jp rom_chan_open
 
   ;.............................................................
   ;:
@@ -3532,6 +3566,7 @@ l5820h:
   ld (dp),hl
   ld (ip_fvar),de
   ret
+
 l582bh:
   pop hl
 l582ch:
@@ -3556,7 +3591,7 @@ l5837h:
 
   ;.............................................................
   ;:
-  ;: type   ( -- ) 
+  ;: type   ( ca len -- ) 
 
   header type_,"type",0
 
@@ -3601,7 +3636,6 @@ return.a:
   ld c,a
   jr return.bc
 
-
   ;.............................................................
   ;:
   ;: dir   ( -- ) 
@@ -3617,16 +3651,43 @@ return.a:
 
   header equals_,"=",0
 
-  ; XXX TODO -- investigate a faster alternative with "sbc hl,de", and 0 in hl as result!
   ; XXX TODO -- write "<>"
   call pop_hl_de
-  ld a,l  ; 09 T
-  cp e    ; 04 T
-  jr nz,push_false
-  ld a,h  ; 09 T
-  cp d    ; 09 T
-  jp nz,false_
-  jp true_
+  if size_optimization
+    call compare_de_hl_unsigned:
+    jp z,true_
+    jp false_
+  else
+    ld a,l  ; 09 T
+    cp e    ; 04 T
+    jp nz,false_
+    ld a,h  ; 09 T
+    cp d    ; 09 T
+    jp nz,false_
+    jp true_
+  endif
+
+  ;.............................................................
+  ;:
+  ;: <>   ( n1 n2 -- ff ) 
+
+  header not_equals_,"<>",0
+
+  call pop_hl_de
+  if size_optimization
+    call compare_de_hl_unsigned:
+    jp z,false_
+    jp true_
+  else
+    ; XXX TODO test it
+    ld a,l  ; 09 T
+    cp e    ; 04 T
+    jp nz,true_
+    ld a,h  ; 09 T
+    cp d    ; 09 T
+    jp nz,true_
+    jp false_
+  endif
 
   ;.............................................................
   ;:
@@ -3686,8 +3747,8 @@ return.a:
   sbc hl,de
 l5a4fh:
   bit 7,h
-  jp z,push_false
-  jp push_true
+  jp z,false_
+  jp true_
 
   ;.............................................................
   ;:
@@ -3725,16 +3786,18 @@ compare_de_hl_unsigned:
 
   ;.............................................................
   ;:
-  ;: rdrop   ( -- ) 
+  ;: rdrop   ( -- ) ( R: x -- )
 
   header r_drop_,"rdrop",0
 
+  ; XXX TODO test (old code: pop hl / ret)
   pop hl
-  ret
+  pop de
+  jp (hl)
 
   ;.............................................................
   ;:
-  ;: r@   ( -- ) 
+  ;: r@   ( -- x ) ( R: x --  )
 
   header r_fetch_,"r@",0
 
@@ -3744,9 +3807,9 @@ compare_de_hl_unsigned:
 
   ;.............................................................
   ;:
-  ;: r>   ( -- x ) 
+  ;: r>   ( -- x ) ( R: x -- )
 
-  header to_r_,"r>",0
+  header r_from_,"r>",0
 
   pop bc
   pop hl
@@ -3755,9 +3818,9 @@ compare_de_hl_unsigned:
 
   ;.............................................................
   ;:
-  ;: >r   ( x -- ) 
+  ;: >r   ( x -- )  ( R: -- x )
 
-  header from_r_,">r",0
+  header to_r_,">r",0
 
   call pop_hl
   pop bc
@@ -3778,8 +3841,7 @@ compare_de_hl_unsigned:
 
   ; XXX TODO
   
-  ; XXX TMP
-  jp true_
+  jp true_ ; XXX TMP
 
   if 0
 
@@ -3795,6 +3857,8 @@ previous_key equ $+1
   ld (sys_last_k),a ; delete the last key
   ld h,0
   jp push_hl
+
+  ; XXX TODO see the code of Couplement Forth
 
   endif
 
@@ -3946,7 +4010,6 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   db left_char
   jp emit_
 
-
   ;.............................................................
   ;:
   ;: backspaces  ( +n -- )
@@ -3967,7 +4030,6 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   call branch_if_false_
   dw backspaces_
   jp drop_
-
 
   ;.............................................................
   ;:
@@ -3993,7 +4055,6 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   call one_minus_
   call one_
   jp backspaces_
-
 
 paren_accept_control_char.edit:
   ; check the edit key
@@ -4025,7 +4086,7 @@ paren_accept_control_char.end:
   call to_r_
   call two_dup_
   call minus_
-  call from_r_
+  call r_from_
   call swap_ ; space left
   call branch_if_0_
   dw paren_accept_ascii_char.no
@@ -4063,13 +4124,12 @@ paren_accept_ascii_char.no:
     call minus_
     call to_r_
     call minus_
-    call from_r_
+    call r_from_
     call u_less_
   endif
   call branch_if_false_
   dw paren_accept_control_char_ ; not ASCII
   jp paren_accept_ascii_char_ ; ASCII
-
 
   ;.............................................................
   ;:
@@ -4089,9 +4149,9 @@ paren_accept.begin:
   call dup_
   call c_lit_
   db cr_char
-  call not_equals_  ; other key than return?
+  call equals_  ; return?
   call branch_if_false_
-  dw paren_accept.begin ; yes
+  dw paren_accept_key_ ; no
   ; the return key was pressed
   call minus_cursor_
   call space_
@@ -4235,7 +4295,7 @@ word.parse:
   ; hl = dp
   ld (hl),0x36
   inc hl
-  ld (hl),0xc9
+  ld (hl),0xc9  ; Z80 "ret"
   inc hl
   ld (hl),0x23
   inc hl
@@ -4745,16 +4805,16 @@ branch_5e39:
   jp hold_
 
 sub_5fc2h:
-  call from_r_
+  call r_from_
   ld hl,0x0000
   call push_hl
   call to_r_
   call dup_
-  call from_r_
+  call r_from_
   call u_slash_mod_
   call to_r_
   call swap_
-  call from_r_
+  call r_from_
   call u_slash_mod_
   call to_r_
   ret
@@ -4968,8 +5028,9 @@ l5f82h:
   ;:
   ;: char   ( -- ) 
 
-  header char_,"char",0
+  ; XXX TODO use 'word' instead
 
+  header char_,"char",0
 
   ld hl,(ip_fvar)
 char.skip_blanks:
@@ -5004,7 +5065,6 @@ char.return:
   ;: [char]   ( -- ) 
 
   header bracket_char_,"[char]",immediate
-
 
   ld a,(state)
   and a ; compiling?
@@ -5048,7 +5108,7 @@ char.return:
 
   header bright_,"bright",0
 
-  ld a,brigth_char
+  ld a,bright_char
   jp print_a_and_tos
 
   ;.............................................................
@@ -5194,12 +5254,15 @@ print_a_and_tos:
 
   ;.............................................................
   ;:
-  ;: bload   ( -- )   sf
+  ;: cat   ( n -- )   sf
 
-  header bload_,"bload",0
+  header cat_,"cat",0
 
-; XXX TODO -- rewrite
-  ret
+  call pop_hl
+  ld a,l
+  ld (drive),a
+  ld bc,basic_line_of_cat
+  jp return.bc
 
   ;.............................................................
   ;:
@@ -5212,18 +5275,58 @@ print_a_and_tos:
 
   ;.............................................................
   ;:
-  ;: dload   ( -- )   sf
+  ;: filename!  ( ca len n -- )
+  ;:
+  ;: Copy a filename to a filename buffer.
+  ;:
+  ;: ca len = filename
+  ;: n      = filename buffer (0 or 1)
 
-  header dload_,"dload",0
+  header filename_store_,"filename!",0
 
-; XXX TODO -- rewrite
+  call pop_hl
+  ld a,l
+  ld de,filename.0
+  and a ; filename buffer 0?
+  jr z,filename_store.move
+  ld de,filename.1
+filename_store.move
+  ; de = filename buffer address
+  push de
+  call pop_hl_de
+  ld b,d
+  ld c,e
+  pop de
+  ; hl = filename address
+  ; de = filename buffer address
+  ; bc = filename length
+  ldir
+  ret
+  
+  ;.............................................................
+  ;:
+  ;: dloaded   ( a ca len -- )   sf
+  ;:
+  ;: Load a code file into memory.
+  ;: ca len = filename
+  ;: a      = memory address
+
+  header dload_,"dloaded",0
+
+  call pop_hl
+  ld (file_address),hl
+  ld bc,basic_line_of_load
+  jp return.bc
   ret
 
   ;.............................................................
   ;:
-  ;: dsave   ( -- )   sf
+  ;: dsaved   ( a1 len1 ca2 len2 -- )   sf
+  ;:
+  ;: a1 len1  = memory zone
+  ;: ca2 len2 = filename
 
-  header dsave_,"dsave",0
+  header dsaved_,"dsaved",0
 
 ; XXX TODO -- rewrite
   ret

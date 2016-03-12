@@ -1,0 +1,3 @@
+*.z80s linguist-language=Assembly
+*.mgt binary
+*.tap binary

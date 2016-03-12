@@ -1,13 +1,15 @@
-= Couplement Fortha
+= Couplement Forth
 :author: Marcos Cruz (programandala.net)
 :revdate: 2016-03-12
 
 == Description
 
 Couplement Forth is an STCfootnote:[Subroutine Threaded Code.] Forth
-system under development for ZX Spectrum 128 with G+DOS or Beta DOS.
+system under development for ZX Spectrum, though the specific model
+and DOS is not yet decided: ZX Spectrum 128 with G+DOS or Beta DOS; ZX
+Spectrum +3 with +3DOS; ZX Spectrum +3e with IDEDOS or ResiDOS.
 
-It was forked from
+Couplement Forth was forked from
 http://programandala.net/en.program.forthcoupe.html[ForthCoupe].
 
 == Status
