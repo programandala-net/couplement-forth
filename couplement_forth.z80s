@@ -4,7 +4,7 @@
 ; <http://programandala.net/en.program.couplement_forth.html>
 
   macro version
-    db "A-00-201501100238"
+    db "A-00-201501101819"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -166,6 +166,7 @@ print_comma_char:           equ 0x06 ; when printed (tab) ; XXX OLD
 caps_lock_toggle_char:      equ 0x06 ; when coming directly from the keyboard
 edit_char:                  equ 0x07 ; when coming directly from the keyboard
 cursor_left_char:           equ 0x08
+backspace_char:             equ cursor_left_char
 cursor_right_char:          equ 0x09
 cursor_down_char:           equ 0x0a
 cursor_up_char:             equ 0x0b
@@ -244,7 +245,7 @@ faster_stack_operations: equ true
 
 ; Screen
 
-whole_screen: equ true ; does the input line uses the whole screen?
+whole_screen: equ false ; does the input line uses the whole screen? ; XXX TODO 
 
 ; }}} ----------------------------------------------------------
 ; Start {{{
@@ -937,17 +938,18 @@ chars_on_the_right_of_the_cursor:
 
 keyboard_input:
 
-  if not whole_screen
-    ld a,0x01 ; usually channel "K", lower screen I/O
-    call link.a
-    call rom_cls_lower
-  endif
-
+  ; Init
   ld hl,(tib_address)
   ld (cursor_address),hl
   xor a
   ld (chars_on_the_left_of_the_cursor),a
   ld (chars_on_the_right_of_the_cursor),a
+
+  if not whole_screen
+    ld a,0x01 ; usually channel "K", lower screen I/O
+    call link.a
+    call rom_cls_lower
+  endif
 
 keyboard_input.next_key:
   push hl
@@ -1056,22 +1058,28 @@ keyboard_input.cr:
 ;;  cp c
 ;;  ret z
 
-  if not whole_screen
+  if whole_screen
 
-    ; XXX OLD original
-    ld b,0x00
-    push hl
-    push bc
-    call cr_
-    pop bc
-    pop hl
-    call print_bc_chars_at_hl_or_nothing
-    call space_
-    jp space_
+; XXX OLD -- no cr here, only in 'quit'
+;    jp cr_ 
+    ret
 
   else
 
-    jp cr_
+    ; XXX OLD original
+    ld b,0x00
+; XXX OLD -- no cr here, only in 'quit'
+;    push hl
+;    push bc
+;    call cr_
+;    pop bc
+;    pop hl
+;    call print_bc_chars_at_hl_or_nothing
+;    call space_
+;    jp space_
+
+    ; XXX NEW simpler:
+    jp print_bc_chars_at_hl_or_nothing
 
   endif
 
@@ -1111,9 +1119,9 @@ keyboard_input.delete_right:
 
 keyboard_input.cursor_left:
   ld a,(chars_on_the_left_of_the_cursor)
-  dec a
-  cp 0xff
+  and a
   jp z,keyboard_input.next_key
+  dec a
   ld (chars_on_the_left_of_the_cursor),a
   ld a,(chars_on_the_right_of_the_cursor)
   inc a
@@ -1124,9 +1132,9 @@ keyboard_input.cursor_left:
 
 keyboard_input.cursor_right:
   ld a,(chars_on_the_right_of_the_cursor)
-  dec a
-  cp 0xff
+  and a
   jp z,keyboard_input.next_key
+  dec a
   ld (chars_on_the_right_of_the_cursor),a
   ld a,(chars_on_the_left_of_the_cursor)
   inc a
@@ -1197,8 +1205,28 @@ toggle_overwrite_mode:
 
 refresh_the_command_line:
 
-  call home_ 
+  if whole_screen
 
+
+    ld a,(chars_on_the_left_of_the_cursor)
+    and a
+    jr z,line_cleared
+    inc a
+    ld b,a
+  backspace_to_left_margin:
+    push bc
+    ld a,backspace_char
+    call print_a
+    pop bc
+    djnz backspace_to_left_margin
+
+  else
+
+    call home_ ; bottom screen
+
+  endif
+
+line_cleared:
   ld hl,(tib_address)
   ld a,(chars_on_the_left_of_the_cursor)
   and a
@@ -1835,7 +1863,9 @@ _previous_nfa: defl 0
 
 quit.do:
 ;;  check "before call keyboard_input"
+  call cr_
   call keyboard_input ; XXX TODO -- this will depend on the current input source
+  call space_
   ; XXX TODO -- set '>in' to zero
 ;;  check "before call interpret_"
   call interpret_
@@ -2528,12 +2558,12 @@ spaces.hl:
 
   ;.............................................................
   ;:
-  ;: emit   ( -- )   94
+  ;: emit   ( c -- )   94
 
   header emit_,"emit",0
 
-  ld a,l
   call pop_hl
+  ld a,l
 print_a:
   rst 0x10
   ld a,0xff
@@ -2800,13 +2830,9 @@ compile_jp_de:
 
   header words_,"words",0
 
-  call cr_
-
-  ; XXX FIXME -- runs fine, but at the end shows "undefined word"; future executions list rubbish ; this with new header format only
-  ; XXX TODO -- do not break words at the end of line!
+  ; XXX TODO -- print word info
 
   check "in words!"
-  ;ret ; XXX TMP -- debug check
 
   ld hl,(latest)
 words.print_word:
@@ -2816,7 +2842,8 @@ words.print_word:
   ld c,(hl)
   inc hl
   call print_bc_chars_at_hl
-  call space_
+;;  call space_ ; XXX OLD
+  call cr_ ; XXX NEW TMP
   pop hl ; hl = nfa
   dec hl ; hl = lfa+1
   ld a,(hl)
@@ -2826,8 +2853,7 @@ words.print_word:
   ; hl = nfa of previous word or zero if end of dictionary
   or l ; end of dictionary?
   jr nz,words.print_word ; no
-  ; end of dictionary
-  jp cr_
+  ret
 
   ;.............................................................
   ;:
@@ -2835,10 +2861,24 @@ words.print_word:
 
   header base_,"base",0
 
-  ld hl,base
-  jp push_hl
-base: ; current number base
-  dw 0x000A
+  if false
+    
+    ; XXX OLD
+    ld hl,base
+    jp push_hl
+    call do_variable
+  base: ; current number base
+    dw 0x000A
+
+  else
+    
+    ; XXX NEW -- structure of actual variables
+    call do_variable
+  base: ; current number base
+    dw 0x000A
+    ret
+
+  endif
 
   ;.............................................................
   ;:
@@ -3667,7 +3707,7 @@ l5a4fh:
 
   ;.............................................................
   ;:
-  ;: r>   ( -- ) 
+  ;: r>   ( -- x ) 
 
   header to_r_,"r>",0
 
@@ -3678,7 +3718,7 @@ l5a4fh:
 
   ;.............................................................
   ;:
-  ;: >r   ( -- ) 
+  ;: >r   ( x -- ) 
 
   header r_from_,">r",0
 
