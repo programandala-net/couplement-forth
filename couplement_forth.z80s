@@ -1,10 +1,10 @@
 ; }}} ----------------------------------------------------------
 ; Couplement Forth {{{
-; A Forth for the ZX Spectrum
+; A subroutine-threaded Forth for the ZX Spectrum
 ; <http://programandala.net/en.program.couplement_forth.html>
 
   macro version
-    db "A-00-2015010528"
+    db "A-00-201501090241"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -59,26 +59,22 @@
 ; New: allocate, free, resize
 
 ; complete the empty stack comments
-; improve the keyboard input:
-; * implement an inverse video cursor
 
+; improve the keyboard input:
+; * Implement the SAM Coupé's cursors
+; * When Return is pressed, move the cursor at the end of the line
 
 ; convert the create_header routine to the new header format
 
-; write "r@" and "rdrop"
-
-; dictionary hash table in other ram page
-; dictionary headers in other ram page
+; dictionary headers in other ram page?
 
 ; idea: 'lower' and 'upper' for chars, 'lowers' and 'uppers' for strings
 
-; rename 'sv'... to 'svar'... ?
-; implement 'dvar' or 'dv' the same way
-; maybe 'sv' for absolute addreses and 'svar' for relatives?
+; own printing routine (from my charset224 for ZX BASIC)
 
-; poke BREAKDI (0x5B41) with non-zero to avoid Esc breaking "scroll?"; it does not work in the loader
+; configurable "scroll?" message and behaviour: break it or not with some key
 
-; change the dictionary header format
+; change the dictionary header format?
 
 ; check the compile-only checks
 
@@ -98,18 +94,30 @@
 ; change conditional relative jumps to absolute jumps,
 ; depending on how often the condition is true
 
-; convert 'where'
-
 ; optimize the primitives, e.g.:
 ; don't use "call pad_cfa" but take the pad address directly,
 ; **without using the data stack**.
 
-; new primitives: ?do case ?dup
+; new words: '?do', 'case', '?dup'
 
-; move error messages to a different page and print them with a ROM routine
-; a BASIC program can create and save them to a file
-; the BASIC loader would load the file
-; this would make translations easy
+; new words: 'cmove>' y 'move'
+
+; Ideas for the file interface:
+; 'load' to load a (already opened?) source file.
+; 'emit' is defered and pointed to a file when needed.
+; 'cr' and 'type' are defered and use 'emit' by default.
+; 'page' does 'cls' on screen, but prints a form feed char to printer or file.
+; Gforth and lina work this way (confirm it).
+; 'open' and 'close' manage the files (they parse the names)
+; 'opened' and 'closed' are the non-parsing versions.
+; 'include' would be just 'open throw load'
+; Only the input word is missing. Use 'key' or 'accept'?
+; This way, all input and output could be redirected to files.
+
+; move error messages to a different page and print them with a ROM routine?
+; a BASIC program can create and save them to a file.
+; the BASIC loader would load the file.
+; this would make translations easy.
 
 ; }}} ----------------------------------------------------------
 ; Notes {{{
@@ -927,6 +935,7 @@ keyboard_input.next_key:
   call refresh_the_command_line
   call key_cfa
   call pop_hl
+  ; XXX TODO get the control char routine from a table
   ld a,l ; key code
   pop hl
   cp cursor_left_char
@@ -1561,6 +1570,7 @@ _previous_nfa: defl 0
   ; XXX TODO -- write 
   ld de,lit_cfa
   call compile_call_de
+  ; hl = dp
   call pop_hl ; XXX TODO -- use pop_de instead
   ex de,hl
   jp compile_de
@@ -1994,13 +2004,16 @@ interpret.compile_non_immediate_word:
 compile_de:
   ld hl,(dp)
   jp compile_de_at_hl
+
 compile_call_tos:
   call pop_hl
   ex de,hl
+
 compile_call_de:
   ld hl,(dp)
   ld (hl),0xcd ; Z80 'call'
   inc hl
+
 compile_de_at_hl:
   ld (hl),e
   inc hl
@@ -2213,7 +2226,7 @@ l5330h:
 
   header within,"within",0
 
-  ; XXX TODO
+  ; XXX TODO -- copy from DZX-Forth
   ; : within over - >r - r> u< ;
   ret
 
@@ -2727,7 +2740,7 @@ compile_jp_de:
 
   ld hl,(latest)
 words.print_word:
-  ; hl = nfa of the dictionary word to be listed
+  ; hl = nfa
   push hl
   ld b,0x00
   ld c,(hl)
@@ -3062,7 +3075,7 @@ l56d1h:
 
   header page,"page",0
 
-linked_stream: equ $+1
+linked_stream: equ $+1 ; XXX TODO make it a variable
   ld a,0x00
   cp 0x03 ; printing?
   jp nz,cls_cfa
@@ -3078,9 +3091,10 @@ linked_stream: equ $+1
 
   ld de,do_do
   call compile_call_de
-  call push_hl ; XXX ?
+  ; hl = dp
+  call push_hl ; save the address 'loop' must jump to
   ld l,do_structure_id
-  jp push_hl ; XXX TODO -- push_a
+  jp push_hl ; XXX TODO -- push_a?
 
   ; XXX TODO -- factor to a word ('(do)'?)
 do_do:
@@ -3185,6 +3199,7 @@ l62e0h:
   call structured
   ld de,l574fh
   call compile_call_de
+  ; hl = dp
   jp sub_57a3h
 
 sub_57a3h:
@@ -3209,6 +3224,7 @@ sub_57a3h:
   call structured
   ld de,l5789h
   call compile_call_de
+  ; hl = dp
   jp sub_57a3h
 
   ;.............................................................
@@ -3367,6 +3383,7 @@ link.a: ; XXX NEW symbol -- faster calls
 
   ld de,l582bh
   call compile_call_de
+  ; hl = dp
   ld de,(ip_fvar)
   inc de
 l5812h:
@@ -3527,6 +3544,7 @@ push_false:
   call structured
   ld de,question_branch_cfa
   call compile_call_de
+  ; hl = dp
   jp sub_57a3h
 
   ;.............................................................
@@ -3556,6 +3574,25 @@ l5a4fh:
   ; XXX TODO -- direct version, no swap
   call swap_cfa
   jp less_than_cfa
+
+  ;.............................................................
+  ;:
+  ;: rdrop   ( -- ) 
+
+  header r_drop,"rdrop",0
+
+  pop hl
+  ret
+
+  ;.............................................................
+  ;:
+  ;: r@   ( -- ) 
+
+  header r_fetch,"r@",0
+
+  pop hl
+  push hl
+  jp push_hl
 
   ;.............................................................
   ;:
@@ -3768,12 +3805,13 @@ word.parse:
 
   ld de,question_branch_cfa
   call compile_call_de
-  call push_hl
+  ; hl = dp
+  call push_hl ; save the address of the jump address
   inc hl
   inc hl
-  ld (dp),hl
+  ld (dp),hl ; skip it
   ld l,if_structure_id
-  jp push_hl
+  jp push_hl ; XXX TODO -- push_a?
 
   ;.............................................................
   ;:
@@ -3785,6 +3823,7 @@ word.parse:
   call structured
   ld de,branch_cfa
   call compile_call_de
+  ; hl = dp
   push hl
   inc hl
   inc hl
@@ -3823,6 +3862,7 @@ word.parse:
   ; XXX TODO -- remove, adapt
   ld de,create_header
   call compile_call_de
+  ; hl = dp
   ld (hl),0x11
   inc hl
   call push_hl
@@ -3831,6 +3871,7 @@ word.parse:
   ld (dp),hl
   ld de,compile_call_de
   call compile_call_de
+  ; hl = dp
   ld (hl),0x36
   inc hl
   ld (hl),0xc9
@@ -3893,6 +3934,7 @@ word.parse:
   call structured
   ld de,question_branch_cfa
   call compile_call_de
+  ; hl = dp
   call push_hl
   inc hl
   inc hl
@@ -3910,6 +3952,7 @@ word.parse:
   call structured
   ld de,branch_cfa
   call compile_call_de
+  ; hl = dp
   push hl
   inc hl
   inc hl
@@ -3938,20 +3981,22 @@ word.parse:
   call create_header
   ld de,do_variable
   call compile_call_de
-  ld hl,(dp)
-  ld (hl),0xc9 ; ret Z80 command ; XXX ? -- why needed?
+  ; hl = dp
+;;  ld hl,(dp) ; XXX OLD unnecessary ; XXX TODO fix in ForthCoupe too
+  ld (hl),0xc9 ; Z80 ret ; XXX ? -- why needed?
   inc hl
-;;  ld (hl),0x00 ; XXX OLD
+;;  ld (hl),0x00 ; XXX TODO configurable
   inc hl
-;;  ld (hl),0x00 ; XXX OLD
+;;  ld (hl),0x00 ; XXX TODO configurable
   inc hl
   ld (dp),hl
   jp save_dictionary_pointers
 
+; XXX TODO create word '(variable)' or 'do_variable'?
 do_variable:
   pop hl
   push hl
-  inc hl
+  inc hl ; XXX TODO this skips the (useless?) 'ret' compiled by 'variable'
   jp push_hl
 
   ;.............................................................
@@ -3963,9 +4008,11 @@ do_variable:
   call create_header
   ld de,do_constant
   call compile_call_de
+  ; hl = dp
   call pop_hl
-  ex de,hl
-  ld hl,(dp)
+  ; XXX TODO two next lines could be omited if only pop_de could be used instead of pop_hl above:
+  ex de,hl ;
+  ld hl,(dp) 
   ld (hl),0xc9 ; ret Z80 command ; XXX ? -- why needed?
   inc hl
   ld (hl),e
@@ -4006,21 +4053,21 @@ dot_code_field.do:
 
   ;.............................................................
   ;:
-  ;: cmove   ( -- ) 
+  ;: cmove   ( ca1 ca2 len -- ) 
 
   header cmove,"cmove",0
 
   call pop_hl
   ld a,h
-  or l
-  jr z,l5cfeh
+  or l ; something to move?
+  jr z,cmove.end ; nothing
   ld b,h
   ld c,l
   call pop_hl_de
   ex de,hl
   ldir
   ret
-l5cfeh:
+cmove.end:
   jp pop_hl_de
 
   ;.............................................................
@@ -4570,6 +4617,7 @@ char.return:
   ld c,l
   ld de,lit_cfa
   call compile_call_de
+  ; hl = dp
   ld (hl),c
   inc hl
   ld (hl),b
@@ -4922,7 +4970,7 @@ state:
   ;:
   ;: unused ( -- u )  94
   ;:
-  ;: Return the the amount of space remaining in the region addressed by 'here', in
+  ;: Return the amount of space remaining in the region addressed by 'here', in
   ;: address units.
   ;: XXX TODO adapt -- implement and use the heap pointer as top limit
 
