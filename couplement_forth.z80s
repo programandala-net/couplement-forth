@@ -4,7 +4,7 @@
 ; <http://programandala.net/en.program.couplement_forth.html>
 
   macro version
-    db "A-00-201501090241"
+    db "A-00-201501100141"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -55,6 +55,10 @@
 
 ; }}} ----------------------------------------------------------
 ; XXX TODO list {{{
+
+; 2015-01-09: Investigate why 'dubflag_fvar' requires a 0x01, not simply <>0.
+; If 'and a' is used instead of 'cp 0x01', the "stack empty" error happens
+; while compiling a number.
 
 ; New: allocate, free, resize
 
@@ -479,6 +483,17 @@ return_stack_max_top:
   ; The return stack grows from bottom (high memory) to top (low memory)
   defs 0x0100
 return_stack_bottom:
+
+; }}} ----------------------------------------------------------
+; Font {{{
+
+; XXX TODO Taken from SE BASIC -- credit
+
+cursors:
+  incbin    "font/cursors.data"
+
+font:
+  incbin    "font/geneva_mono.data"
 
 ; }}} ----------------------------------------------------------
 ; Screen tools {{{
@@ -1755,10 +1770,10 @@ _previous_nfa: defl 0
   call left_bracket_cfa
 
 quit.do:
-  check "before call keyboard_input"
+;;  check "before call keyboard_input"
   call keyboard_input ; XXX TODO -- this will depend on the current input source
   ; XXX TODO -- set '>in' to zero
-  check "before call interpret_cfa"
+;;  check "before call interpret_cfa"
   call interpret_cfa
   ld a,(state)
   and a ; compiling?
@@ -1905,26 +1920,28 @@ interpret.skip_space:
   jp nz,interpret.word_found
 
   ; the word was not found
-  check "the word was not found"
+  check "the word was not found "
   ld hl,(ip_fvar)
-  call push_hl ; XXX TODO -- avoid this...
-  call number_cfa ; XXX TODO -- ...using other entry point
+;  call push_hl ; XXX OLD -- avoided... 
+;  call number_cfa ; ...using other entry point:
+  call number_hl ; XXX NEW
   ld hl,(numbit_fvar) ; XXX TODO -- check if this variable is actually needed
   ld (ip_fvar),hl
   call pop_hl
   ld a,h
   or l
   jp z,l520ah
-  ;; ld a,0x01 ; XXX OLD -- not needed, because A<>0
+  ld a,0x01 ; XXX OLD -- not needed, because A<>0
   ld (dubflag_fvar),a
   call push_hl
 l520ah:
   ld a,(state)
-  and a
-  jp z,l5242h
+  and a ; executing?
+  jp z,l5242h ; jump if executing
+  ; compiling:
   ld a,(dubflag_fvar)
-  ;;cp 0x01 ; XXX OLD
-  and a ; XXX NEW
+  cp 0x01 ; XXX OLD
+;  and a ; XXX NEW
   jp nz,l521fh
   call pop_hl_de
   ex de,hl
@@ -1942,8 +1959,8 @@ l521fh:
   inc hl
   ld (dp),hl
   ld a,(dubflag_fvar)
-  ;;cp 0x01 ; XXX OLD
-  and a ; XXX NEW
+  cp 0x01 ; XXX OLD
+;  and a ; XXX NEW
   jp nz,l5242h
   xor a
   ld (dubflag_fvar),a
@@ -2050,7 +2067,7 @@ paren_find.name_complete:
   ; b = name length
 
   ld de,(ip_fvar) ; XXX TMP -- debugging
-  check "Name1:"
+;;  check "Name1:"
   check.string.de_b
   
   ld a,b
@@ -2071,17 +2088,17 @@ length_of_name_searched_for: equ $+1
   cp (hl) ; lengths are equal?
   jp nz,the_names_are_different 
   ; lengths are equal
-  check "=L"
+;;  check "=L"
   push hl ; save the nfa of the dictionary word
   ld de,(ip_fvar)
   ld b,a
   ; de = address of the name to be searched for
   ; b = its length
-  check "Name2:"
+;;  check "Name2:"
   check.string.de_b
 
 next_char:
-  ;;check "next char"
+;;  check "next char"
   inc hl
   ; de = address of current char of the name to be searched for
   ; b = its remaining length
@@ -2097,7 +2114,7 @@ next_char:
   or %100000 ; convert to lowercase
 
 compare_char:
-  check "Compare:"
+;;  check "Compare:"
   check.char.a
   cp c
   jp nz,one_char_is_different
@@ -2114,10 +2131,10 @@ compare_char:
   jp push_hl ; return the cfa of the dictionary word 
 
 one_char_is_different:
-  check "!c"
+;;  check "!c"
   pop hl ; restore the nfa of the dictionary word
 the_names_are_different:
-  check "!n"
+;;  check "!n"
   ; hl = nfa of the dictionary word
   dec hl ; to high byte of lfa
   ld a,(hl)
@@ -2289,14 +2306,22 @@ l5330h:
 
   ;.............................................................
   ;:
-  ;: number   ( a u -- n | d )   comus
+  ;: number   ( ca -- n | d )   comus
+  ;:
+  ;: ca = address of the first char ; XXX ;: TODO -- confirm
+  ;:
+  ;: Convert the ASCII characters in the input buffer or source code area into
+  ;: a double precision number. If the number is below 65536 convert it into a
+  ;: single precision number.
 
   header number,"number",0
 
   call pop_hl
+number_hl:
   ld a,(hl)
   cp "-"
   jp nz,l53f1h ; not a negative number
+
   ; negative number
   inc hl
   ld a,0x01 ; XXX TODO -- remove?, because a<>0; check how this flag is used later... no way, several bits are used apart
@@ -2311,15 +2336,15 @@ l53f1h:
   ld (number_part_2),hl
 l5400h:
   ld a,(de)
-  cp 0x30
-  check "undefined 1"
+  cp "0" ; any invalid digit?
+;;  check "undefined 1"
   jp c,undefined_word_error
   ld c,a
   ld a,(base)
   ld b,0x0a
-  cp b
+  cp b ; base 10?
   jp nc,l5415h
-  add a,0x30
+  add a,"0"
   cp c
   check "undefined 2"
   jp c,undefined_word_error
@@ -2408,6 +2433,7 @@ l53d8h:
   call push_hl
 
 number.return:
+  check "number.return"
   xor a
   ld (negative_number_flags),a
   ret
@@ -2479,6 +2505,8 @@ print_a:
   ld(sys_scr_ct),a ; no "scroll?" message
   ret
 
+;  include "inc/emit.z80s" ; XXX TODO
+
   ;.............................................................
   ;:
   ;: u.   ( -- ) 
@@ -2534,7 +2562,11 @@ l54dch:
 
   ;.............................................................
   ;:
-  ;: /mod   ( -- ) 
+  ;: /mod   ( n1 n2 -- n3 n4 ) 
+  ;:
+  ;: Divide the second single precision number on the stack by the top single
+  ;: precision number and leave the modulus (remainder) as second on the stack
+  ;: and the quotient on the top of the stack.
 
   header slash_mod,"/mod",0
 
@@ -2672,6 +2704,7 @@ create_header.store_char
   call compile_jp_de
   jp save_dictionary_pointers
 
+  ; XXX TODO convert this into a word
 compile_jp_de:
   ld hl,(dp)
   ld (hl),0xc3 ; Z80 'jp'
@@ -2727,6 +2760,8 @@ compile_jp_de:
   ;.............................................................
   ;:
   ;: words   ( -- )   94
+  ;:
+  ;: List all the words in the context dictionary.
 
   header words,"words",0
 
@@ -3017,11 +3052,11 @@ latest: equ $+1
   jr z,l56cch
   ld (pairs_fvar),a
   call push_hl
-  jp l56d1h
+  jp semicolon.end
 l56cch:
   xor a
   ld (pairs_fvar),a
-l56d1h:
+semicolon.end:
   call left_bracket_cfa
   jp save_dictionary_pointers
 
@@ -3280,12 +3315,13 @@ sub_57a3h:
     push bc
     ; 63 T Cycles
   else ; XXX NEW -- faster
-    ld hl,0x000A
+    ld hl,0x0004
     add hl,sp
     ld a,(hl)
-    ld l,(hl)
-    ld h,a
-    ; 39 T Cycles
+    inc hl
+    ld h,(hl)
+    ld l,a
+    ; 41 T Cycles
   endif
   jp push_hl
 
@@ -3487,7 +3523,7 @@ return.a:
 
   header equals,"=",0
 
-  ; XXX TODO -- investigate falter alternative with "sbc hl,de", and 0 in hl as result!
+  ; XXX TODO -- investigate a faster alternative with "sbc hl,de", and 0 in hl as result!
   ; XXX TODO -- write "<>"
   call pop_hl_de
   ld a,l  ; 09 T
@@ -3551,7 +3587,7 @@ push_false:
   ;:
   ;: <   ( n1 n2 -- ff ) 
 
-  header less_than,"<",0
+  header less,"<",0
 
   call pop_hl_de
   ex de,hl
@@ -3569,11 +3605,11 @@ l5a4fh:
   ;:
   ;: >   ( n1 n2 -- ff ) 
 
-  header greater_than,">",0
+  header greater,">",0
 
   ; XXX TODO -- direct version, no swap
   call swap_cfa
-  jp less_than_cfa
+  jp less_cfa
 
   ;.............................................................
   ;:
@@ -3624,10 +3660,39 @@ l5a4fh:
 
   ;.............................................................
   ;:
+  ;: key?   ( -- f ) 
+
+  header key_question,"key?",0
+
+  ; XXX TMP
+  ld hl,true
+  jp pop_hl
+
+  ; XXX TODO
+  if 0
+
+  ld a,(sys_last_k)
+  ld (previous_key),a
+key_question.1
+  ld a,(sys_last_k)
+previous_key equ $+1
+  cp 0 ; a different key?
+  jp z,key.1
+  ld l,a ; save the key
+  xor a
+  ld (sys_last_k),a ; delete the last key
+  ld h,0
+  jp push_hl
+
+  endif
+
+  ;.............................................................
+  ;:
   ;: key   ( -- c ) 
 
   header key,"key",0
 
+  ; XXX TODO call 'key?'
   ld a,(sys_last_k)
   ld (previous_key),a
 key.1
@@ -3682,6 +3747,9 @@ previous_key equ $+1
   ;.............................................................
   ;:
   ;: pad   ( -- a ) 
+  ;:
+  ;: Places the address of the pad on the top of the stack. See the definition
+  ;: of INPUT under NUMBER.
 
   header pad,"pad",0
 
@@ -3715,6 +3783,9 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ;.............................................................
   ;:
   ;: query   ( -- ) 
+  ;:
+  ;: Clear the input buffer and accept character input until RETURN is
+  ;: pressed.  It can be edited in the normal way.
 
   header query,"query",0
 
@@ -3732,6 +3803,10 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ;.............................................................
   ;:
   ;: retype   ( -- ) 
+  ;:
+  ;: This is similar to QUERY but does not clear the input buffer enabling the
+  ;: text to be edited. Move the text into PAD starting at the second address
+  ;: of PAD before calling RETYPE.
 
   header retype,"retype",0
 
@@ -4227,6 +4302,8 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   call left_bracket_cfa
 ;;  ld (ldflg_fvar),a ; XXX OLD -- formerly used by the BASIC interface
   call page_cfa
+  ld hl,font-256
+  ld (sys_chars),hl
   call bootmessage_cfa
   ; XXX NOTE -- 2013-02-02 quit_cfa changed to abort_cfa, after FIG-Forth.
   jp abort_cfa
@@ -4333,7 +4410,7 @@ l5de3h:
   ld hl,0x0009
   call push_hl
   call over_cfa
-  call less_than_cfa
+  call less_cfa
   call question_branch_cfa
   dw branch_5e39
   ld hl,0x0007
