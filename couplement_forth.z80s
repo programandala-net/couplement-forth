@@ -4,7 +4,7 @@
 ; <http://programandala.net/en.program.couplement_forth.html>
 
   macro version
-    db "A-00-20150112331"
+    db "A-00-20150110032"
   endm
 
 ; Copyright (C) 2015 Marcos Cruz (programandala.net)
@@ -55,6 +55,14 @@
 
 ; }}} ----------------------------------------------------------
 ; XXX TODO list {{{
+
+; 2015-01-11: configurable size optimization (JR/JP) and:
+; if size_optimization
+;  jp push_l
+; else
+;  ld h,0
+;  jp push_hl
+; endif
 
 ; 2015-01-10: key translation table to associate key codes to chars. 
 
@@ -293,7 +301,7 @@ len1_fvar:
 ; Code based on a similar code of "Finen per Imago":
 ; <http://programandala.net/es.programa.finen_per_imago.html>
 
-checks: equ 0
+debug: equ 0
 
   macro save_registers
     push iy
@@ -361,7 +369,7 @@ check:
 
   macro check,  message,condition
     ;if (nul condition) ? check : check or condition ; XXX FIXME
-    if checks
+    if debug
       call check
       db message
       db 0 ; end of message
@@ -375,7 +383,7 @@ check.char.a:
   ret
 
   macro check.char.a
-    if checks
+    if debug
       call check.char.a
     endif
   endm
@@ -404,7 +412,7 @@ check.cstring.hl:
 
   macro check.cstring.hl
     ; print the counted string at HL
-    if checks
+    if debug
       call check.cstring.hl
     endif
   endm
@@ -420,8 +428,18 @@ check.string.de_b:
 
   macro check.string.de_b
     ; print B characters at DE
-    if checks
+    if debug
       call check.string.de_b
+    endif
+  endm
+
+  macro border,color
+    ; change the border to color
+    if debug
+      push af
+      ld a,color
+      call border.a
+      pop af
     endif
   endm
 
@@ -925,15 +943,19 @@ keyboard_input.next_key:
   ld a,l ; key code
   pop hl
 
-  if false ; XXX TODO vector_table_input
+  if false
 
+  cp 128 ; ASCII?
+  jp nc,keyboard_input.next_key ; not ASCII
   cp " " ; printable?
   jr c,printable_char ; yes
+  ; control char
   cp 15 ; not used control char (>14)?
   jp nc,keyboard_input.next_key ; yes
   cp 6 ; not used control char (<6)?
   jp c,keyboard_input.next_key ; yes
-  ; XXX TODO
+
+  ; XXX TODO jump table here
 
   else
 
@@ -955,10 +977,12 @@ keyboard_input.next_key:
   jp z,keyboard_input.cursor_up
   cp delete_left_char ; 12
   jp z,keyboard_input.delete_left
-  cp carriage_return_char ; 13
+  cp cr_char ; 13
   jp z,keyboard_input.cr
   cp extended_mode_char ; 14 ; XXX TMP
   jp z,toggle_overwrite_mode
+  cp 128 ; ASCII?
+  jp nc,keyboard_input.next_key ; not ASCII
 
   endif
 
@@ -1003,7 +1027,7 @@ keyboard_input.cr:
   ld c,a
   ld b,0x00
   add hl,bc
-  ld (hl),carriage_return_char
+  ld (hl),cr_char
   ld (etib_fvar),hl
 
   if not whole_screen
@@ -1523,24 +1547,19 @@ _previous_nfa: defl 0
 
   ; XXX TODO -- justified print routine
   call print_inline_message
-  db "Couplement Forth"
-  db carriage_return_char
-  db "(version "
+  db "Couplement Forth",cr_char,"(version "
   version
-  db ")"
-  db carriage_return_char
-  db "Copyright ",127," 2015 Marcos Cruz"
-  db carriage_return_char
-  db "(programandala.net)"
-  db carriage_return_char
-  db "Couplement Forth comes with"
-  db carriage_return_char
-  db "ABSOLUTELY NO WARRANTY;"
-  db carriage_return_char
-  db "for details type 'license'."
-  db carriage_return_char
-  db "Type 'bye' to exit"
-  db "."+0x80
+  db ")",cr_char
+  db "Copyright ",127," 2015 Marcos Cruz",cr_char
+  db "(programandala.net)",cr_char
+  db "Couplement Forth comes with",cr_char
+  db "ABSOLUTELY NO WARRANTY;",cr_char
+  db "for details type 'license'.",cr_char
+  db "Type 'bye' to exit.",cr_char+0x80
+  call unused_
+  call dot_
+  call print_inline_message
+  db "bytes free","."+0x80
   ret
   
   ;.............................................................
@@ -1568,15 +1587,15 @@ _previous_nfa: defl 0
   db "it under the terms of the GNU General Public License as published by "
   db "the Free Software Foundation; either version 3 of the License, or "
   db "(at your option) any later version."
-  db carriage_return_char
+  db cr_char
   db "Couplement Forth is distributed in the hope that it will be useful, "
   db "but WITHOUT ANY WARRANTY; without even the implied warranty of "
   db "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
   db "GNU General Public License for more details."
-  db carriage_return_char
+  db cr_char
   db "You should have received a copy of the GNU General Public License "
   db "along with Couplement Forth. If not, see http://www.gnu.org/licenses/."
-  db carriage_return_char+0x80
+  db cr_char+0x80
   ret
 
   ;.............................................................
@@ -1968,7 +1987,7 @@ interpret.skip_space:
   jp z,interpret.skip_space ; 
 ;  cp standard_tab_char ; XXX TODO -- experimental
 ;  jr z,interpret.skip_space
-  cp carriage_return_char
+  cp cr_char
   ret z
 
   ; First char to interpret found
@@ -2116,7 +2135,7 @@ paren_find.parse_name:
   ld a,(de)
   cp space_char
   jp z,paren_find.name_complete
-  cp carriage_return_char
+  cp cr_char
   jp z,paren_find.name_complete
 ;  cp standard_tab_char ; XXX TODO -- experimental
 ;  jp z,paren_find.name_complete
@@ -2687,7 +2706,7 @@ create_header.skip_blanks:
   ld a,(de)
   cp space_char
   jr z,create_header.skip_blanks
-  cp carriage_return_char
+  cp cr_char
   jp z,empty_name_error
 
   ld hl,(dp)
@@ -2708,7 +2727,7 @@ create_header.next_char:
   ld a,(de)
   cp space_char
   jr z,create_header.name_complete
-  cp carriage_return_char
+  cp cr_char
   jr z,create_header.name_complete
   inc b
   inc de
@@ -3473,6 +3492,7 @@ link.a: ; XXX NEW symbol -- faster calls
   ; XXX TODO adapt
   call pop_hl
   ld a,l
+border.a:
   out (0xfe),a
   ret
 
@@ -3605,14 +3625,8 @@ return.a:
   jr nz,push_false
   ld a,h  ; 09 T
   cp d    ; 09 T
-  jr nz,push_false
-push_true:
-  ld hl,true 
-  jp push_hl
-
-push_false:
-  ld hl,false
-  jp push_hl
+  jp nz,false_
+  jp true_
 
   ;.............................................................
   ;:
@@ -3689,7 +3703,7 @@ l5a4fh:
   ;:
   ;: u<   ( n1 n2 -- ff )
 
-  header u_less_,"uless",0 ; XXX TMP name
+  header u_less_,"u<",0 ; XXX TMP name
 
   call pop_hl_de
   ex de,hl
@@ -3762,11 +3776,11 @@ compare_de_hl_unsigned:
 
   header key_question_,"key?",0
 
-  ; XXX TMP
-  ld hl,true
-  jp pop_hl
-
   ; XXX TODO
+  
+  ; XXX TMP
+  jp true_
+
   if 0
 
   ld a,(sys_last_k)
@@ -3961,6 +3975,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
 
   header paren_accept_control_char_,"(accept-control-char)",0
 
+  border 2 ; XXX INFORMER
   ; check the delete key
   call dup_
   call c_lit_
@@ -4006,7 +4021,7 @@ paren_accept_control_char.end:
 
   header paren_accept_ascii_char_,"(accept-ascii-char)",0
 
-paren_accept_ascii_char.0:
+  border 4 ; XXX INFORMER
   call to_r_
   call two_dup_
   call minus_
@@ -4040,12 +4055,20 @@ paren_accept_ascii_char.no:
   call bl_
   call c_lit_
   db 127
-  call within_ ; ASCII?
-  call zero_equals_
+  if false
+    ; XXX FIXME
+    call within_ ; ASCII?
+  else
+    call over_
+    call minus_
+    call to_r_
+    call minus_
+    call from_r_
+    call u_less_
+  endif
   call branch_if_false_
-  dw paren_accept_ascii_char.0 ; ASCII
-  ; not ASCII
-  jp paren_accept_control_char_
+  dw paren_accept_control_char_ ; not ASCII
+  jp paren_accept_ascii_char_ ; ASCII
 
 
   ;.............................................................
@@ -4066,19 +4089,15 @@ paren_accept.begin:
   call dup_
   call c_lit_
   db cr_char
-  call equals_  ; enter key?
+  call not_equals_  ; other key than return?
   call branch_if_false_
-  dw paren_accept.repeat
-  ; the end
+  dw paren_accept.begin ; yes
+  ; the return key was pressed
   call minus_cursor_
   call space_
   call drop_
   call nip_
   jp nip_
-paren_accept.repeat
-  call paren_accept_key_
-  call branch_
-  dw paren_accept.begin
 
   ;.............................................................
   ;:
@@ -4547,7 +4566,7 @@ find.skip_blank:
   ld a,(de)
   cp space_char
   jp z,find.skip_blank
-  cp carriage_return_char
+  cp cr_char
   jp z,find.skip_blank
   ld (ip_fvar),de
 
@@ -4958,7 +4977,7 @@ char.skip_blanks:
   ld a,(hl)
   cp space_char
   jr z,char.skip_blanks
-  cp carriage_return_char
+  cp cr_char
   jr nz,char.found
   ld l,0 ; result when not found
   jp char.return
@@ -4970,7 +4989,7 @@ char.skip_remaining:
   ld a,(hl)
   cp space_char
   jr z,char.restore
-  cp carriage_return_char
+  cp cr_char
   jr nz,char.skip_remaining
 
 char.restore:
