@@ -1,126 +1,37 @@
 ; }}} ----------------------------------------------------------
 ; Couplement Forth {{{
-; A subroutine-threaded Forth for the ZX Spectrum
+; A subroutine-threaded Forth system for ZX Spectrum
 ; <http://programandala.net/en.program.couplement_forth.html>
 
-; Unfinished
+; XXX UNDER DEVELOPMENT
 
   macro version
-    db "A-00-2015012123"
+    ; After Semantic Versioning (http://semver.org)
+    db "0.1.0+20160316"
   endm
 
-; Copyright (C) 2015 Marcos Cruz (programandala.net)
-
-; Couplement Forth is free software; you can redistribute it and/or modify it
-; under the terms of the GNU General Public License as published by the Free
-; Software Foundation; either version 3 of the License, or (at your option)
-; any later version.
-; 
-; Couplement Forth is distributed in the hope that it will be useful, but
-; WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-; or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-; more details.
-; 
-; You should have received a copy of the GNU General Public License along with
-; Couplement Forth. If not, see http://www.gnu.org/licenses/.
+; Copyright (C) 2015,2016 Marcos Cruz (programandala.net)
 
 ; --------------------------------------------------------------
+; License
 
-; Couplement Forth is a fork of an abandoned project:
-;   ForthCoupe (version A-00-20141227)
-;   (<http://programandala.net/en.program.forthcoupe.html>)
+; You may do whatever you want with this work, so long as you
+; retain all copyright notices, all credit notices, and this
+; license in all files of all redistributed copies and derived
+; works. There is no warranty.
+
+; --------------------------------------------------------------
+; Credits
+
+; Couplement Forth was forked from ForthCoupe
+; (http://programandala.net/en.program.forthcoupe.html),
+; an abandoned project based on John A. Avis' SamForth
+; (http://programandala.net/en.program.samforth.html).
 
 ; --------------------------------------------------------------
 ; Development history
 
 ; See <http://en.program.couplement_forth.html>.
-
-; }}} ----------------------------------------------------------
-; XXX FIXME list {{{
-
-; ';' can be interpreted, even after adding 'or compile_only' to its header!
-;
-; Esc can break the program when printing
-
-; }}} ----------------------------------------------------------
-; XXX TODO list {{{
-
-; 2015-01-11: configurable size optimization (JR/JP) and:
-; if size_optimization
-;  jp push_l
-; else
-;  ld h,0
-;  jp push_hl
-; endif
-
-; 2015-01-10: key translation table to associate key codes to chars. 
-
-; 2015-01-09: Investigate why 'dubflag_fvar' requires a 0x01, not simply <>0.
-; If 'and a' is used instead of 'cp 0x01', the "stack empty" error happens
-; while compiling a number.
-
-; New: allocate, free, resize
-
-; complete the empty stack comments
-
-; improve the keyboard input:
-; * Implement the SAM Coupé's cursors
-; * When Return is pressed, move the cursor at the end of the line
-
-; convert the create_header routine to the new header format
-
-; dictionary headers in other ram page?
-
-; idea: 'lower' and 'upper' for chars, 'lowers' and 'uppers' for strings
-
-; own printing routine (from my charset224 for ZX BASIC)
-
-; configurable "scroll?" message and behaviour: break it or not with some key
-
-; change the dictionary header format?
-
-; check the compile-only checks
-
-; implement pop_de routine (useful for '>r') and other cases marked in the code
-
-; try number 
-
-; benchmark the data stack code
-
-; move all vars into the code, to save space and time
-; choose the point where the variable is fetch more often
-
-; standard error numbers
-
-; make links point to count byte, to make vocabulary searching faster
-
-; change conditional relative jumps to absolute jumps,
-; depending on how often the condition is true
-
-; optimize the primitives, e.g.:
-; don't use "call pad_" but take the pad address directly,
-; **without using the data stack**.
-
-; new words: '?do', 'case', '?dup'
-
-; new words: 'cmove>' y 'move'
-
-; Ideas for the file interface:
-; 'load' to load a (already opened?) source file.
-; 'emit' is defered and pointed to a file when needed.
-; 'cr' and 'type' are defered and use 'emit' by default.
-; 'page' does 'cls' on screen, but prints a form feed char to printer or file.
-; Gforth and lina work this way (confirm).
-; 'open' and 'close' manage the files (they parse the names)
-; 'opened' and 'closed' are the non-parsing versions.
-; 'include' would be just 'open throw load'
-; Only the input word is missing. Use 'key' or 'accept'?
-; This way, all input and output could be redirected to files.
-
-; }}} ----------------------------------------------------------
-; Stack notation {{{
-
-; XXX TODO
 
 ; }}} ----------------------------------------------------------
 ; Symbols {{{
@@ -152,8 +63,8 @@ builds_structure_id:  equ 0x09
 ; Other
 
 false:  equ 0x0000
-; XXX NOTE -- the legacy code uses 1 as true flag
 true:   equ 0xffff
+; XXX FIXME -- the legacy code uses 1 as true flag
 
 ; }}} ----------------------------------------------------------
 ; Assembling options {{{
@@ -179,11 +90,11 @@ any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 ; Execution speed
 
 ; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
-; default.  In fast mode, some stack checking is omited.  The words 'slow' and
-; 'fast' change the current mode.
+; default.  In fast mode, some stack checking is omited.  The words `slow` and
+; `fast` change the current mode.
 ;
 ; In order to save space, one of both modes can be omited in the kernel.  In
-; this case the words 'slow' and 'fast' are created as alias of 'noop'.
+; this case the words `slow` and `fast` are created as alias of `noop`.
 
 slow_mode_available: equ true
 fast_mode_available: equ true
@@ -197,9 +108,9 @@ faster_stack_operations: equ true
 ; ..............................
 ; Size
 
-; You can save some bytes, but the code will be a bit slower.  The size
-; optimization uses relative jumps when possible, and substitutes some inline
-; code with calls.
+; When size optimization is on, relative jumps are used when possible, and
+; some inline code is replaced with calls.  Some bytes will be saved, but the
+; code will be a bit slower.  
 
 ; XXX TODO
 size_optimization: equ false
@@ -209,27 +120,6 @@ size_optimization: equ false
 
 ; XXX TODO 
 whole_screen: equ false ; does the input line uses the whole screen?
-
-; }}} ----------------------------------------------------------
-; XXX TMP -- Notes {{{
-
-; About jumps
-
-; Jumps are being adapted: Since memory is not a constraint, absolute jumps
-; are used where speed is important. Relative jumps are used otherwise (e.g.
-; keyboard input, printing, etc.). The conditional jumps have different
-; timings depending on the result of the condition. This adaptation is a work
-; in progress.
-
-;! Notes:
-
-;!  timing of alternatives in T Cycles:
-;!
-;!  jp nz,unstructured_error   ; error: 10; no error: 01
-;!  ret                        ; error: 00; no error: 10
-;!
-;!  ret z                      ; error: 05; no error: 11
-;!  jp unstructured_error      ; error: 10; no error: 00
 
 ; }}} ----------------------------------------------------------
 ; Start {{{
@@ -243,6 +133,8 @@ start: equ 25000
 
 ; }}} ----------------------------------------------------------
 ; Interface to BASIC {{{
+
+; XXX TODO
 
 filename_length equ 10
 
@@ -507,23 +399,12 @@ return_stack_max_top:
 return_stack_bottom:
 
 ; }}} ----------------------------------------------------------
-; Font {{{
-
-; XXX TODO Taken from SE BASIC -- credit
-
-cursors:
-  incbin    "font/cursors.data"
-
-font:
-  incbin    "font/geneva_mono.data"
-
-; }}} ----------------------------------------------------------
 ; Screen tools {{{
 
 ; XXX TODO -- factor all this to Forth words, when possible
 
 get_stack_coords_and_copy_to_bc:
-  ; XXX TODO changed by 'slow' and 'fast'
+  ; XXX TODO changed by `slow` and `fast`
   call pop_hl_de
   ld b,l
   ld a,b
@@ -943,7 +824,7 @@ endif
 ; }}} ----------------------------------------------------------
 ; Keyboard input {{{
 
-; XXX TODO convert to 'accept'
+; XXX TODO convert to `accept`
 
 cursor_address:
   ; Address of the cursor in the input buffer
@@ -1085,7 +966,7 @@ keyboard_input.cr:
 
   if whole_screen
 
-; XXX OLD -- no cr here, only in 'quit'
+; XXX OLD -- no cr here, only in `quit`
 ;    jp cr_ 
     ret
 
@@ -1093,7 +974,7 @@ keyboard_input.cr:
 
     ; XXX OLD original
     ld b,0x00
-; XXX OLD -- no cr here, only in 'quit'
+; XXX OLD -- no cr here, only in `quit`
 ;    push hl
 ;    push bc
 ;    call cr_
@@ -1303,6 +1184,7 @@ print_bc_chars_at_hl_or_nothing:
 print_inline_message:
   ; Print a message stored rigth after the call.
   ; The message has the bit 7 of its last char set.
+  ; XXX TODO -- use counted strings instead
   pop hl
   call print_message_at_hl
   jp (hl)
@@ -1376,7 +1258,7 @@ wrap_print_message_at_hl.end_of_message_found:
 ; }}} ----------------------------------------------------------
 ; Errors {{{
 
-; XXX TODO -- move to 'throw'
+; XXX TODO -- move to `throw`
 stack_empty_error:
   ld a,0x01
   jr error_a
@@ -1465,7 +1347,7 @@ error_messages:
   db "k"+0x80
   db "Unstructure" ; Error number 0x09 ; XXX -- -10 in ANS Forth
   db "d"+0x80
-  db "Not foun" ; Error number 0x0a ; XXX -- used only by ';' -- (-13 in ANS Forth?)
+  db "Not foun" ; Error number 0x0a ; XXX -- used only by `;` -- (-13 in ANS Forth?)
   db "d"+0x80
   db "Attempt to use zero-lenght string as a nam" ; Error number 0x0b ; XXX -- -16 in ANS Forth
   db "e"+0x80
@@ -1502,7 +1384,7 @@ save_dictionary_pointers:
   ret
 
 restore_dictionary_pointers:
-  ; XXX -- called only after an error, but maybe useful in the future (e.g. for 'catch')
+  ; XXX -- called only after an error, but maybe useful in the future (e.g. for `catch`)
 saved_dp: equ $+1
   ld hl,0
   ld (dp),hl
@@ -1511,7 +1393,7 @@ saved_latest: equ $+1
   ld (latest),hl
   ret
 
-; XXX TODO -- factor to a word ('?struc', '?pairs' ?)
+; XXX TODO -- factor to a word (`?struc`, `?pairs` ?)
 ; XXX TODO -- rename the original "sub_5743h" name in SamForth
 structured:
   ; (sp) = flow structure code compiled in the current word
@@ -1579,21 +1461,16 @@ _previous_nfa: defl 0
 
   header paren_bootmessage_,"(bootmessage)",0
 
-  ; XXX TODO -- justified print routine
   call print_inline_message
-  db "Couplement Forth",cr_char,"(version "
+  db "Couplement Forth",cr_char,"Version "
   version
-  db ")",cr_char
-  db "Copyright ",127," 2015 Marcos Cruz",cr_char
-  db "(programandala.net)",cr_char
-  db "Couplement Forth comes with",cr_char
-  db "ABSOLUTELY NO WARRANTY;",cr_char
-  db "for details type 'license'.",cr_char
-  db "Type 'bye' to exit.",cr_char+0x80
+  db cr_char
+  db "Copyright ",127," 2015,2016",cr_char
+  db "Marcos Cruz (programandala.net)",cr_char+0x80
   call unused_
-  call dot_
+  call u_dot_
   call print_inline_message
-  db "bytes free","."+0x80
+  db "B fre","e"+0x80
   ret
   
   ;.............................................................
@@ -1601,36 +1478,11 @@ _previous_nfa: defl 0
   ;: bootmessage   ( -- )  cf,gforth
   ;:
   ;: Print a boot message (Couplement Forth's boot message by default).
-  ;: The behaviour of 'bootmessage' can be changed with 'is'.
+  ;: The behaviour of `bootmessage` can be changed with `is`.
 
   header bootmessage_,"bootmessage",0
 
   jp paren_bootmessage_
-
-  ;.............................................................
-  ;:
-  ;: license  ( -- )  cf,gforth
-  ;:
-  ;: Print the Couplement Forth's license information.
-
-  header license_,"license",0
-
-  ; XXX TODO -- justified print routine
-  call print_inline_message
-  db "Couplement Forth is free software; you can redistribute it and/or modify "
-  db "it under the terms of the GNU General Public License as published by "
-  db "the Free Software Foundation; either version 3 of the License, or "
-  db "(at your option) any later version."
-  db cr_char
-  db "Couplement Forth is distributed in the hope that it will be useful, "
-  db "but WITHOUT ANY WARRANTY; without even the implied warranty of "
-  db "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
-  db "GNU General Public License for more details."
-  db cr_char
-  db "You should have received a copy of the GNU General Public License "
-  db "along with Couplement Forth. If not, see http://www.gnu.org/licenses/."
-  db cr_char+0x80
-  ret
 
   ;.............................................................
   ;:
@@ -1826,26 +1678,12 @@ _previous_nfa: defl 0
 
   ;.............................................................
   ;:
-  ;: @execute   ( a -- )   comus
+  ;: perform   ( a -- )   cf
 
-  header perform_,"@execute",0
-  
-  ; XXX FIXME ? it seems the byte order is wrong
-  call pop_hl
-  ld a,(hl)
-  inc hl
-  ld l,(hl)
-  ld h,a
-  jp (hl)
-  
-  ;.............................................................
-  ;:
-  ;: @?execute   ( a -- )   cf
+  header perform_,"perform",0
 
-  header fetch_execute_,"@?execute",0
-
-  ; XXX TODO -- make it optional?
-  ; XXX FIXME ? it seems the byte order is wrong
+  ; XXX TODO -- make it optional
+  ; XXX FIXME -- it seems the byte order is wrong
   call pop_hl
   ld a,(hl)
   inc hl
@@ -1873,11 +1711,11 @@ _previous_nfa: defl 0
   ;:
   ;: quit  ( -- )  ( R: i*x -- )  94
   ;:
-  ;: Empty the return stack, store zero in 'SOURCE-ID' if it is present, make
+  ;: Empty the return stack, store zero in `source-id` if it is present, make
   ;: the user input device the input source, and enter interpretation state.
   ;: Do not display a message.  Repeat the following:
   ;:
-  ;: - Accept a line from the input source into the input buffer, set '>IN' to
+  ;: - Accept a line from the input source into the input buffer, set `>in` to
   ;: zero, and interpret.
   ;:
   ;: - Display the implementation-defined system prompt if in interpretation
@@ -1890,7 +1728,7 @@ _previous_nfa: defl 0
   di ; XXX ? -- needed?
   ld sp,(rp0) ; reset the return stack
   ei ; XXX ? -- needed?
-  ; store zero in 'source-id' ; XXX TODO
+  ; store zero in `source-id` ; XXX TODO
   ; make the user input device the input source ; XXX TODO
   ; enter intepretation state:
   call left_bracket_
@@ -1900,7 +1738,7 @@ quit.do:
   call cr_
   call keyboard_input ; XXX TODO -- this will depend on the current input source
   call space_
-  ; XXX TODO -- set '>in' to zero
+  ; XXX TODO -- set `>in` to zero
 ;;  check "before call interpret_"
   call interpret_
   ld a,(state)
@@ -2143,7 +1981,7 @@ compile_call_tos:
 
 compile_call_de:
   ld hl,(dp)
-  ld (hl),0xcd ; Z80 'call'
+  ld (hl),0xcd ; Z80 `call`
   inc hl
 
 compile_de_at_hl:
@@ -2240,7 +2078,7 @@ compare_char:
   dec de ; XXX NOTE -- needed, checked!
   ld (ip_fvar),de
   pop de ; nfa of the dictionary word
-  ld (nfa_found),de ; needed by 'interpret' later
+  ld (nfa_found),de ; needed by `interpret` later
   inc hl
   ; hl = cfa of the dictionary word 
   jp push_hl ; return the cfa of the dictionary word 
@@ -2584,7 +2422,7 @@ number.return:
   ;: In ANS Forth the parameter is a signed number (n) and the word's
   ;: description is: "If n is greater than zero, display n spaces.".
   ;:
-  ;: Couplement Forth's 'spaces' behaves like fig-Forth's. It's simpler and
+  ;: Couplement Forth's `spaces` behaves like fig-Forth's. It's simpler and
   ;: faster and 0..65535 spaces can be printed. When printing 0..32,767 spaces
   ;: U uses an unsigned 16-bit number instead.
 
@@ -2824,7 +2662,7 @@ create_header.store_char
   ; XXX TODO convert this into a word
 compile_jp_de:
   ld hl,(dp)
-  ld (hl),0xc3 ; Z80 'jp'
+  ld (hl),0xc3 ; Z80 `jp`
   inc hl
   ld (hl),e
   inc hl
@@ -2894,8 +2732,7 @@ words.print_word:
   ld c,(hl)
   inc hl
   call print_bc_chars_at_hl
-;;  call space_ ; XXX OLD
-  call cr_ ; XXX NEW TMP
+  call space_
   pop hl ; hl = nfa
   dec hl ; hl = lfa+1
   ld a,(hl)
@@ -3130,7 +2967,7 @@ dsp: equ $+1 ; data stack pointer
   ;:
   ;: Return the address of the dictionary pointer variable, which contains the
   ;: next free memory location above the dictionary. The value may be read by
-  ;: 'here' and altered by 'allot'.
+  ;: `here` and altered by `allot`.
 
   header dp_,"dp",0
 
@@ -3142,7 +2979,7 @@ dp: equ $+1
   ;:
   ;: here   ( -- a )  fig,79,83,94
   ;:
-  ;: Return the content of 'dp', the address of the next available memory
+  ;: Return the content of `dp`, the address of the next available memory
   ;: location above the dictionary. 
 
   header here_,"here",0
@@ -3154,10 +2991,10 @@ dp: equ $+1
   ;:
   ;: latest   ( -- nfa )  fig,af,gforth
   ;:
-  ;: Return the name field address of the last word defined in the 'current'
+  ;: Return the name field address of the last word defined in the `current`
   ;: vocabulary.
 
-  ; XXX TODO -- 'current' is not implemented yet
+  ; XXX TODO -- `current` is not implemented yet
 
   header latest_,"latest",0
 
@@ -3254,11 +3091,11 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   ld de,do_do
   call compile_call_de
   ; hl = dp
-  call push_hl ; save the address 'loop' must jump to
+  call push_hl ; save the address `loop` must jump to
   ld l,do_structure_id
   jp push_hl ; XXX TODO -- push_a?
 
-  ; XXX TODO -- factor to a word ('(do)'?)
+  ; XXX TODO -- factor to a word (`(do)`?)
 do_do:
   pop bc
   call pop_hl_de
@@ -3394,11 +3231,11 @@ sub_57a3h:
   ;: j  ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 )  hist,94
   ;:
   ;: Return a copy of the index of the next outer loop.  May only
-  ;: be used within a nested 'do'-'loop' or 'do'-'+loop' structure.
+  ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
 
   header j_,"j",0
 
-  if false ; XXX OLD -- first method, based on SamForth's 'i'
+  if false ; XXX OLD -- first method, based on SamForth's `i`
     pop bc
     pop de
     pop hl
@@ -3429,7 +3266,7 @@ sub_57a3h:
   ;: i  ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94
   ;:
   ;: Return a copy of the current (innermost) loop index. May only
-  ;: be used within a nested 'do'-'loop' or 'do'-'+loop' structure.
+  ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
 
   header i_,"i",0
 
@@ -3868,7 +3705,7 @@ previous_key equ $+1
 
   header key_,"key",0
 
-  ; XXX TODO call 'key?'
+  ; XXX TODO call `key?`
   ld a,(sys_last_k)
   ld (previous_key),a
 key.1
@@ -4413,11 +4250,11 @@ word.parse:
   ld (dp),hl
   jp save_dictionary_pointers
 
-; XXX TODO create word '(variable)' or 'do_variable'?
+; XXX TODO create word `(variable)` or `do_variable`?
 do_variable:
   pop hl
   push hl
-  inc hl ; XXX TODO this skips the (useless?) 'ret' compiled by 'variable'
+  inc hl ; XXX TODO this skips the (useless?) `ret` compiled by `variable`
   jp push_hl
 
   ;.............................................................
@@ -4619,7 +4456,7 @@ l5d4bh:
   header find_,"find",0
 
   ; XXX TODO -- rewrite according to ANS; now it simply skips leading blanks!
-  ; XXX TODO -- move this code to '(find)'
+  ; XXX TODO -- move this code to `(find)`
   ld de,(ip_fvar)
 find.skip_blank:
   inc de
@@ -4640,7 +4477,7 @@ find.skip_blank:
   ;:
   ;: (abort)  ( i*x -- ) ( R: j*x -- )  comus
   ;:
-  ;: Empty the data stack and perform the function of 'quit', which includes
+  ;: Empty the data stack and perform the function of `quit`, which includes
   ;: emptying the return stack, without displaying a message.
 
   header paren_abort_,"(abort)",0
@@ -4668,7 +4505,7 @@ find.skip_blank:
   ;: cold   ( -- )  fig,comus,gforth
   ;:
   ;: The cold start procedure.  Adjust the dictionary pointer to the minimum
-  ;: standard and restart via 'abort'.  May be called from terminal to remove
+  ;: standard and restart via `abort`.  May be called from terminal to remove
   ;: the application program and restart.  
 
   header cold_,"cold",0
@@ -4684,8 +4521,6 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   call left_bracket_
 ;;  ld (ldflg_fvar),a ; XXX OLD -- formerly used by the BASIC interface
   call page_
-  ld hl,font-256
-  ld (sys_chars),hl
   call bootmessage_
   ; XXX NOTE -- 2013-02-02 quit_ changed to abort_, after FIG-Forth.
   jp abort_
@@ -4694,14 +4529,14 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   ;:
   ;: fence   ( -- a )  fig
   ;:
-  ;: Return an address which contains the address below which 'forget' will not operate.
+  ;: Return an address which contains the address below which `forget` will not operate.
 
   header fence_,"fence",0
 
   ld hl,fence
   jp push_hl
 fence:
-  dw end_of_code ; address below which 'forget' will not operate.
+  dw end_of_code ; address below which `forget` will not operate.
 
   ;.............................................................
   ;:
@@ -4784,7 +4619,7 @@ l5de3h:
 
   header number_sign_,"#",0
 
-  ; XXX TODO -- avoid fetching base every time '#s' calls '#':
+  ; XXX TODO -- avoid fetching base every time `#s` calls `#`:
   ld hl,(base)
   call push_hl
   call sub_5fc2h
@@ -5028,7 +4863,7 @@ l5f82h:
   ;:
   ;: char   ( -- ) 
 
-  ; XXX TODO use 'word' instead
+  ; XXX TODO use `word` instead
 
   header char_,"char",0
 
@@ -5472,7 +5307,7 @@ state:
   ;:
   ;: unused ( -- u )  94
   ;:
-  ;: Return the amount of space remaining in the region addressed by 'here', in
+  ;: Return the amount of space remaining in the region addressed by `here`, in
   ;: address units.
   ;: XXX TODO adapt -- implement and use the heap pointer as top limit
 
@@ -5492,7 +5327,7 @@ state:
   header to_in_,"to_in",0
  
   ; XXX TODO -- not used yet
-  ; XXX TODO -- convert 'ip_fvar', an absolute address, to 'to_in'.
+  ; XXX TODO -- convert `ip_fvar`, an absolute address, to `to_in`.
   ld hl,to_in
   jp push_hl
 to_in: 

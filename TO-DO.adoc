@@ -1,0 +1,103 @@
+= Couplement Forth TO-DO
+:author: Marcos Cruz (programandala.net)
+:revdate: 2016-03-16
+
+Fix: `;` can be interpreted, even after adding `or compile_only` to
+its header!
+
+Fix: "Esc" can break the program when printing.
+
+2015-01-11: configurable size optimization (JR/JP) and:
+
+----
+if size_optimization
+ jp push_l
+else
+ ld h,0
+ jp push_hl
+endif
+----
+
+2015-01-10: key translation table to associate key codes to chars. 
+
+2015-01-09: Investigate why `dubflag_fvar` requires a 0x01, not simply
+`<>0`.  If `and a` is used instead of `cp 0x01`, the "stack empty" error
+happens while compiling a number.
+
+New: `allocate`, `free`, `resize`.
+
+Complete the empty stack comments.
+
+Improve the keyboard input:
+
+- Implement the SAM Coupé's cursors.
+- When Return is pressed, move the cursor at the end of the line.
+
+Convert the `create_header` routine to the new header format.
+
+Dictionary headers in a RAM page?
+
+Idea: `lower` and `upper` for chars, `lowers` and `uppers` for strings.
+
+Own printing routine (from my charset224 for ZX BASIC).
+
+Configurable "scroll?" message and behaviour: break it or not with some key.
+
+Change the dictionary header format?
+
+Check the compile-only checks.
+
+Implement `pop_de` routine (useful for `>r`) and other cases marked in
+the code
+
+Try `number`.
+
+Benchmark the data stack code.
+
+Move all vars into the code, to save space and time.  Choose the point
+where the variable is fetch more often.
+
+Standard error numbers.
+
+Make links point to count byte, to make vocabulary searching faster.
+
+Change conditional relative jumps to absolute jumps,
+depending on how often the condition is true.
+
+Optimize the primitives, e.g.:
+Don't use `call pad_` but take the pad address directly,
+**without using the data stack**.
+
+New words: `?do`, `case`, `?dup`.
+
+New words: `cmove>` y `move`.
+
+Ideas for the file interface:
+`load` to load a (already opened?) source file.
+`emit` is defered and pointed to a file when needed.
+`cr` and `type` are defered and use `emit` by default.
+`page` does `cls` on screen, but prints a form feed char to printer or file.
+Gforth and lina work this way (confirm).
+`open` and `close` manage the files (they parse the names)
+`opened` and `closed` are the non-parsing versions.
+`include` would be just `open throw load`
+Only the input word is missing. Use `key` or `accept`?
+This way, all input and output could be redirected to files.
+
+Document the stack notation.
+
+Jumps are being adapted: Since memory is not a constraint, absolute
+jumps are used where speed is important. Relative jumps are used
+otherwise (e.g.  keyboard input, printing, etc.). The conditional
+jumps have different timings depending on the result of the condition.
+This adaptation is a work in progress.
+
+----
+;  timing of alternatives in T Cycles:
+;
+;  jp nz,unstructured_error   ; error: 10; no error: 01
+;  ret                        ; error: 00; no error: 10
+;
+;  ret z                      ; error: 05; no error: 11
+;  jp unstructured_error      ; error: 10; no error: 00
+----

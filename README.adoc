@@ -1,23 +1,54 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2016-03-12
+:revdate: 2016-03-16
 
 == Description
 
 Couplement Forth is an STCfootnote:[Subroutine Threaded Code.] Forth
-system under development for ZX Spectrum, though the specific model
-and DOS is not yet decided: ZX Spectrum 128 with G+DOS or Beta DOS; ZX
-Spectrum +3 with +3DOS; ZX Spectrum +3e with IDEDOS or ResiDOS.
+system under development for ZX Spectrum, with a BASIC file interface
+easy to adapt to any DOS.
+
+Home page: http://programandala.net/en.program.couplement_forth.html
+
+== Origin
 
 Couplement Forth was forked from
-http://programandala.net/en.program.forthcoupe.html[ForthCoupe].
+http://programandala.net/en.program.forthcoupe.html[ForthCoupe], an
+abandoned project based on John A. Avis'
+http://programandala.net/en.program.samforth.html[SamForth] .
 
 == Status
 
-Developed from 2014-12-30 to 2015-05-20.  Alpha state. Sleeping
-project.
+Couplement Forth is a sleeping project. It was developed from
+2014-12-30 to 2015-05-20.
 
-== Git repository
+It's usable, but there's no disk support yet, the only input is the
+keyboard.
 
-The Git repository of Couplement Forth was created from development
-backups on 2016-03-12.
+A Git repository was created on 2016-03-12 with the development
+backups, in order to make future development easier.
+
+Most ideas noted for Couplement Forth have already been implemented in
+http://programandala.net/en.program.solo_forth.html[Solo Forth], a
+DTCfootnote:[Direct Threaded Code.] Forth system under active
+development for ZX Spectrum 128 and G+DOS.
+
+== Future
+
+The next goal is to adapt the G+DOS disk support from Solo Forth to
+Couplement Forth, which should be very easy, either natively or with
+the planned BASIC interface.  Most high-level words of the Solo Forth
+library will be compatible. Then STC-DTC comparison benchmarks will be
+possible.
+
+== Usage
+
+A TAP file is included in the bin directory. Open it with your
+favorite ZX Spectrum emulator.
+
+== Compilation
+
+A Makefile is provided. The only requirement is the
+http://pasmo.speccy.org/[Pasmo assembler], which must be installed.
+Then just do `make` and an updated TAP file will be created in the bin
+directory.

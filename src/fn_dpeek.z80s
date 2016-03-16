@@ -1,0 +1,102 @@
+; fn_dpeek.z80s 
+;
+; DPEEK BASIC function for ZX Spectrum
+
+; Version B-00-20150122
+
+; This file is part of DEFFNder:
+; http://programandala.net/en.program.deffnder.html
+
+; --------------------------------------------------------------
+; Author and license
+
+; Copyright (C) 2014,2015 Marcos Cruz (programandala.net)
+
+; You may do whatever you want with this work, so long as you
+; retain the copyright notice(s) and this license in all
+; redistributed copies and derived works. There is no warranty.
+
+; --------------------------------------------------------------
+; Description
+
+; This code adds a DPEEK function to Sinclair BASIC, that
+; returns the 16-bit value from a memory address.
+
+; --------------------------------------------------------------
+; Usage
+
+; The routine is called from BASIC using a function defined this
+; way (the actual names are unimportant):
+;   10 DEF FN d(a)=USR dpeek
+; Where:
+;   a     = address to peek
+;   dpeek = address of the machine code routine
+
+; Example:
+;   PRINT FN d(1887)
+
+; --------------------------------------------------------------
+; Internal
+
+; During the execution of a FN, the system variable DEFADD holds
+; the address of the first parameter of its DEF FN definition
+; (the first address after the opening paren). The structure of
+; DEF FN d(a) is the following:
+
+; offset  content
+; ------  -------
+; -03     DEF FN
+; -02     d
+; -01     (
+; +00     a
+; +01     14
+; +02     0
+; +03     [sign byte: 0=positive; 255=negative]
+; +04     [16-bit number, LSB first]
+; +06     0
+; +07     )
+; +08     =
+
+; --------------------------------------------------------------
+; History of this file
+
+; 2014-08-07: Written.
+;
+; 2014-08-10: Removed unnecessary saving and restoring of
+; registers.  New: 'proc', 'local' and 'public', in order to
+; make it possible to combine several modules into a single
+; file.
+;
+; 2015-01-22: Some changes for publication. Version B-00.
+;
+; 2015-02-27: Improved comment.
+;
+; 2015-08-10: Revision. License.
+
+; --------------------------------------------------------------
+
+  proc
+
+  ; The code is relocatable
+
+  public fn_dpeek,fn_dpeek_size
+fn_dpeek:
+
+  local DEFADD
+  DEFADD equ 23563 ; system variable
+
+  ld ix,(DEFADD)
+  ld l,(ix+4)
+  ld h,(ix+5)
+  ; hl = parameter address
+  ld c,(hl)
+  inc hl
+  ld b,(hl)
+  ; bc = value, returned by USR
+  ret
+
+fn_dpeek_size equ $-fn_dpeek
+
+  endp
+
+; vim: textwidth=64

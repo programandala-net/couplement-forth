@@ -1,0 +1,122 @@
+; fn_peeks.z80s 
+;
+; PEEK$ BASIC function for ZX Spectrum
+
+; Version B-00-20150122
+
+; This file is part of DEFFNder:
+; http://programandala.net/en.program.deffnder.html
+
+; --------------------------------------------------------------
+; Author and license
+
+; Copyright (C) 2014,2015 Marcos Cruz (programandala.net)
+
+; You may do whatever you want with this work, so long as you
+; retain the copyright notice(s) and this license in all
+; redistributed copies and derived works. There is no warranty.
+
+; --------------------------------------------------------------
+; Description
+
+; This code adds a PEEK$ function to Sinclair BASIC. PEEK$ gets
+; a string from memory.
+
+; --------------------------------------------------------------
+; Usage
+
+; The routine is called from BASIC using a function defined this way
+; (the actual names are unimportant):
+;   10 DEF FN p$(a,l)="" AND USR peeks
+; Where:
+;   a     = address of the first char of the string
+;   l     = length of the string
+;   peeks = address of the machine code routine
+
+; Example:
+;   PRINT FN p$(filename,10)
+
+; --------------------------------------------------------------
+; Internal
+
+; During the execution of a FN, the system variable DEFADD holds
+; the address of the first parameter of its DEF FN definition
+; (the first address after the opening paren). The structure of
+; DEF FN p$(a,l) is the following:
+
+; offset  content
+; ------  -------
+; -04     DEF FN
+; -03     p$(
+; +00     a
+; +01     14
+; +02     0
+; +03     [sign byte: 0=positive; 255=negative]
+; +04     [16-bit number, LSB first]
+; +06     0
+; +07     ,
+; +08     l
+; +09     14
+; +10     0
+; +11     [sign byte: 0=positive; 255=negative]
+; +12     [16-bit number, LSB first]
+; +14     0
+; +15     )=
+
+; --------------------------------------------------------------
+; History of this file
+
+; 2015-01-22: Written.
+;
+; 2015-02-27: Improved comment.
+;
+; 2015-08-10: Revision. License.
+
+; --------------------------------------------------------------
+
+  proc
+
+  ; The code is relocatable
+  
+  public fn_peeks,fn_peeks_size
+fn_peeks:
+
+; ..............................
+; System variables
+
+  local DEFFADD
+DEFADD equ 23563
+
+; ..............................
+; ROM routines
+
+  local STK_STORE
+STK_STORE   equ 0x2ab6
+            ; Input:
+            ;   A = flag
+            ;   DE = string address
+            ;   BC = string length
+
+; ..............................
+; Start
+
+  ld ix,(DEFADD)
+  ld e,(ix+4)
+  ld d,(ix+5)
+  ; de = string address
+  ld c,(ix+12)
+  ld b,(ix+13)
+  ; bc = string length
+  xor a
+  ; a = 0 (=new string)
+  call STK_STORE
+  rst 0x28 ; calculator
+  db 0x17 ; concatenate to the empty string in the DEF FN expression
+  db 0x38 ; end
+  ret
+
+fn_peeks_size equ $-fn_peeks
+
+  endp
+
+; vim: textwidth=64
