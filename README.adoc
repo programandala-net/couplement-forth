@@ -1,10 +1,10 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2016-03-16
+:revdate: 2016-03-17
 
 == Description
 
-Couplement Forth is an STCfootnote:[Subroutine Threaded Code.] Forth
+Couplement Forth is an STCfootnote:[Subroutine-Threaded Code.] Forth
 system under development for ZX Spectrum, with a BASIC file interface
 easy to adapt to any DOS.
 
@@ -17,23 +17,42 @@ http://programandala.net/en.program.forthcoupe.html[ForthCoupe], an
 abandoned project based on John A. Avis'
 http://programandala.net/en.program.samforth.html[SamForth] .
 
+== Name
+
+“Couplement” resembles first to the SAM Coupé origin of this Forth
+system, and the combination of the original source with the ZX
+Spectrum operating system; and second, it resembles to the file
+interface combination with BASIC.
+
+Beside, I found the following quote in the “couplement” entry of _The
+Collaborative International Dictionary of English v.0.48 [gcide]_,
+which was definitive for choosing the name:
+
+[quote,Spenser]
+____
+And forth together rode, a goodly couplement.
+____
+
 == Status
 
 Couplement Forth is a sleeping project. It was developed from
 2014-12-30 to 2015-05-20.
 
-It's usable, but there's no disk support yet, the only input is the
-keyboard.
+It's usable, but many common words and are still missing, and there's
+no disk support yet, the only input is the keyboard.
 
-A Git repository was created on 2016-03-12 with the development
+A Git repository was created on 2016-03-12 from the development
 backups, in order to make future development easier.
 
 Most ideas noted for Couplement Forth have already been implemented in
 http://programandala.net/en.program.solo_forth.html[Solo Forth], a
-DTCfootnote:[Direct Threaded Code.] Forth system under active
+DTCfootnote:[Direct-Threaded Code.] Forth system under active
 development for ZX Spectrum 128 and G+DOS.
 
 == Future
+
+Couplement Forth will evolve slowly, because Solo Forth is _on top of
+the stack_.
 
 The next goal is to adapt the G+DOS disk support from Solo Forth to
 Couplement Forth, which should be very easy, either natively or with
