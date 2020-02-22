@@ -7,14 +7,15 @@
 #
 # 2016-03-16: Commented out +3 disk code, not used yet.
 # Fixed the dependency.
+#
+# 2016-03-19: Typo.
 
 ################################################################
 # Notes
 
 # $? list of dependencies changed more recently than current target
 # $@ name of current target
-# $> name of current dependency
-# $* name of current dependency without extension
+# $< name of current dependency
 
 ################################################################
 # Config
