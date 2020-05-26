@@ -1,18 +1,18 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2016-03-17
+:revdate: 2020-05-27
 
 == Description
 
-Couplement Forth is an STCfootnote:[Subroutine-Threaded Code.] Forth
-system under development for ZX Spectrum, with a BASIC file interface
-easy to adapt to any DOS.
+Couplement Forth is a small and experimental STC (Subroutine-Threaded
+Code) Forth system under development for ZX Spectrum, with a BASIC
+file interface easy to adapt to any DOS.
 
 Home page: http://programandala.net/en.program.couplement_forth.html
 
 == Origin
 
-Couplement Forth was forked from
+Couplement Forth was forked on 2014-12-30 from
 http://programandala.net/en.program.forthcoupe.html[ForthCoupe], an
 abandoned project based on John A. Avis'
 http://programandala.net/en.program.samforth.html[SamForth] .
@@ -24,7 +24,7 @@ system, and the combination of the original source with the ZX
 Spectrum operating system; and second, it resembles to the file
 interface combination with BASIC.
 
-Beside, I found the following quote in the “couplement” entry of _The
+Besides, I found the following quote in the “couplement” entry of _The
 Collaborative International Dictionary of English v.0.48 [gcide]_,
 which was definitive for choosing the name:
 
@@ -35,39 +35,37 @@ ____
 
 == Status
 
-Couplement Forth is a sleeping project. It was developed from
-2014-12-30 to 2015-05-20.
-
-It's usable, but many common words and are still missing, and there's
-no disk support yet, the only input is the keyboard.
+Couplement Forth is usable, but many common words and are still
+missing, and there's no disk support yet: the only input is the
+keyboard.
 
 A Git repository was created on 2016-03-12 from the development
-backups, in order to make future development easier.
+backups, in order to make future development easier and preserve the
+evolution of the code.
 
 Most ideas noted for Couplement Forth have already been implemented in
-http://programandala.net/en.program.solo_forth.html[Solo Forth], a
-DTCfootnote:[Direct-Threaded Code.] Forth system under active
-development for ZX Spectrum 128 and G+DOS.
+http://programandala.net/en.program.solo_forth.html[Solo Forth], a DTC
+(Direct-Threaded Code) Forth system under active development for ZX
+Spectrum 128 with G+DOS, +3DOS or TR-DOS, with a huge library.
 
 == Future
 
-Couplement Forth will evolve slowly, because Solo Forth is _on top of
-the stack_.
+Couplement Forth will evolve slowly, as a test system to try and
+benchmark a Subroutine-Threaded Code Forth in the Z80 processor.
 
-The next goal is to adapt the G+DOS disk support from Solo Forth to
-Couplement Forth, which should be very easy, either natively or with
-the planned BASIC interface.  Most high-level words of the Solo Forth
-library will be compatible. Then STC-DTC comparison benchmarks will be
-possible.
+// The next goal is to adapt the G+DOS disk support from Solo Forth to
+// Couplement Forth, which should be very easy, either natively or with
+// the planned BASIC interface.  Most high-level words of the Solo Forth
+// library will be compatible. Then STC-DTC comparison benchmarks will be
+// possible.
 
-== Usage
+// == Usage
 
-A TAP file is included in the bin directory. Open it with your
-favorite ZX Spectrum emulator.
+// A TAP file is included in the bin directory. Open it with your
+// favorite ZX Spectrum emulator.
 
 == Compilation
 
 A Makefile is provided. The only requirement is the
-http://pasmo.speccy.org/[Pasmo assembler], which must be installed.
-Then just do `make` and an updated TAP file will be created in the bin
-directory.
+http://pasmo.speccy.org/[Pasmo assembler]. Do `make` and a TAP file
+will be created in the <bin> directory.
