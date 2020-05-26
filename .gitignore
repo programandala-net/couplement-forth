@@ -1,4 +1,4 @@
-_doc/
-_ex/
 _meta/
-_old/
+000-info.txt
+bin/*
+src/*.symbols.*
