@@ -1,13 +1,13 @@
-; }}} ----------------------------------------------------------
-; Couplement Forth {{{
-; A subroutine-threaded Forth system for ZX Spectrum
+; Couplement Forth {{{1
+
+; An experimental subroutine-threaded Forth system for ZX Spectrum
 ; <http://programandala.net/en.program.couplement_forth.html>
 
 ; XXX UNDER DEVELOPMENT
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.0.0+202002220111"
+    db "0.2.0-dev.0.0+202005270129"
   endm
 
 ; Copyright (C) 2015,2016,2020 Marcos Cruz (programandala.net)
@@ -28,15 +28,10 @@
 ; an abandoned project based on John A. Avis' SamForth
 ; (http://programandala.net/en.program.samforth.html).
 
+; ==============================================================
+; Symbols {{{1
+
 ; --------------------------------------------------------------
-; Development history
-
-; See <http://en.program.couplement_forth.html>.
-
-; }}} ----------------------------------------------------------
-; Symbols {{{
-
-; ..............................
 ; Forth
 
 precedence_bit:       equ 6
@@ -52,25 +47,25 @@ begin_structure_id:   equ 0x03
 if_structure_id:      equ 0x04
 builds_structure_id:  equ 0x09
 
-; ..............................
+; --------------------------------------------------------------
 ; ZX Spectrum
 
   include zx_spectrum_system_variables.z80s
   include zx_spectrum_rom_routines.z80s
   include zx_spectrum_char_codes.z80s
 
-; ..............................
+; --------------------------------------------------------------
 ; Other
 
 false:  equ 0x0000
 true:   equ 0xffff
 ; XXX FIXME -- the legacy code uses 1 as true flag
 
-; }}} ----------------------------------------------------------
-; Assembling options {{{
+; ==============================================================
+; Assembling options {{{1
 
-; ..............................
-; Data stack method 
+; --------------------------------------------------------------
+; Data stack method
 
 ; Couplement Forth can use different methods to manage its data stack.
 ; Every method has a constant identifier:
@@ -86,7 +81,7 @@ hl_dsm:           equ %1000 ; push, load, use, save and pop HL, with checks
 data_stack_method:  equ sf_dsm
 any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
-; ..............................
+; --------------------------------------------------------------
 ; Execution speed
 
 ; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
@@ -105,34 +100,34 @@ fast_mode_available: equ true
 
 faster_stack_operations: equ true
 
-; ..............................
+; --------------------------------------------------------------
 ; Size
 
 ; When size optimization is on, relative jumps are used when possible, and
 ; some inline code is replaced with calls.  Some bytes will be saved, but the
-; code will be a bit slower.  
+; code will be a bit slower.
 
 ; XXX TODO
 size_optimization: equ false
 
-; ..............................
+; --------------------------------------------------------------
 ; Screen
 
-; XXX TODO 
+; XXX TODO
 whole_screen: equ false ; does the input line uses the whole screen?
 
-; }}} ----------------------------------------------------------
-; Start {{{
+; ==============================================================
+; Start {{{1
 
 start: equ 25000
 
   org start
 
-  jp cold_start 
+  jp cold_start
   jp warm_start
 
-; }}} ----------------------------------------------------------
-; Interface to BASIC {{{
+; ==============================================================
+; Interface to BASIC {{{1
 
 ; XXX TODO
 
@@ -158,8 +153,8 @@ basic_line_of_save    equ 120
 basic_line_of_erase   equ 130
 basic_line_of_rename  equ 140
 
-; }}} ----------------------------------------------------------
-; Variables {{{
+; ==============================================================
+; Variables {{{1
 
 ; XXX NOTE -- The following two variables
 ; have to be at a fixed address from the start of the code,
@@ -223,8 +218,8 @@ len1_fvar:
   ; Used to increase or decrease length of source during editing
   dw 0x0000
 
-; }}} ----------------------------------------------------------
-; Debugging tools {{{
+; ==============================================================
+; Debugging tools {{{1
 
 ; Code based on a similar code of "Finen per Imago":
 ; <http://programandala.net/es.programa.finen_per_imago.html>
@@ -371,8 +366,8 @@ check.string.de_b:
     endif
   endm
 
-; }}} ----------------------------------------------------------
-; Data zones {{{
+; ==============================================================
+; Data zones {{{1
 
 ; XXX TODO -- choose better names for the bounds
 
@@ -398,8 +393,8 @@ return_stack_max_top:
   defs 0x0100
 return_stack_bottom:
 
-; }}} ----------------------------------------------------------
-; Screen tools {{{
+; ==============================================================
+; Screen tools {{{1
 
 ; XXX TODO -- factor all this to Forth words, when possible
 
@@ -413,8 +408,8 @@ get_stack_coords_and_copy_to_bc:
   ld c,e
   ret
 
-; }}} ----------------------------------------------------------
-; Data stack manipulation {{{
+; ==============================================================
+; Data stack manipulation {{{1
 
 init_data_stack:
   if data_stack_method = any_dsm
@@ -424,7 +419,7 @@ init_data_stack:
   ret
 
 if data_stack_method = sf_dsm
-  
+
 ; SamForth's method
 ; Slow versions are the original
 ; Fast versions have no checks
@@ -571,7 +566,7 @@ if data_stack_method = iy_unchecked_dsm
 
 ; XXX -- alternative data stack -- experimental
 
-; no over/underflow checks 
+; no over/underflow checks
 
 push_hl:
 slow_push_hl:
@@ -579,11 +574,11 @@ fast_push_hl:
                       ; T Cycles
   push iy             ;  15
   ld iy,(dsp)         ;  20
-  dec iy              ;  10 
+  dec iy              ;  10
   ld (iy),h           ;  19
   dec iy              ;  10
   ld (iy),l           ;  19
-  ld (dsp),iy         ;  20 
+  ld (dsp),iy         ;  20
   pop iy              ;  14
   ret                 ;  10
                       ; 137 total
@@ -641,7 +636,7 @@ if data_stack_method = hl_unchecked_dsm
 
 ; XXX -- alternative data stack -- experimental
 
-; no over/underflow checks 
+; no over/underflow checks
 
 push_hl:
 slow_push_hl:
@@ -821,8 +816,8 @@ fast_pop_hl_de:
 
 endif
 
-; }}} ----------------------------------------------------------
-; Keyboard input {{{
+; ==============================================================
+; Keyboard input {{{1
 
 ; XXX TODO convert to `accept`
 
@@ -967,7 +962,7 @@ keyboard_input.cr:
   if whole_screen
 
 ; XXX OLD -- no cr here, only in `quit`
-;    jp cr_ 
+;    jp cr_
     ret
 
   else
@@ -1162,8 +1157,8 @@ cursor:
   db "X" ; overwrite mode ; XXX TMP!
   db "_" ; insert mode
 
-; }}} ----------------------------------------------------------
-; Text output {{{
+; ==============================================================
+; Text output {{{1
 
 print_bc_chars_at_hl:
   ; XXX TODO-- faster version por 0-255 chars?
@@ -1242,9 +1237,9 @@ wrap_print_message_at_hl.end_of_word_found:
 
   ; inc ; XXX TODO
   jr z,wrap_print_message_at_hl.next_char
- 
+
 wrap_print_message_at_hl.end_of_message_found:
- 
+
 ; wrap_print_message_at_hl.next_word: ; XXX TODO
   pop hl
 
@@ -1253,10 +1248,10 @@ wrap_print_message_at_hl.end_of_message_found:
 
   ret
 
-  
 
-; }}} ----------------------------------------------------------
-; Errors {{{
+
+; ==============================================================
+; Errors {{{1
 
 ; XXX TODO -- move to `throw`
 stack_empty_error:
@@ -1354,8 +1349,8 @@ error_messages:
 ;  db "Return stack empt" ; XXX -- not used yet ; xxx -- -6 in ANS Forth
 ;  db "y"+0x80
 
-; }}} ----------------------------------------------------------
-; Entry points  {{{
+; ==============================================================
+; Entry points  {{{1
 
 cold_start:
   di
@@ -1373,8 +1368,8 @@ warm_start:
   ei
   jp quit_
 
-; }}} ----------------------------------------------------------
-; Dictionary tools {{{
+; ==============================================================
+; Dictionary tools {{{1
 
 save_dictionary_pointers:
   ld hl,(dp)
@@ -1400,22 +1395,22 @@ structured:
   ; a = flow structure code to compare
   call pop_hl
   cp l
-  jp nz,unstructured_error 
+  jp nz,unstructured_error
   ret
-  
-; }}} ----------------------------------------------------------
-; Dictionary {{{
 
-_previous_nfa: defl 0 
+; ==============================================================
+; Dictionary {{{1
+
+_previous_nfa: defl 0
 
   macro header,  label_,name,flags,previous
-  
+
     ; Create a word header in the dictionary
-      
+
     ; label = label-format name (with a "_" suffix)
     ; name = string with the actual name
     ; flags = byte with the precedence and compile-only bits combined
-    
+
     label_##flags_field:  db flags
     label_##lfa:          dw _previous_nfa
     _previous_nfa:        defl $
@@ -1442,8 +1437,7 @@ _previous_nfa: defl 0
   ; hist    = historical: present in the language from the start ; XXX TODO -- remove?
   ; sf      = SamForth ; XXX TODO -- remove?
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: couplement_forth ( -- ) cf
   ;:
   ;: Noop word. If present, the program is running on Couplement Forth.
@@ -1453,8 +1447,7 @@ _previous_nfa: defl 0
 
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (bootmessage) ( -- ) cf,gforth
   ;:
   ;: Print the Couplement Forth boot message.
@@ -1469,9 +1462,8 @@ _previous_nfa: defl 0
   db "(programandala.net), 2015, 2016,",cr_char
   db "2020",cr_char+0x80
   ret
-  
-  ;.............................................................
-  ;:
+
+; --------------------------------------------------------------
   ;: bootmessage ( -- ) cf,gforth
   ;:
   ;: Print a boot message (Couplement Forth's boot message by default).
@@ -1481,8 +1473,7 @@ _previous_nfa: defl 0
 
   jp paren_bootmessage_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: clit ( -- b )
   ;:
   ;: Push the content of the next address unit to the data stack as a literal.
@@ -1497,8 +1488,7 @@ _previous_nfa: defl 0
   ex de,hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: lit ( -- x ) fig,comus,gforth
   ;:
   ;: Push the content of the next cell to the data stack as a literal.
@@ -1514,8 +1504,7 @@ _previous_nfa: defl 0
   ex de,hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: literal ( compilation: x -- ) ( run-time: -- x ) 2012
   ;:
   ;:  Interpretation: Interpretation semantics for this word are undefined.
@@ -1526,7 +1515,7 @@ _previous_nfa: defl 0
 
   header literal_,"literal",immediate+compile_only
 
-  ; XXX TODO -- write 
+  ; XXX TODO -- write
   ld de,lit_
   call compile_call_de
   ; hl = dp
@@ -1534,8 +1523,7 @@ _previous_nfa: defl 0
   ex de,hl
   jp compile_de
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: >body ( cfa -- pfa ) 94
   ;:
   ;:  XXX TODO -- doc
@@ -1550,7 +1538,7 @@ _previous_nfa: defl 0
     inc hl
     ld d,(hl)
     inc de
-    inc de 
+    inc de
     inc de
     ld (hl),d
     dec hl
@@ -1558,14 +1546,13 @@ _previous_nfa: defl 0
     ret
   else
     call pop_hl
-    inc hl 
-    inc hl 
-    inc hl 
+    inc hl
+    inc hl
+    inc hl
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 2- ( n1|u1 -- n2|u2 ) comus
   ;:
   ;:  Subtract two (2) from n1|u1 giving the difference n2|u2.
@@ -1590,8 +1577,7 @@ _previous_nfa: defl 0
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 2+ ( n1|u1 -- n2|u2 ) comus
   ;:
   ;:  Add two (2) to n1|u1 giving the sum n2|u2.
@@ -1616,8 +1602,7 @@ _previous_nfa: defl 0
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 1- ( n1|u1 -- n2|u2 ) 94
   ;:
   ;:  Subtract one (1) from n1|u1 giving the difference n2|u2.
@@ -1640,8 +1625,7 @@ _previous_nfa: defl 0
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 1+ ( n1|u1 -- n2|u2 ) 94
   ;:
   ;:  Add one (1) to n1|u1 giving the sum n2|u2.
@@ -1664,8 +1648,7 @@ _previous_nfa: defl 0
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: execute ( cfa -- ) 94
 
   header execute_,"execute",0
@@ -1673,8 +1656,7 @@ _previous_nfa: defl 0
   call pop_hl
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: perform ( a -- ) cf
 
   header perform_,"perform",0
@@ -1690,8 +1672,7 @@ _previous_nfa: defl 0
   ret z
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: prompt ( -- ) ( R: i*x -- ) gforth
   ;:
   ;: Print the system prompt.
@@ -1704,8 +1685,7 @@ _previous_nfa: defl 0
   db "k"+0x80
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: quit ( -- ) ( R: i*x -- ) 94
   ;:
   ;: Empty the return stack, store zero in `source-id` if it is present, make
@@ -1743,8 +1723,7 @@ quit.do:
   call z,prompt_
   jp quit.do
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: branch ( -- ) comus
 
   header branch_,"branch",0
@@ -1756,8 +1735,7 @@ quit.do:
   push bc
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ?branch ( f -- ) 83
 
   header question_branch_,"?branch",0
@@ -1775,8 +1753,7 @@ zero_branch_:
   inc hl
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: swap ( x1 x2 -- x2 x1 ) hist,94
 
   header swap_,"swap",0
@@ -1785,8 +1762,7 @@ zero_branch_:
   ex de,hl
   jp push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: dup ( x -- x x ) hist,94
   ;:
   ;: Duplicate the cell on the top of the stack.
@@ -1805,8 +1781,7 @@ zero_branch_:
   call push_hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ?dup ( x -- 0 | x x ) hist,94
   ;:
   ;: Duplicate the cell on the top of the stack if it is non-zero.
@@ -1819,8 +1794,7 @@ zero_branch_:
   call nz,push_hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: nip ( x1 x2 -- x2 )
 
   header nip_,"nip",0
@@ -1831,17 +1805,15 @@ zero_branch_:
   pop hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: drop ( x -- ) hist,94
 
   header drop_,"drop",0
 
   jp pop_hl
 
-  ;.............................................................
-  ;:
-  ;: interpret ( -- ) 
+; --------------------------------------------------------------
+  ;: interpret ( -- )
 
   header interpret_,"interpret",0
 
@@ -1853,7 +1825,7 @@ interpret.skip_space:
   inc hl
   ld a,(hl)
   cp space_char
-  jp z,interpret.skip_space ; 
+  jp z,interpret.skip_space ;
 ;  cp standard_tab_char ; XXX TODO -- experimental
 ;  jr z,interpret.skip_space
   cp cr_char
@@ -1872,7 +1844,7 @@ interpret.skip_space:
   ; the word was not found
   check "the word was not found "
   ld hl,(ip_fvar)
-;  call push_hl ; XXX OLD -- avoided... 
+;  call push_hl ; XXX OLD -- avoided...
 ;  call number_ ; ...using other entry point:
   call number_hl ; XXX NEW
   ld hl,(numbit_fvar) ; XXX TODO -- check if this variable is actually needed
@@ -1989,9 +1961,8 @@ compile_de_at_hl:
   ld (dp),hl
   ret
 
-  ;.............................................................
-  ;:
-  ;: (find) ( -- 0 | cfa ) 
+; --------------------------------------------------------------
+  ;: (find) ( -- 0 | cfa )
 
   header paren_find_,"(find)",0
 
@@ -2019,7 +1990,7 @@ paren_find.name_complete:
   ld de,(ip_fvar) ; XXX TMP -- debugging
 ;;  check "Name1:"
   check.string.de_b
-  
+
   ld a,b
   ld (length_of_name_searched_for),a
   ld hl,(latest) ; nfa of the first dictionary word to compare to
@@ -2036,7 +2007,7 @@ compare_the_names:
 length_of_name_searched_for: equ $+1
   ld a,0x00 ; length of the name searched for
   cp (hl) ; lengths are equal?
-  jp nz,the_names_are_different 
+  jp nz,the_names_are_different
   ; lengths are equal
 ;;  check "=L"
   push hl ; save the nfa of the dictionary word
@@ -2077,8 +2048,8 @@ compare_char:
   pop de ; nfa of the dictionary word
   ld (nfa_found),de ; needed by `interpret` later
   inc hl
-  ; hl = cfa of the dictionary word 
-  jp push_hl ; return the cfa of the dictionary word 
+  ; hl = cfa of the dictionary word
+  jp push_hl ; return the cfa of the dictionary word
 
 one_char_is_different:
 ;;  check "!c"
@@ -2107,8 +2078,7 @@ the_names_are_different:
 ;;  ld hl,0x0000 ; not found                      ;10
 ;;  jp push_hl ; return                           ;10
                                                   ;37 total T Cycles
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack
 
   header u_mult_,"u*",0
@@ -2145,8 +2115,7 @@ l5330h:
   jp nz,l5329h
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: + ( n1 n2 -- n3 ) hist,94
 
   header plus_,"+",0
@@ -2156,8 +2125,7 @@ l5330h:
   add hl,de
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack
 
   header d_plus_,"d+",0
@@ -2181,10 +2149,9 @@ l5330h:
   adc hl,bc
   jp push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: within ( n1|u1 n2|u2 n3|u3 -- flag ) 2012
-  ;:                  
+  ;:
   ;: Perform a comparison of a test value n1|u1 with a lower limit n2|u2 and an
   ;: upper limit n3|u3, returning true if either (n2|u2 < n3|u3 and (n2|u2 <=
   ;: n1|u1 and n1|u1 < n3|u3)) or (n2|u2 > n3|u3 and (n2|u2 <= n1|u1 or n1|u1 <
@@ -2212,8 +2179,7 @@ l5330h:
   call r_from_
   jp u_less_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: - ( n1 n2 -- n3 ) hist,94
 
   header minus_,"-",0
@@ -2223,9 +2189,8 @@ l5330h:
   sbc hl,de
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: negate ( n1 -- n2 ) 
+; --------------------------------------------------------------
+  ;: negate ( n1 -- n2 )
 
   header negate_,"negate",0
 
@@ -2235,9 +2200,8 @@ l5330h:
   sbc hl,de
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: dnegate ( d1 -- d2 ) 
+; --------------------------------------------------------------
+  ;: dnegate ( d1 -- d2 )
 
   header d_negate_,"dnegate",0
 
@@ -2256,8 +2220,7 @@ l5330h:
   ld h,a
   jp push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: number ( ca -- n | d ) comus
   ;:
   ;: ca = address of the first char ; XXX ;: TODO -- confirm
@@ -2390,8 +2353,7 @@ number.return:
   ld (negative_number_flags),a
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: space ( -- ) fig,79,83,94
   ;:
   ;: Display one space.
@@ -2401,8 +2363,7 @@ number.return:
   ld a,space_char
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: spaces ( u -- ) fig
   ;:
   ;: Display u spaces.
@@ -2443,8 +2404,7 @@ spaces.hl:
   jp nz,spaces.hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: emit ( c -- ) 94
 
   header emit_,"emit",0
@@ -2459,9 +2419,8 @@ print_a:
 
 ;  include "inc/emit.z80s" ; XXX TODO
 
-  ;.............................................................
-  ;:
-  ;: u. ( u -- ) 
+; --------------------------------------------------------------
+  ;: u. ( u -- )
 
   header u_dot_,"u.",0
 
@@ -2477,7 +2436,7 @@ l54a3h:
   ; XXX TODO -- pop_l or pop_a would be useful here
   call pop_hl ; XXX ? -- why not simply here?
   ld a,0x09
-  cp l 
+  cp l
   jr c,l54cdh ; base >9?
   ld a,0x30
 l54b9h:
@@ -2512,9 +2471,8 @@ l54dch:
   djnz l54dch
   jp space_
 
-  ;.............................................................
-  ;:
-  ;: /mod ( n1 n2 -- n3 n4 ) 
+; --------------------------------------------------------------
+  ;: /mod ( n1 n2 -- n3 n4 )
   ;:
   ;: Divide the second single precision number on the stack by the top single
   ;: precision number and leave the modulus (remainder) as second on the stack
@@ -2540,8 +2498,7 @@ de_hl_slash_mod.again:
   ex de,hl
   jp push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: cls ( -- ) zx
   ;:
   ;: XXX TODO
@@ -2555,9 +2512,8 @@ de_hl_slash_mod.again:
 ;  ld a,2
 ;  jp rom_chan_open
 
-  ;.............................................................
-  ;:
-  ;: create ( "name" -- ) 
+; --------------------------------------------------------------
+  ;: create ( "name" -- )
 
   header create_,"create",0
 
@@ -2606,7 +2562,7 @@ create_header.name_complete:
   ; (sp) = address of the first char of the name
   ; de = address of the last char of the name
   ; b = name length
-  ; hl = nfa of the new header 
+  ; hl = nfa of the new header
   ld a,b
   ld (hl),a
   ld (latest),hl
@@ -2637,17 +2593,15 @@ create_header.store_char
   ld (ip_fvar),de
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: noop ( <name> -- ) af,gforth,comus
 
   header noop_,"noop",0
 
   ret
 
-  ;.............................................................
-  ;:
-  ;: defer ( <name> -- ) 
+; --------------------------------------------------------------
+  ;: defer ( <name> -- )
 
   header defer_,"defer",0
 
@@ -2668,9 +2622,8 @@ compile_jp_de:
   ld (dp),hl
   ret
 
-  ;.............................................................
-  ;:
-  ;: : ( "name" -- ) 
+; --------------------------------------------------------------
+  ;: : ( "name" -- )
 
   header colon_,":",0
 
@@ -2683,8 +2636,7 @@ compile_jp_de:
   ld l,colon_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ; ( colon-sys -- ) ; XXX TODO -- stack
 
   header semicolon_,";",immediate+compile_only
@@ -2700,17 +2652,15 @@ compile_jp_de:
   call left_bracket_
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: cr ( -- ) 
+; --------------------------------------------------------------
+  ;: cr ( -- )
 
   header cr_,"cr",0
 
   ld a,0x0d
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: words ( -- ) 94
   ;:
   ;: List all the words in the context dictionary.
@@ -2741,14 +2691,13 @@ words.print_word:
   jr nz,words.print_word ; no
   ret
 
-  ;.............................................................
-  ;:
-  ;: base ( n -- ) 
+; --------------------------------------------------------------
+  ;: base ( n -- )
 
   header base_,"base",0
 
   if false
-    
+
     ; XXX OLD
     ld hl,base
     jp push_hl
@@ -2757,7 +2706,7 @@ words.print_word:
     dw 0x000A
 
   else
-    
+
     ; XXX NEW -- structure of actual variables
     call do_variable
   base: ; current number base
@@ -2766,9 +2715,8 @@ words.print_word:
 
   endif
 
-  ;.............................................................
-  ;:
-  ;: rp0 ( -- a ) 
+; --------------------------------------------------------------
+  ;: rp0 ( -- a )
 
   header rp0_,"rp0",0
 
@@ -2777,9 +2725,8 @@ words.print_word:
 rp0: ; initial value of the return stack pointer
   dw return_stack_bottom
 
-  ;.............................................................
-  ;:
-  ;: rp@ ( -- a ) 
+; --------------------------------------------------------------
+  ;: rp@ ( -- a )
 
   header rp_fetch_,"rp@",0
 
@@ -2787,9 +2734,8 @@ rp0: ; initial value of the return stack pointer
   ld hl,0
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: rp! ( a -- ) 
+; --------------------------------------------------------------
+  ;: rp! ( a -- )
 
   header rp_store_,"rp!",0
 
@@ -2799,9 +2745,8 @@ rp0: ; initial value of the return stack pointer
   ei
   ret
 
-  ;.............................................................
-  ;:
-  ;: sp0 ( -- a ) 
+; --------------------------------------------------------------
+  ;: sp0 ( -- a )
 
   header sp0_,"sp0",0
 
@@ -2810,9 +2755,8 @@ rp0: ; initial value of the return stack pointer
 sp0: ; initial value of the data stack pointer
   dw data_stack_bottom
 
-  ;.............................................................
-  ;:
-  ;: sp@ ( -- a ) 
+; --------------------------------------------------------------
+  ;: sp@ ( -- a )
 
   header sp_fetch_,"sp@",0
 
@@ -2820,9 +2764,8 @@ dsp: equ $+1 ; data stack pointer
   ld hl,data_stack_bottom
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: sp! ( a -- ) 
+; --------------------------------------------------------------
+  ;: sp! ( a -- )
 
   header sp_store_,"sp!",0
 
@@ -2830,9 +2773,8 @@ dsp: equ $+1 ; data stack pointer
   ld (dsp),hl
   ret
 
-  ;.............................................................
-  ;:
-  ;: decimal ( -- ) 
+; --------------------------------------------------------------
+  ;: decimal ( -- )
 
   header decimal_,"decimal",0
 
@@ -2840,9 +2782,8 @@ dsp: equ $+1 ; data stack pointer
   ld (base),a
   ret
 
-  ;.............................................................
-  ;:
-  ;: hex ( -- ) 
+; --------------------------------------------------------------
+  ;: hex ( -- )
 
   header hex_,"hex",0
 
@@ -2850,9 +2791,8 @@ dsp: equ $+1 ; data stack pointer
   ld (base),a
   ret
 
-  ;.............................................................
-  ;:
-  ;: c, ( c -- ) 
+; --------------------------------------------------------------
+  ;: c, ( c -- )
 
   header c_comma_,"c,",0
 
@@ -2864,9 +2804,8 @@ dsp: equ $+1 ; data stack pointer
   ld (dp),hl
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: , ( x -- ) 
+; --------------------------------------------------------------
+  ;: , ( x -- )
 
   header comma_,",",0
 
@@ -2880,9 +2819,8 @@ dsp: equ $+1 ; data stack pointer
   ld (dp),hl
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: allot ( n -- ) 
+; --------------------------------------------------------------
+  ;: allot ( n -- )
 
   header allot_,"allot",0
 
@@ -2892,9 +2830,8 @@ dsp: equ $+1 ; data stack pointer
   ld (dp),hl
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: ! ( x a -- ) 
+; --------------------------------------------------------------
+  ;: ! ( x a -- )
 
   header store_,"!",0
 
@@ -2904,9 +2841,8 @@ dsp: equ $+1 ; data stack pointer
   ld (hl),d
   ret
 
-  ;.............................................................
-  ;:
-  ;: c! ( c a -- ) 
+; --------------------------------------------------------------
+  ;: c! ( c a -- )
 
   header c_store_,"c!",0
 
@@ -2914,9 +2850,8 @@ dsp: equ $+1 ; data stack pointer
   ld (hl),e
   ret
 
-  ;.............................................................
-  ;:
-  ;: @ ( a -- ) 
+; --------------------------------------------------------------
+  ;: @ ( a -- )
 
   header fetch_,"@",0
 
@@ -2927,9 +2862,8 @@ dsp: equ $+1 ; data stack pointer
   ex de,hl
   jp push_hl ; XXX TODO -- push_de ?
 
-  ;.............................................................
-  ;:
-  ;: c@ ( ca -- ) 
+; --------------------------------------------------------------
+  ;: c@ ( ca -- )
 
   header c_fetch_,"c@",0
 
@@ -2938,8 +2872,7 @@ dsp: equ $+1 ; data stack pointer
   ld h,0x00
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: on ( a -- ) comus
 
   header on_,"on",0
@@ -2948,8 +2881,7 @@ dsp: equ $+1 ; data stack pointer
   ld (hl),true
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: off ( a -- ) comus
 
   header off_,"off",0
@@ -2958,8 +2890,7 @@ dsp: equ $+1 ; data stack pointer
   ld (hl),false
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: dp ( -- a ) fig
   ;:
   ;: Return the address of the dictionary pointer variable, which contains the
@@ -2972,20 +2903,18 @@ dp: equ $+1
   ld hl,end_of_code
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: here ( -- a ) fig,79,83,94
   ;:
   ;: Return the content of `dp`, the address of the next available memory
-  ;: location above the dictionary. 
+  ;: location above the dictionary.
 
   header here_,"here",0
 
   ld hl,(dp)
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: latest ( -- nfa ) fig,af,gforth
   ;:
   ;: Return the name field address of the last word defined in the `current`
@@ -2999,8 +2928,7 @@ latest: equ $+1
   ld hl,current_latest ; nfa of the latest Forth word in the dictionary
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ;code ( colon-sys -- ) ; XXX TODO -- stack
 
   header semicolon_code_,";code",immediate
@@ -3021,9 +2949,8 @@ semicolon.end:
   call left_bracket_
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: code: ( -- ) 
+; --------------------------------------------------------------
+  ;: code: ( -- )
   ;:
   ;: XXX TODO adapt, test
 
@@ -3036,8 +2963,7 @@ semicolon.end:
   ld l,colon_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: in ( a -- c ) zx
 
   header in_,"in",0
@@ -3050,8 +2976,7 @@ semicolon.end:
   ld h,0x00
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: out ( a c -- ) zx
 
   header out_,"out",0
@@ -3062,8 +2987,7 @@ semicolon.end:
   out (c),e
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: page ( -- ) 83,94
   ;:
   ;: On a terminal, clear the screen and resets the cursor position to the
@@ -3078,9 +3002,8 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   ; printing
   ld a,form_feed_char
   jp print_a
-  
-  ;.............................................................
-  ;:
+
+; --------------------------------------------------------------
   ;: do ( -- do-sys ) ; XXX TODO -- stack
 
   header do_,"do",compile_only
@@ -3185,8 +3108,7 @@ l62e0h:
   inc hl
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: +loop ( do-sys - ) ; XXX TODO -- stack
 
   header plus_loop_,"+loop",compile_only
@@ -3210,8 +3132,7 @@ sub_57a3h:
   ld (dp),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: loop ( do-sys -- ) ; XXX TODO -- stack
 
   header loop_,"loop",compile_only
@@ -3223,8 +3144,7 @@ sub_57a3h:
   ; hl = dp
   jp sub_57a3h
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: j ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 ) hist,94
   ;:
   ;: Return a copy of the index of the next outer loop.  May only
@@ -3258,8 +3178,7 @@ sub_57a3h:
     jp push_hl
   endif
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94
   ;:
   ;: Return a copy of the current (innermost) loop index. May only
@@ -3286,8 +3205,7 @@ sub_57a3h:
   endif
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: link ( n -- ) sf
   ;: XXX TODO adapt
 
@@ -3314,8 +3232,7 @@ link.a: ; XXX NEW symbol -- faster calls
   ld (linked_stream),a ; XXX NEW
   jp rom_chan_open
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: home ( -- ) comus,cf
   ;:
   ;: Make the next character displayed will appear in column 0, row 0 of the
@@ -3330,8 +3247,7 @@ link.a: ; XXX NEW symbol -- faster calls
   xor a
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: at-xy ( u1 u2 -- ) 94,cf
   ;:
   ;: Make the next character displayed will appear in column u1, row u2 of the
@@ -3351,8 +3267,7 @@ link.a: ; XXX NEW symbol -- faster calls
   ld a,e
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: border ( u -- ) zx
 
   header border_,"border",0
@@ -3364,8 +3279,7 @@ border.a:
   out (0xfe),a
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: beep ( u1 u2 -- ) zx
 
   header beep_,"beep",0
@@ -3373,9 +3287,8 @@ border.a:
   ; XXX TODO
   ret
 
-  ;.............................................................
-  ;:
-  ;: ." ( "ccc<quote>" -- ) 
+; --------------------------------------------------------------
+  ;: ." ( "ccc<quote>" -- )
 
   header dot_quote_,'."',compile_only
 
@@ -3416,8 +3329,7 @@ l5837h:
   inc hl
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: * ( n1 n2 -- n3 )
 
   header star_,"*",0
@@ -3425,9 +3337,8 @@ l5837h:
   call u_mult_ ; XXX TODO -- `u*`?
   jp pop_hl
 
-  ;.............................................................
-  ;:
-  ;: type ( ca len -- ) 
+; --------------------------------------------------------------
+  ;: type ( ca len -- )
 
   header type_,"type",0
 
@@ -3437,9 +3348,8 @@ l5837h:
   ld c,e
   jp print_bc_chars_at_hl
 
-  ;.............................................................
-  ;:
-  ;: bye ( -- ) 
+; --------------------------------------------------------------
+  ;: bye ( -- )
 
   header bye_,"bye",0
 
@@ -3448,23 +3358,22 @@ saved_basic_sp: equ $+1 ; Sinclair BASIC's stack pointer
   ld sp,hl
   rst 0x08     ; error
   db 0xff      ; 0: "OK"
-  
-  ;.............................................................
-  ;:
-  ;: return ( n -- ) 
+
+; --------------------------------------------------------------
+  ;: return ( n -- )
   ;:
   ;: Return to BASIC with return code _n_.
   ;: The return code is used as line number for disk operations.
 
   header return_,"return",0
-  
+
   call pop_hl
-return.hl: 
+return.hl:
   ld b,h
   ld c,l
-return.bc: 
+return.bc:
   ld sp,(saved_basic_sp)
-  ret 
+  ret
 
 return.a:
   ;: Return to BASIC with register A as return code.
@@ -3472,18 +3381,16 @@ return.a:
   ld c,a
   jr return.bc
 
-  ;.............................................................
-  ;:
-  ;: dir ( -- ) 
+; --------------------------------------------------------------
+  ;: dir ( -- )
 
   header dir_,"dir",0
 
   ld a,0x03 ; dir id
   jp return.a
 
-  ;.............................................................
-  ;:
-  ;: = ( n1 n2 -- f ) 
+; --------------------------------------------------------------
+  ;: = ( n1 n2 -- f )
 
   header equals_,"=",0
 
@@ -3503,9 +3410,8 @@ return.a:
     jp true_
   endif
 
-  ;.............................................................
-  ;:
-  ;: <> ( n1 n2 -- f ) 
+; --------------------------------------------------------------
+  ;: <> ( n1 n2 -- f )
 
   header not_equals_,"<>",0
 
@@ -3525,9 +3431,8 @@ return.a:
     jp false_
   endif
 
-  ;.............................................................
-  ;:
-  ;: / ( n1 n2 -- n3 ) 
+; --------------------------------------------------------------
+  ;: / ( n1 n2 -- n3 )
 
   header slash_,"/",0
 
@@ -3535,17 +3440,15 @@ return.a:
   call swap_
   jp pop_hl
 
-  ;.............................................................
-  ;:
-  ;: mod ( n1 n2 -- n3 ) 
+; --------------------------------------------------------------
+  ;: mod ( n1 n2 -- n3 )
 
   header mod_,"mod",0
 
   call slash_mod_
   jp pop_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: begin ( -- begin-sys ) ; XXX TODO -- stack
 
   header begin_,"begin",compile_only
@@ -3555,9 +3458,8 @@ return.a:
   ld l,begin_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: until ( begin-sys -- ) 
+; --------------------------------------------------------------
+  ;: until ( begin-sys -- )
 
   header until_,"until",compile_only
 
@@ -3568,9 +3470,8 @@ return.a:
   ; hl = dp
   jp sub_57a3h
 
-  ;.............................................................
-  ;:
-  ;: < ( n1 n2 -- f ) 
+; --------------------------------------------------------------
+  ;: < ( n1 n2 -- f )
 
   header less_,"<",0
 
@@ -3586,9 +3487,8 @@ l5a4fh:
   jp z,false_
   jp true_
 
-  ;.............................................................
-  ;:
-  ;: > ( n1 n2 -- f ) 
+; --------------------------------------------------------------
+  ;: > ( n1 n2 -- f )
 
   header greater_,">",0
 
@@ -3596,8 +3496,7 @@ l5a4fh:
   call swap_
   jp less_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: u< ( n1 n2 -- f )
 
   header u_less_,"u<",0 ; XXX TMP name
@@ -3620,8 +3519,7 @@ compare_de_hl_unsigned:
   cp e
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: rdrop ( -- ) ( R: x -- )
 
   header r_drop_,"rdrop",0
@@ -3631,8 +3529,7 @@ compare_de_hl_unsigned:
   pop de
   jp (hl)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: r@ ( -- x ) ( R: x --  )
 
   header r_fetch_,"r@",0
@@ -3641,8 +3538,7 @@ compare_de_hl_unsigned:
   push hl
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: r> ( -- x ) ( R: x -- )
 
   header r_from_,"r>",0
@@ -3652,8 +3548,7 @@ compare_de_hl_unsigned:
   push bc
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: >r ( x -- ) ( R: -- x )
 
   header to_r_,">r",0
@@ -3669,14 +3564,13 @@ compare_de_hl_unsigned:
 ;  push de
 ;  jp (hl)
 
-  ;.............................................................
-  ;:
-  ;: key? ( -- f ) 
+; --------------------------------------------------------------
+  ;: key? ( -- f )
 
   header key_question_,"key?",0
 
   ; XXX TODO
-  
+
   jp true_ ; XXX TMP
 
   if 0
@@ -3698,9 +3592,8 @@ previous_key equ $+1
 
   endif
 
-  ;.............................................................
-  ;:
-  ;: key ( -- c ) 
+; --------------------------------------------------------------
+  ;: key ( -- c )
 
   header key_,"key",0
 
@@ -3718,9 +3611,8 @@ previous_key equ $+1
   ld h,0
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: over ( x1 x2 -- x1 x2 x1 ) 
+; --------------------------------------------------------------
+  ;: over ( x1 x2 -- x1 x2 x1 )
 
   header over_,"over",0
 
@@ -3729,9 +3621,8 @@ previous_key equ $+1
   ex de,hl
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: rot ( x1 x2 x3 -- x2 x3 x1 ) 
+; --------------------------------------------------------------
+  ;: rot ( x1 x2 x3 -- x2 x3 x1 )
 
   header rot_,"rot",0
 
@@ -3746,9 +3637,8 @@ previous_key equ $+1
   pop hl
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: 2dup ( x1 x2 -- x1 x2 x1 x2 ) 
+; --------------------------------------------------------------
+  ;: 2dup ( x1 x2 -- x1 x2 x1 x2 )
 
   header two_dup_,"2dup",0
 
@@ -3756,9 +3646,8 @@ previous_key equ $+1
   call push_de_hl
   jp push_de_hl
 
-  ;.............................................................
-  ;:
-  ;: pad ( -- a ) 
+; --------------------------------------------------------------
+  ;: pad ( -- a )
   ;:
   ;: Places the address of the pad on the top of the stack. See the definition
   ;: of INPUT under NUMBER.
@@ -3769,9 +3658,8 @@ pad_address: equ $+1
   ld hl,pad_start ; XXX TODO -- rename
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: tib ( -- a ) 
+; --------------------------------------------------------------
+  ;: tib ( -- a )
 
   header tib_,"tib",0
 
@@ -3792,9 +3680,8 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
 ;to_in:
 ;  dw 0x0000 ; character offset within the input stream
 
-  ;.............................................................
-  ;:
-  ;: query ( -- ) 
+; --------------------------------------------------------------
+  ;: query ( -- )
   ;:
   ;: Clear the input buffer and accept character input until RETURN is
   ;: pressed.  It can be edited in the normal way.
@@ -3812,9 +3699,8 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ld (tib_address),hl
   ret
 
-  ;.............................................................
-  ;:
-  ;: retype ( -- ) 
+; --------------------------------------------------------------
+  ;: retype ( -- )
   ;:
   ;: This is similar to QUERY but does not clear the input buffer enabling the
   ;: text to be edited. Move the text into PAD starting at the second address
@@ -3833,8 +3719,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ld (tib_address),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: -cursor ( n -- ) ; XXX NEW
   ;:
   ;: Delete the cursor.
@@ -3846,8 +3731,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   db left_char
   jp emit_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: backspaces ( +n -- )
   ;:
   ;: Delete +n chars at the left of the cursor.
@@ -3867,8 +3751,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   dw backspaces_
   jp drop_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (accept-control-char) ( ca len len2 c -- ca len len2' )
 
   header paren_accept_control_char_,"(accept-control-char)",0
@@ -3912,8 +3795,7 @@ paren_accept_control_char.edit:
 paren_accept_control_char.end:
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (accept-ascii-char) ( ca len len2 c -- ca len len2' )
 
   header paren_accept_ascii_char_,"(accept-ascii-char)",0
@@ -3942,8 +3824,7 @@ paren_accept_ascii_char.no:
   ; no space left for the char
   jp drop_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (accept-key) ( ca len len2 c -- ca len len2' )
 
   header paren_accept_key_,"(accept-key)",0
@@ -3967,8 +3848,7 @@ paren_accept_ascii_char.no:
   dw paren_accept_control_char_ ; not ASCII
   jp paren_accept_ascii_char_ ; ASCII
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (accept) ( ca len -- len2 )
 
   header paren_accept_,"(accept)",0
@@ -3995,16 +3875,14 @@ paren_accept.begin:
   call nip_
   jp nip_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: accept ( ca +n1 -- +n2 )
 
   header accept_,"accept",0
 
   jp paren_accept_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: word ( char "<chars>ccc<char>" -- c-addr )
   ;:
   ;: XXX TODO -- edit the following ANS description:
@@ -4054,8 +3932,7 @@ word.parse:
   ld hl,(pad_address)
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: if ( -- if-sys ) ; XXX TODO -- stack
 
   header if_,"if",compile_only
@@ -4070,9 +3947,8 @@ word.parse:
   ld l,if_structure_id
   jp push_hl ; XXX TODO -- push_a?
 
-  ;.............................................................
-  ;:
-  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack  
+; --------------------------------------------------------------
+  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack
 
   header else_,"else",compile_only
 
@@ -4095,9 +3971,8 @@ word.parse:
   ld l,if_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: then ( if-sys -- ) ; XXX TODO -- stack  
+; --------------------------------------------------------------
+  ;: then ( if-sys -- ) ; XXX TODO -- stack
 
   header then_,"then",compile_only
 
@@ -4110,8 +3985,7 @@ word.parse:
   ld (hl),b
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: <builds ( -- ) ; XXX TODO -- stack
 
   header builds_,"<builds",compile_only
@@ -4146,8 +4020,7 @@ word.parse:
   ld l,builds_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: does> ( -- ) ; XXX TODO -- stack
 
   header does_,"does>",compile_only
@@ -4181,9 +4054,8 @@ word.parse:
   ld (dp),hl
   ret
 
-  ;.............................................................
-  ;:
-  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack  
+; --------------------------------------------------------------
+  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack
 
   header while_,"while",compile_only
 
@@ -4199,9 +4071,8 @@ word.parse:
   ld l,begin_structure_id
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack  
+; --------------------------------------------------------------
+  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack
 
   header repeat_,"repeat",compile_only
 
@@ -4229,9 +4100,8 @@ word.parse:
   ld (hl),b
   ret
 
-  ;.............................................................
-  ;:
-  ;: variable ( -- a ) 
+; --------------------------------------------------------------
+  ;: variable ( -- a )
 
   header variable_,"variable",0
 
@@ -4253,9 +4123,8 @@ do_variable:
   inc hl ; skip the `ret` compiled by `variable` before its value
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: constant ( -- x ) 
+; --------------------------------------------------------------
+  ;: constant ( -- x )
 
   header constant_,"constant",0
 
@@ -4266,7 +4135,7 @@ do_variable:
   call pop_hl
   ; XXX TODO two next lines could be omited if only pop_de could be used instead of pop_hl above:
   ex de,hl ;
-  ld hl,(dp) 
+  ld hl,(dp)
   ld (hl),0xc9 ; compile Z80 `ret`
   inc hl
   ld (hl),e
@@ -4286,9 +4155,8 @@ do_constant:
   ex de,hl
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: . ( n -- ) 
+; --------------------------------------------------------------
+  ;: . ( n -- )
 
   header dot_,".",0
 
@@ -4307,9 +4175,8 @@ dot_code_field.do:
   call push_hl
   jp u_dot_
 
-  ;.............................................................
-  ;:
-  ;: cmove ( ca1 ca2 len -- ) 
+; --------------------------------------------------------------
+  ;: cmove ( ca1 ca2 len -- )
 
   header cmove_,"cmove",0
 
@@ -4326,9 +4193,8 @@ dot_code_field.do:
 cmove.end:
   jp pop_hl_de
 
-  ;.............................................................
-  ;:
-  ;: and ( x1 x2 -- f ) 
+; --------------------------------------------------------------
+  ;: and ( x1 x2 -- f )
 
   header and_,"and",0
 
@@ -4341,9 +4207,8 @@ cmove.end:
   ld h,a
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: or ( x1 x2 -- f ) 
+; --------------------------------------------------------------
+  ;: or ( x1 x2 -- f )
 
   header or_,"or",0
 
@@ -4356,9 +4221,8 @@ cmove.end:
   ld h,a
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: xor ( x1 x2 -- f ) 
+; --------------------------------------------------------------
+  ;: xor ( x1 x2 -- f )
 
   header xor_,"xor",0
 
@@ -4371,9 +4235,8 @@ cmove.end:
   ld h,a
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: not ( x1 -- x2 ) 
+; --------------------------------------------------------------
+  ;: not ( x1 -- x2 )
 
   header not_,"not",0
 
@@ -4388,8 +4251,7 @@ l5d4bh:
   ld h,0x00
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: false ( -- false )
 
   header false_,"false",0
@@ -4397,8 +4259,7 @@ l5d4bh:
   ld hl,0
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: true ( -- true )
 
   header true_,"true",0
@@ -4406,8 +4267,7 @@ l5d4bh:
   ld hl,-1
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 0 ( -- 0 )
 
   header zero_,"0",0
@@ -4415,8 +4275,7 @@ l5d4bh:
   ld hl,0
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: 1 ( -- 1 )
 
   header one_,"1",0
@@ -4424,8 +4283,7 @@ l5d4bh:
   ld hl,1
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: bl ( -- c ) 94
 
   header bl_,"bl",0
@@ -4433,8 +4291,7 @@ l5d4bh:
   ld hl,space_char
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: count ( a -- a' u ) 94
 
   header count_,"count",0
@@ -4447,8 +4304,7 @@ l5d4bh:
   ld l,a
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: find (  -- ) ; XXX TODO -- stack
 
   header find_,"find",0
@@ -4471,8 +4327,7 @@ find.skip_blank:
 
   jp paren_find_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: (abort) ( i*x -- ) ( R: j*x -- ) comus
   ;:
   ;: Empty the data stack and perform the function of `quit`, which includes
@@ -4484,8 +4339,7 @@ find.skip_blank:
   call init_data_stack
   jp quit_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: abort ( i*x -- ) ( R: j*x -- ) 94
   ;:
   ;: Empty the data stack and perform the function of QUIT, which includes
@@ -4493,18 +4347,17 @@ find.skip_blank:
 
   header abort_,"abort",0
 
-  ; XXX NEW -- 2013-02-02 
+  ; XXX NEW -- 2013-02-02
   ; XXX TODO -- test, confirm
   ; XXX TODO -- improve with the exception extension set
   jp paren_abort_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: cold ( -- ) fig,comus,gforth
   ;:
   ;: The cold start procedure.  Adjust the dictionary pointer to the minimum
   ;: standard and restart via `abort`.  May be called from terminal to remove
-  ;: the application program and restart.  
+  ;: the application program and restart.
 
   header cold_,"cold",0
 
@@ -4523,8 +4376,7 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   ; XXX NOTE -- 2013-02-02 quit_ changed to abort_, after FIG-Forth.
   jp abort_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: fence ( -- a ) fig
   ;:
   ;: Return an address which contains the address below which `forget` will not operate.
@@ -4536,8 +4388,7 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
 fence:
   dw end_of_code ; address below which `forget` will not operate.
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: u/mod ( -- ) ; XXX TODO -- stack
 
   header u_slash_mod_,"u/mod",0
@@ -4587,8 +4438,7 @@ l5de3h:
   ex de,hl
   jp push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: <# ( -- ) ; XXX TODO -- stack
 
   header less_number_sign_,"<#",0
@@ -4598,8 +4448,7 @@ l5de3h:
   ld (hlds_fvar),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: #> ( -- ) ; XXX TODO -- stack
 
   header number_sign_greater_,"#>",0
@@ -4611,8 +4460,7 @@ l5de3h:
   call over_
   jp minus_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: # ( -- ) ; XXX TODO -- stack
 
   header number_sign_,"#",0
@@ -4652,8 +4500,7 @@ sub_5fc2h:
   call to_r_
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: #s ( -- ) ; XXX TODO -- stack
 
   header number_sign_s_,"#s",0
@@ -4667,9 +4514,8 @@ sub_5fc2h:
   dw number_sign_s_
   ret
 
-  ;.............................................................
-  ;:
-  ;: d. ( d -- ) 
+; --------------------------------------------------------------
+  ;: d. ( d -- )
 
   header d_dot_,"d.",0
 
@@ -4681,9 +4527,8 @@ sub_5fc2h:
   call type_
   jp space_
 
-  ;.............................................................
-  ;:
-  ;: hold ( c -- ) 
+; --------------------------------------------------------------
+  ;: hold ( c -- )
 
   header hold_,"hold",0
 
@@ -4696,8 +4541,7 @@ sub_5fc2h:
   ld (hl),a
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: sign ( -- ) ; XXX TODO -- stack
 
   header sign_,"sign",0
@@ -4720,9 +4564,8 @@ branch_5ea9:
 branch_5eb8:
   ret
 
-  ;.............................................................
-  ;:
-  ;: 0= ( n -- f ) 
+; --------------------------------------------------------------
+  ;: 0= ( n -- f )
 
   header zero_equals_,"0=",0
 
@@ -4734,9 +4577,8 @@ branch_5eb8:
   dec hl
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: 0< ( n -- f ) 
+; --------------------------------------------------------------
+  ;: 0< ( n -- f )
 
   header zero_less_,"0<",0
 
@@ -4747,18 +4589,16 @@ branch_5eb8:
   dec hl
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: inkey ( -- c ) 
+; --------------------------------------------------------------
+  ;: inkey ( -- c )
 
   header inkey_,"inkey",0
 
-  ; XXX TODO 
+  ; XXX TODO
   jp key_
 
-  ;.............................................................
-  ;:
-  ;: forget ( "name" -- ) 
+; --------------------------------------------------------------
+  ;: forget ( "name" -- )
 
   header forget_,"forget",0
 
@@ -4781,9 +4621,8 @@ branch_5eb8:
   ld (dp),hl
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
-  ;: error ( n -- ) 
+; --------------------------------------------------------------
+  ;: error ( n -- )
 
   header error_,"error",0
 
@@ -4792,9 +4631,8 @@ branch_5eb8:
   ld a,l
   jp error_a
 
-  ;.............................................................
-  ;:
-  ;: ( ( "text"<closing-paren> -- ) 
+; --------------------------------------------------------------
+  ;: ( ( "text"<closing-paren> -- )
 
   header paren_,"(",immediate
 
@@ -4807,8 +4645,7 @@ l5f40h:
   ld (ip_fvar),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: pick ( x#u...x#1 x#0 u -- x#u...x#1 x#0 x#u )
 
   header pick_,"pick",0
@@ -4820,7 +4657,7 @@ l5f40h:
   ld e,l
   dec e
   rl e
-  if data_stack_method = any_dsm 
+  if data_stack_method = any_dsm
     ld hl,(dsp)
   endif
   ld d,0x00
@@ -4832,8 +4669,7 @@ l5f40h:
   ld l,c
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: roll ( x#u x#u-1...x#0 u -- x#u-1...x#0 x#u )
 
   header roll_,"roll",0
@@ -4859,9 +4695,8 @@ l5f82h:
   ld l,e
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: char ( "c" -- ) 
+; --------------------------------------------------------------
+  ;: char ( "c" -- )
 
   ; XXX TODO use `word` instead
 
@@ -4895,9 +4730,8 @@ char.return:
   ld h,0x00
   jp push_hl
 
-  ;.............................................................
-  ;:
-  ;: [char] ( "c" -- ) 
+; --------------------------------------------------------------
+  ;: [char] ( "c" -- )
 
   header bracket_char_,"[char]",immediate
 
@@ -4919,8 +4753,7 @@ char.return:
   ld (dp),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: paper ( n -- ) zx
 
   header paper_,"paper",0
@@ -4928,8 +4761,7 @@ char.return:
   ld a,paper_char
   jp print_a_and_tos
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ink ( n -- ) zx
 
   header ink_,"ink",0
@@ -4937,8 +4769,7 @@ char.return:
   ld a,ink_char
   jp print_a_and_tos
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: bright ( f -- ) zx
 
   header bright_,"bright",0
@@ -4946,8 +4777,7 @@ char.return:
   ld a,bright_char
   jp print_a_and_tos
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: flash ( f -- ) zx
 
   header flash_,"flash",0
@@ -4959,8 +4789,7 @@ print_a_and_tos:
   ld a,l
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: colour ( n1 n2 -- ) sf
   ;:
   ;: Sets the permanent screen colours. The parameters are paper code and pen
@@ -4978,8 +4807,7 @@ print_a_and_tos:
   ex de,hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: plot ( -- ) zx
   ;: XXX TODO adapt
 
@@ -4987,8 +4815,7 @@ print_a_and_tos:
 
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: draw ( -- ) zx
   ;: XXX TODO adapt
 
@@ -4996,8 +4823,7 @@ print_a_and_tos:
 
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: drawby ( -- ) sf
   ;: XXX TODO adapt
 
@@ -5014,8 +4840,7 @@ print_a_and_tos:
 ;;  call push_de_hl
   jp draw_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ?scroll ( f -- ) sf
   ;: XXX TODO adapt
 
@@ -5030,8 +4855,7 @@ print_a_and_tos:
 ;;  jp page_forth_hmp_in
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: drive ( n -- ) sf
   ;: XXX TODO adapt
 
@@ -5040,8 +4864,7 @@ print_a_and_tos:
   call pop_hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: screen ( -- ) zx
   ;: XXX TODO adapt; rename?
 
@@ -5055,8 +4878,7 @@ print_a_and_tos:
   ld h,0x00
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: tab ( n -- ) zx
   ;: XXX TODO adapt
 
@@ -5070,8 +4892,7 @@ print_a_and_tos:
   xor a ; XXX FIXME -- why print this?
   jp print_a
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: overp ( f -- ) zx
 
   header overp_,"overp",0
@@ -5080,8 +4901,7 @@ print_a_and_tos:
   ld a,over_char
   jp print_a_and_tos
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: inverse ( f -- ) zx
 
   header inverse_,"inverse",0
@@ -5089,8 +4909,7 @@ print_a_and_tos:
   ld a,inverse_char
   jp print_a_and_tos
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: cat ( n -- ) sf
 
   header cat_,"cat",0
@@ -5101,8 +4920,7 @@ print_a_and_tos:
   ld bc,basic_line_of_cat
   jp return.bc
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: bsave ( -- ) sf
 
   header bsave_,"bsave",0
@@ -5110,8 +4928,7 @@ print_a_and_tos:
 ; XXX TODO -- rewrite
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: filename! ( ca len n -- )
   ;:
   ;: Copy a filename to a filename buffer.
@@ -5139,9 +4956,8 @@ filename_store.move
   ; bc = filename length
   ldir
   ret
-  
-  ;.............................................................
-  ;:
+
+; --------------------------------------------------------------
   ;: dloaded ( a ca len -- ) sf
   ;:
   ;: Load a code file into memory.
@@ -5156,8 +4972,7 @@ filename_store.move
   jp return.bc
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: dsaved ( a1 len1 ca2 len2 -- ) sf
   ;:
   ;: a1 len1  = memory zone
@@ -5168,8 +4983,7 @@ filename_store.move
 ; XXX TODO -- rewrite
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: push-hl ( -- x ) cf
   ;: XXX TODO adapt?
 
@@ -5179,8 +4993,7 @@ filename_store.move
 push_hl_vector: equ $+1
   jp slow_push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: pop-hl ( x -- ) cf
   ;: XXX TODO adapt?
 
@@ -5190,8 +5003,7 @@ push_hl_vector: equ $+1
 pop_hl_vector: equ $+1
   jp slow_push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: push-de-hl ( -- x1 x2 ) cf
   ;: XXX TODO adapt?
 
@@ -5201,8 +5013,7 @@ pop_hl_vector: equ $+1
 push_de_hl_vector: equ $+1
   jp slow_push_de_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: pop-hl-de ( x1 x2 -- ) cf
 
   header pop_hl_de_,"pop-hl-de",0
@@ -5212,8 +5023,7 @@ push_de_hl_vector: equ $+1
 pop_hl_de_vector: equ $+1
   jp slow_pop_hl_de
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: fast ( -- ) ace
 
   header fast_,"fast",0
@@ -5228,8 +5038,7 @@ pop_hl_de_vector: equ $+1
   ld (pop_hl_de_vector),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: slow ( -- ) ace
 
   header slow_,"slow",0
@@ -5244,8 +5053,7 @@ pop_hl_de_vector: equ $+1
   ld (pop_hl_de_vector),hl
   ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: expand ( -- ) sf
 
   header expand_,"expand",0
@@ -5264,8 +5072,7 @@ pop_hl_de_vector: equ $+1
   ld (fence),hl
   jp save_dictionary_pointers
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: state ( -- a ) 94
 
   header state_,"state",0
@@ -5275,8 +5082,7 @@ pop_hl_de_vector: equ $+1
 state:
   dw 0 ; compilation state flag (non-zero value when in compilation state)
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: bounds ( a n -- a' a ) comus
 
   header bounds_,"bounds",0
@@ -5285,28 +5091,25 @@ state:
   call plus_
   jp swap_
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: [ ( -- ) fig,83,94  "left-bracket"
 
   header left_bracket_,"[",immediate
 
   ld hl,false
   ld (state),hl
-  ret 
+  ret
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: ] ( -- ) fig,83,94  "right-bracket"
 
   header right_bracket_,"]",0
- 
+
   ld hl,true
   ld (state),hl
-  ret 
-  
-  ;.............................................................
-  ;:
+  ret
+
+; --------------------------------------------------------------
   ;: unused ( -- u ) 94
   ;:
   ;: Return the amount of space remaining in the region addressed by `here`, in
@@ -5319,31 +5122,29 @@ state:
   sbc hl,de
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: >in ( -- +n ) 83,94
   ;:
   ;: Return the address of a cell containing the offset in characters from
   ;: the start of the input buffer to the start of the parse area.
 
   header to_in_,"to_in",0
- 
+
   ; XXX TODO -- not used yet
   ; XXX TODO -- convert `ip_fvar`, an absolute address, to `to_in`.
   ld hl,to_in
   jp push_hl
-to_in: 
+to_in:
   dw 0x0000
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: depth ( -- +n ) 83,94
   ;:
   ;: Return the number of single-cell (16-bit in this case) values contained in
   ;: the data stack before it was placed on the stack.
 
   header depth_,"depth",0
-  
+
   ld hl,(sp0)
   if data_stack_method = any_dsm
     ld de,(dsp)
@@ -5354,8 +5155,7 @@ to_in:
   rr l
   jp push_hl
 
-  ;.............................................................
-  ;:
+; --------------------------------------------------------------
   ;: .s ( -- ) 94
   ;:
   ;: Copy and display the values currently on the data stack.
@@ -5372,7 +5172,7 @@ to_in:
 ;;  ld b,h
 ;;  ld c,l
 ;;dot_s.next
-  
+
 current_latest: equ dot_s_nfa
 
 end_of_code:

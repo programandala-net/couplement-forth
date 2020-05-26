@@ -51,7 +51,7 @@ Spectrum 128 with G+DOS, +3DOS or TR-DOS, with a huge library.
 == Future
 
 Couplement Forth will evolve slowly, as a test system to try and
-benchmark a Subroutine-Threaded Code Forth in the Z80 processor.
+benchmark a subroutine-threaded Forth in the Z80 processor.
 
 // The next goal is to adapt the G+DOS disk support from Solo Forth to
 // Couplement Forth, which should be very easy, either natively or with
