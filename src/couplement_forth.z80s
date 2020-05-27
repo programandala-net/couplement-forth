@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.3.1+202005271918"
+    db "0.2.0-dev.3.2+202005271925"
   endm
 
 ; --------------------------------------------------------------
@@ -417,7 +417,9 @@ get_stack_coords_and_copy_to_bc:
 ; Data stack manipulation {{{1
 
 init_data_stack:
-  if data_stack_method = any_dsm
+  if data_stack_method = ix_dsm
+    ld ix,(sp0)
+  else  
     ld hl,(sp0)
     ld (dsp),hl
   endif
@@ -2854,7 +2856,7 @@ words.print_word:
     call do_variable
   base: ; current number base
     dw 0x000A
-    ret
+    ret ; XXX FIXME --
 
   endif
 
@@ -2893,10 +2895,9 @@ rp0: ; initial value of the return stack pointer
 
   header sp0_,"sp0",0
 
-  ld hl,sp0
+sp0: equ $+1 ; initial value of the data stack pointer
+  ld hl,data_stack_bottom
   jp push_hl
-sp0: ; initial value of the data stack pointer
-  dw data_stack_bottom
 
 ; --------------------------------------------------------------
   ;: sp@ ( -- a )
@@ -2905,19 +2906,17 @@ sp0: ; initial value of the data stack pointer
 
 if data_stack_method = ix_dsm
 
-; XXX TODO --
-; XXX FIXME --
-dsp: equ $+1 ; data stack pointer
-  ld hl,data_stack_bottom
-  jp push_hl
+  push ix
+  pop hl
 
 else
 
 dsp: equ $+1 ; data stack pointer
   ld hl,data_stack_bottom
-  jp push_hl
 
 endif
+
+  jp push_hl
 
 ; --------------------------------------------------------------
   ;: sp! ( a -- )
@@ -2926,6 +2925,7 @@ endif
 
   call pop_hl
   if data_stack_method = ix_dsm
+    ; XXX TODO -- improve with direct fetch of _a_
     push hl
     pop ix
   else
