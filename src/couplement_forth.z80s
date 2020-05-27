@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.10.0+202005280042"
+    db "0.2.0-dev.11.0+202005280058"
   endm
 
 ; --------------------------------------------------------------
@@ -4794,74 +4794,18 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: colour ( n1 n2 -- ) sf ; {{{2
-  ;:
-  ;: Sets the permanent screen colours. The parameters are paper code and pen
-  ;: code.
-  ;:
-  ;: XXX TODO adapt
-
-  ; XXX FIXME --
-
-  header colour_,"colour",0
-
-  call pop_hl
-  push hl
-  call pop_hl
-  ex de,hl
-  ret
-
-; --------------------------------------------------------------
-  ;: plot ( -- ) zx ; {{{2
-  ;: XXX TODO adapt
-
-  header plot_,"plot",0
-
-  ret
-
-; --------------------------------------------------------------
-  ;: drive ( n -- ) sf ; {{{2
-  ;: XXX TODO adapt
-
-  header drive_,"drive",0
-
-  call pop_hl
-  ret
-
-; --------------------------------------------------------------
-  ;: screen ( -- ) zx ; {{{2
-  ;: XXX TODO adapt; rename?
-
-  header screen_,"screen",0
-
-  call pop_hl_de
-  ld d,e
-  ld e,l
-;;  call jnchar_rom_routine
-  ld l,a
-  ld h,0x00
-  jp push_hl
-
-; --------------------------------------------------------------
-  ;: tab ( n -- ) zx ; {{{2
-  ;: XXX TODO adapt
+  ;: tab ( -- ) zx ; {{{2
 
   header tab_,"tab",0
 
   ld a,tab_char
-  call print_a
-  call pop_hl
-  ld a,l
-  call print_a
-  xor a ; XXX FIXME -- why print this?
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: overp ( f -- ) zx ; {{{2
+  ;: overprint ( f -- ) zx ; {{{2
 
-  header overp_,"overp",0
+  header overprint_,"overprint",0
 
-  ; XXX TODO -- rename?
   ld a,over_char
   jp print_a_and_tos
 
@@ -4952,6 +4896,7 @@ filename_store.move
 
   header push_hl_,"push-hl",0
 
+  ; XXX TODO -- convert to routine address
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -4959,6 +4904,7 @@ filename_store.move
 
   header pop_hl_,"pop-hl",0
 
+  ; XXX TODO -- convert to routine address
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -4966,6 +4912,7 @@ filename_store.move
 
   header push_de_hl_,"push-de-hl",0
 
+  ; XXX TODO -- convert to routine address
   jp push_de_hl
 
 ; --------------------------------------------------------------
@@ -4973,6 +4920,7 @@ filename_store.move
 
   header pop_hl_de_,"pop-hl-de",0
 
+  ; XXX TODO -- convert to routine address
   jp pop_hl_de
 
 ; --------------------------------------------------------------
@@ -4999,6 +4947,7 @@ filename_store.move
 
   header state_,"state",0
 
+  ; XXX TODO -- fix/improve
   ld hl,state
   jp push_hl
 state:
@@ -5039,6 +4988,7 @@ state:
   ;: XXX TODO adapt -- implement and use the heap pointer as top limit
 
   header unused_,"unused",0
+
   ld de,(dp)
   ld hl,0x0000
   sbc hl,de
