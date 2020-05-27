@@ -1,6 +1,6 @@
 = Couplement Forth TO-DO
 :author: Marcos Cruz (programandala.net)
-:revdate: 2020-05-27
+:revdate: 2020-05-28
 
 // This file is part of
 // Couplement Forth
@@ -137,3 +137,5 @@ interpretation mode. non-immediate and compile-only words (e.g.
 2020-05-27: Fix the ix_dsm version of `dup`.
 
 2020-05-28: Convert 0x80-terminated strings to counted strings.
+
+2020-05-28: Add `0exit` and `?exit`.

@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.9.1+202005280032"
+    db "0.2.0-dev.10.0+202005280042"
   endm
 
 ; --------------------------------------------------------------
@@ -4550,26 +4550,19 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  ;: sign ( -- ) ; XXX TODO -- stack ; {{{2
+  ;: sign ( n d -- ) ; XXX TODO -- stack ; {{{2
+  ;: sign ( n -- ) ; XXX TODO -- standard
 
   header sign_,"sign",0
 
-  call rot_
+  call rot_ ; XXX TODO -- this is not standard
   call zero_less_
-  call zero_branch_
-  dw branch_5ea9
-  ld hl,0x002d
-  call push_hl
+  call zero_branch_ ; XXX TODO -- use `0exit`
+  dw sign_.end
+  call c_lit_
+  db "-"
   call hold_
-branch_5ea9:
-  ret
-  ; XXX FIXME -- no entry here? mark it in SamForth-B
-  call dup_
-  call zero_less_
-  call zero_branch_
-  dw branch_5eb8
-  call d_negate_
-branch_5eb8:
+sign_.end:
   ret
 
 ; --------------------------------------------------------------
