@@ -112,3 +112,7 @@ This adaptation is a work in progress.
 2020-05-27: Try a new data stack using `ix` as permanent pointer. Now
 `drop` does `jp pop_hl` (3 bytes). Using `ix` it would do much faster
 `inc ix: inc ix: ret` (5 bytes).
+
+2020-05-27: Make the data stack grow from low memory to high memory,
+towards the return stack. This makes the space between both stacks
+shared. 

@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.0.0+202005271535"
+    db "0.2.0-dev.2.0+202005271620"
   endm
 
 ; --------------------------------------------------------------
@@ -73,15 +73,14 @@ true:   equ 0xffff
 ; Couplement Forth can use different methods to manage its data stack.
 ; Every method has a constant identifier:
 
-sf_dsm:           equ %0001 ; SamForth's method: restore, check, use and save Z80 SP
-iy_unchecked_dsm: equ %0010 ; push, load, use, save and pop IX, without checks
-hl_unchecked_dsm: equ %0100 ; push, load, use, save and pop HL, without checks
-hl_dsm:           equ %1000 ; push, load, use, save and pop HL, with checks
+sp_dsm: equ %0001 ; use SP with the contents of `dsp`
+iy_dsm: equ %0010 ; use IY with the contents of `dsp`
+hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 
 ; The data stack method can be selected here, using one of the above
 ; identifiers:
 
-data_stack_method:  equ sf_dsm
+data_stack_method:  equ sp_dsm
 any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
 ; --------------------------------------------------------------
@@ -399,6 +398,8 @@ return_stack_bottom:
 ; ==============================================================
 ; Screen tools {{{1
 
+; XXX TODO -- delete
+
 ; XXX TODO -- factor all this to Forth words, when possible
 
 get_stack_coords_and_copy_to_bc:
@@ -421,11 +422,11 @@ init_data_stack:
   endif
   ret
 
-if data_stack_method = sf_dsm ; {{{2
+if data_stack_method = sp_dsm ; {{{2
 
-; SamForth's method
-; Slow versions are the original
-; Fast versions have no checks
+; This is the method used by SamForth.
+; Slow versions are the original ones.
+; Fast versions have no checks.
 
 push_hl:
 
@@ -565,7 +566,7 @@ endif
 
 endif
 
-if data_stack_method = iy_unchecked_dsm ; {{{2
+if data_stack_method = iy_dsm ; {{{2
 
 ; XXX -- alternative data stack -- experimental
 
@@ -635,85 +636,12 @@ fast_pop_hl_de:
 
 endif
 
-if data_stack_method = hl_unchecked_dsm ; {{{2
-
-; XXX -- alternative data stack -- experimental
-
-; no over/underflow checks
-
-push_hl:
-slow_push_hl:
-fast_push_hl:
-                      ; T Cycles
-  push hl             ;  11
-  push de             ;  11
-  ex de,hl            ;  04
-  ld hl,(dsp)         ;  20
-  dec hl              ;  06
-  ld (hl),d           ;  07
-  dec hl              ;  06
-  ld (hl),e           ;  07
-  ld (dsp),hl         ;  16
-  pop de              ;  10
-  pop hl              ;  10
-  ret                 ;  10
-                      ; 118 Total
-
-pop_hl:
-slow_pop_hl:
-fast_pop_hl:
-  push de
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  ex de,hl
-  pop de
-  ret
-
-push_de_hl:
-slow_push_de_hl:
-fast_push_de_hl:
-  push de
-  push hl
-  ld hl,(dsp)
-  dec hl
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  dec hl
-  pop de
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  ld (dsp),hl
-  pop hl
-  ex de,hl
-  ret
-
-pop_hl_de:
-fast_pop_hl_de:
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  push de
-  inc hl
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  pop hl
-  ret
-
-endif
-
 if data_stack_method = hl_dsm ; {{{2
 
 push_hl:
+
+if slow_mode_available
+
 slow_push_hl:
                               ; T Cycles
   push af                     ;  11
@@ -735,6 +663,10 @@ slow_push_hl:
   ret                         ;  10
                               ; 146 Total
 
+endif
+
+if fast_mode_available
+
 fast_push_hl:
                               ; T Cycles
   push hl                     ;  11
@@ -749,11 +681,16 @@ fast_push_hl:
   pop de                      ;  10
   pop hl                      ;  10
   ret                         ;  10
-                              ; 111 Total
+                              ; 118 Total
+
+endif
 
 pop_hl:
+
+if slow_mode_available
+
 slow_pop_hl:
-fast_pop_hl:
+
   push af
   push de
   ld hl,(dsp)
@@ -770,9 +707,31 @@ fast_pop_hl:
   pop af
   ret
 
+endif
+
+if fast_mode_available
+
+fast_pop_hl:
+
+  push de
+  ld hl,(dsp)
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld (dsp),hl
+  ex de,hl
+  pop de
+  ret
+
+endif
+
 push_de_hl:
+
+if slow_mode_available
+
 slow_push_de_hl:
-fast_push_de_hl:
+
   push af
   push de
   push hl
@@ -795,9 +754,37 @@ fast_push_de_hl:
   pop af
   ret
 
+endif
+
+if fast_mode_available
+
+fast_push_de_hl:
+
+  push de
+  push hl
+  ld hl,(dsp)
+  dec hl
+  ld (hl),d
+  dec hl
+  ld (hl),e
+  dec hl
+  pop de
+  ld (hl),d
+  dec hl
+  ld (hl),e
+  ld (dsp),hl
+  pop hl
+  ex de,hl
+  ret
+
+endif
+
 pop_hl_de:
+
+if slow_mode_available
+
 slow_pop_hl_de:
-fast_pop_hl_de:
+
   push af
   ld hl,(dsp)
   ld e,(hl)
@@ -816,6 +803,28 @@ fast_pop_hl_de:
   pop hl
   pop af
   ret
+
+endif
+
+if fast_mode_available
+
+fast_pop_hl_de:
+
+  ld hl,(dsp)
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  push de
+  inc hl
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld (dsp),hl
+  pop hl
+  ret
+
+endif
 
 endif
 
@@ -5031,6 +5040,8 @@ pop_hl_de_vector: equ $+1
 
   header fast_,"fast",0
 
+  if fast_mode_available
+
   ld hl,fast_push_hl
   ld (push_hl_vector),hl
   ld hl,fast_pop_hl
@@ -5039,12 +5050,17 @@ pop_hl_de_vector: equ $+1
   ld (push_de_hl_vector),hl
   ld hl,fast_pop_hl_de
   ld (pop_hl_de_vector),hl
+
+  endif
+
   ret
 
 ; --------------------------------------------------------------
   ;: slow ( -- ) ace ; {{{2
 
   header slow_,"slow",0
+
+  if slow_mode_available
 
   ld hl,slow_push_hl
   ld (push_hl_vector),hl
@@ -5054,6 +5070,9 @@ pop_hl_de_vector: equ $+1
   ld (push_de_hl_vector),hl
   ld hl,slow_pop_hl_de
   ld (pop_hl_de_vector),hl
+
+  endif
+
   ret
 
 ; --------------------------------------------------------------
