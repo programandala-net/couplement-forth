@@ -1,19 +1,22 @@
 ; Couplement Forth {{{1
 
-; An experimental subroutine-threaded Forth system for ZX Spectrum
-; <http://programandala.net/en.program.couplement_forth.html>
+; This file is part of
+; Couplement Forth
+; (http://programandala.net/en.program.couplement_forth.html),
+; by Marcos Cruz (programandala.net), 2015, 2016, 2020.
 
-; XXX UNDER DEVELOPMENT
+; Couplement Forth is an experimental subroutine-threaded Forth system under
+; development for the ZX Spectrum.
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.0.0+202005270129"
+    db "0.2.0-dev.0.0+202005271315"
   endm
-
-; Copyright (C) 2015,2016,2020 Marcos Cruz (programandala.net)
 
 ; --------------------------------------------------------------
 ; License
+
+; Copyright (C) 2015,2016,2020 Marcos Cruz (programandala.net)
 
 ; You may do whatever you want with this work, so long as you
 ; retain all copyright notices, all credit notices, and this

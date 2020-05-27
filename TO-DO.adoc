@@ -1,6 +1,14 @@
 = Couplement Forth TO-DO
 :author: Marcos Cruz (programandala.net)
-:revdate: 2016-03-16
+:revdate: 2020-05-27
+
+// This file is part of
+// Couplement Forth
+// (http://programandala.net/en.program.couplement_forth.html),
+// by Marcos Cruz (programandala.net), 2015, 2016, 2020.
+//
+// This file is written in Asciidoctor format
+// (http://asciidoctor.org).
 
 Fix: `;` can be interpreted, even after adding `or compile_only` to
 its header!
@@ -28,10 +36,7 @@ New: `allocate`, `free`, `resize`.
 
 Complete the empty stack comments.
 
-Improve the keyboard input:
-
 - Implement the SAM Coupé's cursors.
-- When Return is pressed, move the cursor at the end of the line.
 
 Convert the `create_header` routine to the new header format.
 
@@ -66,22 +71,24 @@ depending on how often the condition is true.
 
 Optimize the primitives, e.g.:
 Don't use `call pad_` but take the pad address directly,
-**without using the data stack**.
+*without using the data stack*.
 
 New words: `?do`, `case`, `?dup`.
 
 New words: `cmove>` y `move`.
 
 Ideas for the file interface:
-`load` to load a (already opened?) source file.
-`emit` is defered and pointed to a file when needed.
-`cr` and `type` are defered and use `emit` by default.
-`page` does `cls` on screen, but prints a form feed char to printer or file.
-Gforth and lina work this way (confirm).
-`open` and `close` manage the files (they parse the names)
-`opened` and `closed` are the non-parsing versions.
-`include` would be just `open throw load`
-Only the input word is missing. Use `key` or `accept`?
+
+- `load` to load a (already opened?) source file.
+- `emit` is defered and pointed to a file when needed.
+- `cr` and `type` are defered and use `emit` by default.
+- `page` does `cls` on screen, but prints a form feed char to printer
+  or file. Gforth and lina work this way (confirm).
+- `open` and `close` manage the files (they parse the names)
+- `opened` and `closed` are the non-parsing versions.
+- `include` would be just `open throw load`
+- Only the input word is missing. Use `key` or `accept`?
+
 This way, all input and output could be redirected to files.
 
 Document the stack notation.
@@ -101,3 +108,7 @@ This adaptation is a work in progress.
 ;  ret z                      ; error: 05; no error: 11
 ;  jp unstructured_error      ; error: 10; no error: 00
 ----
+
+2020-05-27: Try a new data stack using `ix` as permanent pointer. Now
+`drop` does `jp pop_hl` (3 bytes). Using `ix` it would do much faster
+`inc ix: inc ix: ret` (5 bytes).

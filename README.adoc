@@ -2,6 +2,14 @@
 :author: Marcos Cruz (programandala.net)
 :revdate: 2020-05-27
 
+// This file is part of
+// Couplement Forth
+// (http://programandala.net/en.program.couplement_forth.html),
+// by Marcos Cruz (programandala.net), 2015, 2016, 2020.
+//
+// This file is written in Asciidoctor format
+// (http://asciidoctor.org).
+
 == Description
 
 Couplement Forth is a small and experimental STC (Subroutine-Threaded
