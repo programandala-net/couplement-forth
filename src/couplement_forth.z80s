@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.8.0+202005280008"
+    db "0.2.0-dev.8.1+202005280021"
   endm
 
 ; --------------------------------------------------------------
@@ -1695,14 +1695,12 @@ _previous_nfa: defl 0
 
   header perform_,"perform",0
 
-  ; XXX TODO -- make it optional
-  ; XXX FIXME -- it seems the byte order is wrong
   call pop_hl
   ld a,(hl)
   inc hl
-  ld l,(hl)
-  ld h,a
-  or l
+  ld h,(hl)
+  ld l,a
+  or h
   ret z
   jp (hl)
 
@@ -4306,7 +4304,7 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: find (  -- ) ; XXX TODO -- stack ; {{{2
+  ;: find ( "name" -- cfa ) ; ; {{{2
 
   header find_,"find",0
 
