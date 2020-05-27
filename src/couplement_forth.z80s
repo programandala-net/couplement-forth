@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.3.3+202005271941"
+    db "0.2.0-dev.4.0+202005271942"
   endm
 
 ; --------------------------------------------------------------
@@ -2842,7 +2842,6 @@ words.print_word:
   header base_,"base",0
 
   call do_variable
-  ret
 base: ; current number base
   dw 0x000A
 
@@ -4255,8 +4254,6 @@ word.parse:
   ld de,do_variable
   call compile_call_de
   ; hl = dp
-  ld (hl),0xc9 ; compile Z80 `ret`
-  inc hl ; point to the address of the value
   inc hl
   inc hl ; point to the address after the value
   ld (dp),hl
@@ -4265,8 +4262,6 @@ word.parse:
 ; XXX TODO create word `(variable)` or `do_variable`?
 do_variable:
   pop hl ; get the return address
-  push hl ; restore it
-  inc hl ; skip the `ret` compiled by `variable` before its value
   jp push_hl
 
 ; --------------------------------------------------------------

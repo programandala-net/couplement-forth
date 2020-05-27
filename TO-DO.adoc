@@ -120,7 +120,4 @@ shared.
 2020-05-27: Remove all of the compilation security checks and the
 `structured` subroutine.
 
-2020-05-27: Save the `ret` after a `variable` value:
-manage the return in `do_variable`.
-
 2020-05-27: Fix: any number of "?" characteres is ignored.
