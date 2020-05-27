@@ -127,3 +127,9 @@ Forth: `csp`, `!csp` and `?csp`.
 `push-hl` and `push-de-hl` with constants `pop-hl_`, `pop-hl-de_`,
 `push-hl_` and `push-de-hl_` returning the address of the
 corresponding routines, to be used in assembly.
+
+2020-05-27: Fix: immediate and compile-only words can be executed in
+interpretation mode. non-immediate and compile-only words (e.g.
+`<builds`) don't. Probably there's a problem in `interpret`.
+
+2020-05-27: Fix: check the data stack in `interpret` with `?stack`.
