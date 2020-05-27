@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.3.2+202005271925"
+    db "0.2.0-dev.3.3+202005271941"
   endm
 
 ; --------------------------------------------------------------
@@ -2841,24 +2841,10 @@ words.print_word:
 
   header base_,"base",0
 
-  if false
-
-    ; XXX OLD
-    ld hl,base
-    jp push_hl
-    call do_variable
-  base: ; current number base
-    dw 0x000A
-
-  else
-
-    ; XXX NEW -- structure of actual variables
-    call do_variable
-  base: ; current number base
-    dw 0x000A
-    ret ; XXX FIXME --
-
-  endif
+  call do_variable
+  ret
+base: ; current number base
+  dw 0x000A
 
 ; --------------------------------------------------------------
   ;: rp0 ( -- a )
