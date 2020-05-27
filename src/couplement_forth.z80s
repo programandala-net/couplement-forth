@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.7.0+202005272215"
+    db "0.2.0-dev.8.0+202005272235"
   endm
 
 ; --------------------------------------------------------------
@@ -1813,18 +1813,28 @@ quit.do:
   ret
 
 ; --------------------------------------------------------------
-  ;: ?branch ( f -- ) 83 ; {{{2
+  ;: ?branch ( f -- ) ; {{{2
 
   header question_branch_,"?branch",0
 
-branch_if_0_:
-branch_if_zero_:
-branch_if_false_:
-zero_branch_:
   call pop_hl
   ld a,l
   cp h
-  jr z,branch_
+  jp nz,branch_
+  pop hl
+  inc hl
+  inc hl
+  jp (hl)
+
+; --------------------------------------------------------------
+  ;: 0branch ( f -- ) ; {{{2
+
+  header zero_branch_,"0branch",0
+
+  call pop_hl
+  ld a,l
+  cp h
+  jp z,branch_
   pop hl
   inc hl
   inc hl
@@ -1848,6 +1858,7 @@ zero_branch_:
 
   if faster_stack_operations
     if data_stack_method = ix_dsm
+      ; XXX FIXME -- 
       ld e,(ix)
       inc ix
       ld d,(ix)
@@ -3554,7 +3565,7 @@ return.a:
 
   ld a,begin_structure_id
   call structured
-  ld de,question_branch_
+  ld de,zero_branch_
   call compile_call_de
   ; hl = dp
   jp sub_57a3h
@@ -3835,8 +3846,8 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   call emit_
   call one_minus_
   call dup_
-  call zero_equals_
-  call branch_if_false_
+  call zero_equals_ ; XXX TODO --
+  call zero_branch_ ; XXX TODO -- improve with `?branch`
   dw backspaces_
   jp drop_
 
@@ -3851,12 +3862,12 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   call c_lit_
   db delete_char
   call equals_ ; delete?
-  call branch_if_false_
+  call zero_branch_
   dw paren_accept_control_char.edit
   ; delete the last char
   call drop_ ; c
   call dup_ ; something to delete?
-  call branch_if_zero_
+  call zero_branch_
   dw paren_accept_control_char.end
   ; do it
   call minus_cursor_
@@ -3869,11 +3880,11 @@ paren_accept_control_char.edit:
   call c_lit_
   db edit_char
   call equals_ ; edit?
-  call branch_if_false_
+  call zero_branch_
   dw paren_accept_control_char.end
   ; delete the whole input
   call dup_ ; something to delete?
-  call branch_if_zero_
+  call zero_branch_
   dw paren_accept_control_char.end
   ; do it
   call minus_cursor_
@@ -3895,7 +3906,7 @@ paren_accept_control_char.end:
   call minus_
   call r_from_
   call swap_ ; space left
-  call branch_if_0_
+  call zero_branch_
   dw paren_accept_ascii_char.no
 
   ; there's space left for the char
@@ -3933,7 +3944,7 @@ paren_accept_ascii_char.no:
     call r_from_
     call u_less_
   endif
-  call branch_if_false_
+  call zero_branch_
   dw paren_accept_control_char_ ; not ASCII
   jp paren_accept_ascii_char_ ; ASCII
 
@@ -3955,7 +3966,7 @@ paren_accept.begin:
   call c_lit_
   db cr_char
   call equals_  ; return?
-  call branch_if_false_
+  call zero_branch_
   dw paren_accept_key_ ; no
   ; the return key was pressed
   call minus_cursor_
@@ -4026,7 +4037,7 @@ word.parse:
 
   header if_,"if",immediate+compile_only
 
-  ld de,question_branch_
+  ld de,zero_branch_
   call compile_call_de
   ; hl = dp
   call push_hl ; save the address of the jump address
@@ -4150,7 +4161,7 @@ word.parse:
 
   ld a,begin_structure_id
   call structured
-  ld de,question_branch_
+  ld de,zero_branch_
   call compile_call_de
   ; hl = dp
   call push_hl
@@ -4556,7 +4567,7 @@ l5de3h:
   call push_hl
   call over_
   call less_
-  call question_branch_
+  call zero_branch_
   dw branch_5e39
   ld hl,0x0007
   call push_hl
@@ -4588,10 +4599,9 @@ sub_5fc2h:
   header number_sign_s_,"#s",0
 
   call number_sign_
-  call over_
+  call over_ ; XXX TODO -- over over -> 2dup
   call over_
   call or_
-  call zero_equals_
   call question_branch_
   dw number_sign_s_
   ret
@@ -4630,7 +4640,7 @@ sub_5fc2h:
 
   call rot_
   call zero_less_
-  call question_branch_
+  call zero_branch_
   dw branch_5ea9
   ld hl,0x002d
   call push_hl
@@ -4640,7 +4650,7 @@ branch_5ea9:
   ; XXX FIXME -- no entry here? mark it in SamForth-B
   call dup_
   call zero_less_
-  call question_branch_
+  call zero_branch_
   dw branch_5eb8
   call d_negate_
 branch_5eb8:
