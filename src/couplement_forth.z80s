@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.8.1+202005280021"
+    db "0.2.0-dev.9.0+202005280030"
   endm
 
 ; --------------------------------------------------------------
@@ -1813,23 +1813,27 @@ quit.do:
 
   if faster_stack_operations
     if data_stack_method = ix_dsm
-      ; XXX FIXME -- 
-      ld e,(ix)
-      inc ix
-      ld d,(ix)
-      inc ix
+      ld e,(ix+0)
+      ld d,(ix+1)
+      ld (ix-1),d
+      ld (ix-2),e
+      dec ix
+      dec ix
+      ret
     else
       ld hl,(dsp)
       ld e,(hl)
       inc hl
       ld d,(hl)
       ex de,hl
+      call push_hl
+      jp push_hl
     endif
   else
     call pop_hl
+    call push_hl
+    jp push_hl
   endif
-  call push_hl
-  jp push_hl
 
 ; --------------------------------------------------------------
   ;: ?dup ( x -- 0 | x x ) hist,94 ; {{{2
@@ -1860,7 +1864,13 @@ quit.do:
 
   header drop_,"drop",0
 
-  jp pop_hl
+  if data_stack_method = ix_dsm
+    inc ix
+    inc ix
+    ret
+  else
+    jp pop_hl
+  endif  
 
 ; --------------------------------------------------------------
   ;: interpret ( -- )
