@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.4.0+202005271942"
+    db "0.2.0-dev.5.0+202005271957"
   endm
 
 ; --------------------------------------------------------------
@@ -4259,7 +4259,7 @@ word.parse:
   ld (dp),hl
   jp save_dictionary_pointers
 
-; XXX TODO create word `(variable)` or `do_variable`?
+; XXX TODO create word `(variable)` or `do_variable` and call to its cfa
 do_variable:
   pop hl ; get the return address
   jp push_hl
@@ -4277,8 +4277,6 @@ do_variable:
   ; XXX TODO two next lines could be omited if only pop_de could be used instead of pop_hl above:
   ex de,hl ;
   ld hl,(dp)
-  ld (hl),0xc9 ; compile Z80 `ret`
-  inc hl
   ld (hl),e
   inc hl
   ld (hl),d
@@ -4286,10 +4284,9 @@ do_variable:
   ld (dp),hl
   jp save_dictionary_pointers
 
+; XXX TODO create word `(constant)` or `do_constant` and call to its cfa
 do_constant:
   pop hl
-  push hl
-  inc hl
   ld e,(hl)
   inc hl
   ld d,(hl)
