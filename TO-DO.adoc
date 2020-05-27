@@ -133,3 +133,5 @@ interpretation mode. non-immediate and compile-only words (e.g.
 `<builds`) don't. Probably there's a problem in `interpret`.
 
 2020-05-27: Fix: check the data stack in `interpret` with `?stack`.
+
+2020-05-27: Fix the ix_dsm version of `dup`.
