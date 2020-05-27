@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.6.0+202005272146"
+    db "0.2.0-dev.6.1+202005272152"
   endm
 
 ; --------------------------------------------------------------
@@ -2512,10 +2512,7 @@ print_a:
   header u_dot_,"u.",0
 
   if data_stack_method = ix_dsm
-    ; XXX TODO --
-    ; XXX FIXME --
     push ix
-    pop hl
   else
     ld hl,(dsp)
     push hl
@@ -2548,8 +2545,6 @@ l54cdh:
 l54d1h:
   pop hl
   if data_stack_method = ix_dsm
-    ; XXX TODO --
-    ; XXX FIXME --
     push ix
     pop de
   else
