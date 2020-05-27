@@ -5,12 +5,12 @@
 ; (http://programandala.net/en.program.couplement_forth.html),
 ; by Marcos Cruz (programandala.net), 2015, 2016, 2020.
 
-; Couplement Forth is an experimental subroutine-threaded Forth system under
-; development for the ZX Spectrum.
+; Couplement Forth is an experimental subroutine-threaded Forth
+; system under development for the ZX Spectrum.
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.5.0+202005271957"
+    db "0.2.0-dev.6.0+202005272146"
   endm
 
 ; --------------------------------------------------------------
@@ -27,9 +27,9 @@
 ; Credits
 
 ; Couplement Forth was forked from ForthCoupe
-; (http://programandala.net/en.program.forthcoupe.html),
-; an abandoned project based on John A. Avis' SamForth
-; (http://programandala.net/en.program.samforth.html).
+; (http://programandala.net/en.program.forthcoupe.html), an
+; abandoned Forth for the SAM Coupé, based on John A. Avis'
+; SamForth (http://programandala.net/en.program.samforth.html).
 
 ; ==============================================================
 ; Symbols {{{1
@@ -70,16 +70,16 @@ true:   equ 0xffff
 ; --------------------------------------------------------------
 ; Data stack method {{{2
 
-; Couplement Forth can use different methods to manage its data stack.
-; Every method has a constant identifier:
+; Couplement Forth can use different methods to manage its data
+; stack. Every method has a constant identifier:
 
 sp_dsm: equ %0001 ; use SP with the contents of `dsp`
 iy_dsm: equ %0010 ; use IY with the contents of `dsp`
 ix_dsm: equ %0100 ; use IX to hold the stack pointer permanently
 hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 
-; The data stack method can be selected here, using one of the above
-; identifiers:
+; The data stack method can be selected here, using one of the
+; above identifiers:
 
 data_stack_method:  equ sp_dsm
 any_dsm:            equ data_stack_method ; XXX TODO -- simpler
@@ -87,28 +87,24 @@ any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 ; --------------------------------------------------------------
 ; Execution speed {{{2
 
-; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
-; default.  In fast mode, some stack checking is omited.  The words `slow` and
-; `fast` change the current mode.
-;
-; In order to save space, one of both modes can be omited in the kernel.  In
-; this case the words `slow` and `fast` are created as alias of `noop`.
+; Couplement Forth can be compiled in two modes: normal
+; (default) and safe. In safe mode, the data stack limits are.
 
-slow_mode_available: equ true
-fast_mode_available: equ true
+safe_mode: equ false
 
-; Some stack operations can be faster by manipulating the stack directly (thus
-; without any error checking) instead of calling the push/pop routines.  This
-; configuration is independent from the speed mode above.
+; Some stack operations can be faster by manipulating the stack
+; directly (thus without any error checking) instead of calling
+; the push/pop routines.  This configuration is independent from
+; the speed mode above.
 
 faster_stack_operations: equ true
 
 ; --------------------------------------------------------------
 ; Size {{{2
 
-; When size optimization is on, relative jumps are used when possible, and
-; some inline code is replaced with calls.  Some bytes will be saved, but the
-; code will be a bit slower.
+; When size optimization is on, relative jumps are used when
+; possible, and some inline code is replaced with calls.  Some
+; bytes will be saved, but the code will be a bit slower.
 
 ; XXX TODO
 size_optimization: equ false
@@ -419,7 +415,7 @@ get_stack_coords_and_copy_to_bc:
 init_data_stack:
   if data_stack_method = ix_dsm
     ld ix,(sp0)
-  else  
+  else
     ld hl,(sp0)
     ld (dsp),hl
   endif
@@ -434,9 +430,8 @@ if data_stack_method = sp_dsm ; {{{2
 
 push_hl:
 
-if slow_mode_available
+if safe_mode
 
-slow_push_hl:
                               ; T Cycles
   push hl                     ;  11
   ld (rsp_copy),sp            ;  20
@@ -446,31 +441,30 @@ slow_push_hl:
   sbc hl,sp                   ;  15
   jp nc,stack_full_error      ;  01 (if no jump)
   ld (dsp),sp                 ;  20
-  ld sp,(rsp_copy)            ;  20
+rsp_copy: equ $+1
+  ld sp,return_stack_bottom   ;  10
   pop hl                      ;  10
   ret                         ;  10
-                              ; 148 Total
+                              ; 138 Total
 
-endif
+else
 
-if fast_mode_available
-
-fast_push_hl:
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
   push hl                     ;  11
   ld (dsp),sp                 ;  20
-rsp_copy: equ $+2 ; return stack pointer's tmp copy
+rsp_copy: equ $+1
   ld sp,return_stack_bottom   ;  10
   ret                         ;  10
                               ;  91 Total
+
 endif
 
 pop_hl:
 
-if slow_mode_available
-slow_pop_hl:
+if safe_mode
+
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -482,11 +476,8 @@ slow_pop_hl:
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
                               ; 136 Total
-endif
+else
 
-if fast_mode_available
-
-fast_pop_hl:
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -495,13 +486,13 @@ fast_pop_hl:
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
                               ; 100 Total
+
 endif
 
 push_de_hl:
 
-if slow_mode_available
+if safe_mode
 
-slow_push_de_hl:
                               ; T Cycles
   push hl                     ;  11
   ld (rsp_copy),sp            ;  20
@@ -516,11 +507,8 @@ slow_push_de_hl:
   pop hl                      ;  10
   ret                         ;  10
                               ; 159 Total
-endif
+else
 
-if fast_mode_available
-
-fast_push_de_hl:
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -534,9 +522,8 @@ endif
 
 pop_hl_de:
 
-if slow_mode_available
+if safe_mode
 
-slow_pop_hl_de:
   ; Modified SamForth's version, with one check
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
@@ -551,11 +538,8 @@ slow_pop_hl_de:
   ret                         ;  10
                               ; 146 Total
 
-endif
+else
 
-if fast_mode_available
-
-fast_pop_hl_de:
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -568,7 +552,7 @@ fast_pop_hl_de:
 
 endif
 
-endif
+endif ; data_stack_method = sp_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = iy_dsm ; {{{2
@@ -578,8 +562,6 @@ if data_stack_method = iy_dsm ; {{{2
 ; no fast/slow variants: no over/underflow checks
 
 push_hl:
-slow_push_hl:
-fast_push_hl:
                       ; T Cycles
   push iy             ;  15
   ld iy,(dsp)         ;  20
@@ -593,8 +575,6 @@ fast_push_hl:
                       ; 137 total
 
 pop_hl:
-slow_pop_hl:
-fast_pop_hl:
   push iy
   ld iy,(dsp)
   ld l,(iy)
@@ -606,8 +586,6 @@ fast_pop_hl:
   ret
 
 push_de_hl:
-slow_push_de_hl:
-fast_push_de_hl:
   push iy
   ld iy,(dsp)
   dec iy
@@ -623,8 +601,6 @@ fast_push_de_hl:
   ret
 
 pop_hl_de:
-slow_pop_hl_de:
-fast_pop_hl_de:
   push iy
   ld iy,(dsp)
   ld l,(iy)
@@ -639,16 +615,15 @@ fast_pop_hl_de:
   pop iy
   ret
 
-endif
+endif ; data_stack_method = iy_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = hl_dsm ; {{{2
 
 push_hl:
 
-if slow_mode_available
+if safe_mode
 
-slow_push_hl:
                               ; T Cycles
   push af                     ;  11
   push hl                     ;  11
@@ -669,11 +644,8 @@ slow_push_hl:
   ret                         ;  10
                               ; 146 Total
 
-endif
+else
 
-if fast_mode_available
-
-fast_push_hl:
                               ; T Cycles
   push hl                     ;  11
   push de                     ;  11
@@ -693,9 +665,7 @@ endif
 
 pop_hl:
 
-if slow_mode_available
-
-slow_pop_hl:
+if safe_mode
 
   push af
   push de
@@ -713,11 +683,7 @@ slow_pop_hl:
   pop af
   ret
 
-endif
-
-if fast_mode_available
-
-fast_pop_hl:
+else
 
   push de
   ld hl,(dsp)
@@ -734,9 +700,7 @@ endif
 
 push_de_hl:
 
-if slow_mode_available
-
-slow_push_de_hl:
+if safe_mode
 
   push af
   push de
@@ -760,11 +724,7 @@ slow_push_de_hl:
   pop af
   ret
 
-endif
-
-if fast_mode_available
-
-fast_push_de_hl:
+else
 
   push de
   push hl
@@ -787,9 +747,7 @@ endif
 
 pop_hl_de:
 
-if slow_mode_available
-
-slow_pop_hl_de:
+if safe_mode
 
   push af
   ld hl,(dsp)
@@ -810,11 +768,7 @@ slow_pop_hl_de:
   pop af
   ret
 
-endif
-
-if fast_mode_available
-
-fast_pop_hl_de:
+else
 
   ld hl,(dsp)
   ld e,(hl)
@@ -832,7 +786,7 @@ fast_pop_hl_de:
 
 endif
 
-endif
+endif ; data_stack_method = hl_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = ix_dsm ; {{{2
@@ -844,8 +798,6 @@ if data_stack_method = ix_dsm ; {{{2
 ; no fast/slow variants: no over/underflow checks
 
 push_hl:
-slow_push_hl:
-fast_push_hl:
                       ; T Cycles
   dec ix              ;  10
   ld (ix),h           ;  19
@@ -855,8 +807,6 @@ fast_push_hl:
                       ; 068 total
 
 pop_hl:
-slow_pop_hl:
-fast_pop_hl:
   ld l,(ix)
   inc ix
   ld h,(ix)
@@ -864,8 +814,6 @@ fast_pop_hl:
   ret
 
 push_de_hl:
-slow_push_de_hl:
-fast_push_de_hl:
   dec ix
   ld (ix),d
   dec ix
@@ -877,8 +825,7 @@ fast_push_de_hl:
   ret
 
 pop_hl_de:
-slow_pop_hl_de:
-fast_pop_hl_de:
+
   ld l,(ix)
   inc ix
   ld h,(ix)
@@ -889,7 +836,7 @@ fast_pop_hl_de:
   inc ix
   ret
 
-endif
+endif ; data_stack_method = ix_dsm
 
 ; ==============================================================
 ; Keyboard input {{{1
@@ -1322,8 +1269,6 @@ wrap_print_message_at_hl.end_of_message_found:
   ; b = message length
 
   ret
-
-
 
 ; ==============================================================
 ; Errors {{{1
@@ -2566,7 +2511,12 @@ print_a:
 
   header u_dot_,"u.",0
 
-  if data_stack_method = any_dsm
+  if data_stack_method = ix_dsm
+    ; XXX TODO --
+    ; XXX FIXME --
+    push ix
+    pop hl
+  else
     ld hl,(dsp)
     push hl
   endif
@@ -2598,6 +2548,8 @@ l54cdh:
 l54d1h:
   pop hl
   if data_stack_method = ix_dsm
+    ; XXX TODO --
+    ; XXX FIXME --
     push ix
     pop de
   else
@@ -3000,7 +2952,7 @@ endif
 
   header fetch_,"@",0
 
-  call pop_hl ; XXX TODO -- use pop_de instead and ld hl,(de)
+  call pop_hl
   ld e,(hl)
   inc hl
   ld d,(hl)
@@ -4798,7 +4750,7 @@ l5f40h:
   if data_stack_method = ix_dsm
     push ix
     pop hl
-  else 
+  else
     ld hl,(dsp)
   endif
   ld d,0x00
@@ -5126,83 +5078,31 @@ filename_store.move
 
 ; --------------------------------------------------------------
   ;: push-hl ( -- x ) cf ; {{{2
-  ;: XXX TODO adapt?
 
   header push_hl_,"push-hl",0
 
-;  ld hl,push_hl ; XXX OLD
-push_hl_vector: equ $+1
-  jp slow_push_hl
+  jp push_hl
 
 ; --------------------------------------------------------------
   ;: pop-hl ( x -- ) cf ; {{{2
-  ;: XXX TODO adapt?
 
   header pop_hl_,"pop-hl",0
 
-;  ld hl,pop_hl ; XXX OLD
-pop_hl_vector: equ $+1
-  jp slow_push_hl
+  jp push_hl
 
 ; --------------------------------------------------------------
   ;: push-de-hl ( -- x1 x2 ) cf ; {{{2
-  ;: XXX TODO adapt?
 
   header push_de_hl_,"push-de-hl",0
 
-;   ld hl,push_de_hl ; XXX OLD
-push_de_hl_vector: equ $+1
-  jp slow_push_de_hl
+  jp push_de_hl
 
 ; --------------------------------------------------------------
   ;: pop-hl-de ( x1 x2 -- ) cf ; {{{2
 
   header pop_hl_de_,"pop-hl-de",0
-  ;: XXX TODO adapt?
 
-;  ld hl,pop_hl_de ; XXX OLD
-pop_hl_de_vector: equ $+1
-  jp slow_pop_hl_de
-
-; --------------------------------------------------------------
-  ;: fast ( -- ) ace ; {{{2
-
-  header fast_,"fast",0
-
-  if fast_mode_available
-
-  ld hl,fast_push_hl
-  ld (push_hl_vector),hl
-  ld hl,fast_pop_hl
-  ld (pop_hl_vector),hl
-  ld hl,fast_push_de_hl
-  ld (push_de_hl_vector),hl
-  ld hl,fast_pop_hl_de
-  ld (pop_hl_de_vector),hl
-
-  endif
-
-  ret
-
-; --------------------------------------------------------------
-  ;: slow ( -- ) ace ; {{{2
-
-  header slow_,"slow",0
-
-  if slow_mode_available
-
-  ld hl,slow_push_hl
-  ld (push_hl_vector),hl
-  ld hl,slow_pop_hl
-  ld (pop_hl_vector),hl
-  ld hl,slow_push_de_hl
-  ld (push_de_hl_vector),hl
-  ld hl,slow_pop_hl_de
-  ld (pop_hl_de_vector),hl
-
-  endif
-
-  ret
+  jp pop_hl_de
 
 ; --------------------------------------------------------------
   ;: expand ( -- ) sf ; {{{2
