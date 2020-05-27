@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.11.0+202005280058"
+    db "0.2.0-dev.12.0+202005280144"
   endm
 
 ; --------------------------------------------------------------
@@ -4892,36 +4892,36 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: push-hl ( -- x ) cf ; {{{2
+  ;: push-hl_ ( -- x ) cf ; {{{2
 
-  header push_hl_,"push-hl",0
+  header push_hl_,"push-hl_",0
 
-  ; XXX TODO -- convert to routine address
-  jp push_hl
-
-; --------------------------------------------------------------
-  ;: pop-hl ( x -- ) cf ; {{{2
-
-  header pop_hl_,"pop-hl",0
-
-  ; XXX TODO -- convert to routine address
-  jp push_hl
+  call do_constant
+  dw push_hl
 
 ; --------------------------------------------------------------
-  ;: push-de-hl ( -- x1 x2 ) cf ; {{{2
+  ;: pop-hl_ ( x -- ) cf ; {{{2
 
-  header push_de_hl_,"push-de-hl",0
+  header pop_hl_,"pop-hl_",0
 
-  ; XXX TODO -- convert to routine address
-  jp push_de_hl
+  call do_constant
+  dw push_hl
 
 ; --------------------------------------------------------------
-  ;: pop-hl-de ( x1 x2 -- ) cf ; {{{2
+  ;: push-de-hl_ ( -- x1 x2 ) cf ; {{{2
 
-  header pop_hl_de_,"pop-hl-de",0
+  header push_de_hl_,"push-de-hl_",0
 
-  ; XXX TODO -- convert to routine address
-  jp pop_hl_de
+  call do_constant
+  dw push_de_hl
+
+; --------------------------------------------------------------
+  ;: pop-hl-de_ ( x1 x2 -- ) cf ; {{{2
+
+  header pop_hl_de_,"pop-hl-de_",0
+
+  call do_constant
+  dw pop_hl_de
 
 ; --------------------------------------------------------------
   ;: expand ( -- ) sf ; {{{2
