@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.8.0+202005272235"
+    db "0.2.0-dev.8.0+202005280008"
   endm
 
 ; --------------------------------------------------------------
@@ -172,13 +172,6 @@ slen_fvar:
   dw 0x0000
 
 ; XXX TODO -- move all variables into the code, except those shared with the BASIC loader
-
-ycord_fvar:
-  ; Last Y position plotted or drawn
-  db 0x00
-xcord_fvar:
-  ; Last X position plotted or drawn
-  dw 0x0000
 
 ip_fvar:
   ; Address of interpreter pointer within source being compiled
@@ -391,23 +384,6 @@ return_stack_max_top:
   ; The return stack grows from bottom (high memory) to top (low memory)
   defs 0x0100
 return_stack_bottom:
-
-; ==============================================================
-; Screen tools {{{1
-
-; XXX TODO -- delete
-
-; XXX TODO -- factor all this to Forth words, when possible
-
-get_stack_coords_and_copy_to_bc:
-  ; XXX TODO changed by `slow` and `fast`
-  call pop_hl_de
-  ld b,l
-  ld a,b
-  ld (ycord_fvar),a
-  ld (xcord_fvar),de
-  ld c,e
-  ret
 
 ; ==============================================================
 ; Data stack manipulation {{{1
@@ -973,33 +949,14 @@ keyboard_input.cr:
   ld c,a
   ld a,(chars_on_the_right_of_the_cursor)
   add a,c
-  ; XXX OLD:
-;;  ld c,a
-;;  xor a
-;;  cp c
-;;  ret z
 
   if whole_screen
 
-; XXX OLD -- no cr here, only in `quit`
-;    jp cr_
     ret
 
   else
 
-    ; XXX OLD original
     ld b,0x00
-; XXX OLD -- no cr here, only in `quit`
-;    push hl
-;    push bc
-;    call cr_
-;    pop bc
-;    pop hl
-;    call print_bc_chars_at_hl_or_nothing
-;    call space_
-;    jp space_
-
-    ; XXX NEW simpler:
     jp print_bc_chars_at_hl_or_nothing
 
   endif
@@ -1099,7 +1056,7 @@ keyboard_input.cursor_down:
   jp keyboard_input.next_key
 
 sub_4f54h:
-  ; XXX TODO -- documentate
+  ; XXX TODO -- document
   ld hl,(tib_address)
   ld a,(chars_on_the_left_of_the_cursor)
   ld c,a
@@ -1438,7 +1395,7 @@ _previous_nfa: defl 0
 
   endm
 
-  ; In order to documentate the origin of a word, or the most recent Forth
+  ; In order to document the origin of a word, or the most recent Forth
   ; standard it is based on, the following notation is used in the word
   ; comments, above the header definition:
 
@@ -1939,16 +1896,14 @@ interpret.skip_space:
   ; the word was not found
   check "the word was not found "
   ld hl,(ip_fvar)
-;  call push_hl ; XXX OLD -- avoided...
-;  call number_ ; ...using other entry point:
-  call number_hl ; XXX NEW
+  call number_hl
   ld hl,(numbit_fvar) ; XXX TODO -- check if this variable is actually needed
   ld (ip_fvar),hl
   call pop_hl
   ld a,h
   or l
   jp z,l520ah
-  ld a,0x01 ; XXX OLD -- not needed, because A<>0
+  ld a,0x01 ; XXX OLD -- not needed, because A<>0 ; XXX TODO --
   ld (dubflag_fvar),a
   call push_hl
 l520ah:
@@ -1957,8 +1912,8 @@ l520ah:
   jp z,l5242h ; jump if executing
   ; compiling:
   ld a,(dubflag_fvar)
-  cp 0x01 ; XXX OLD
-;  and a ; XXX NEW
+  cp 0x01 ; XXX OLD ; XXX TODO --
+;  and a ; XXX NEW ; XXX TODO --
   jp nz,l521fh
   call pop_hl_de
   ex de,hl
@@ -1976,8 +1931,8 @@ l521fh:
   inc hl
   ld (dp),hl
   ld a,(dubflag_fvar)
-  cp 0x01 ; XXX OLD
-;  and a ; XXX NEW
+  cp 0x01 ; XXX OLD ; XXX TODO --
+;  and a ; XXX NEW ; XXX TODO --
   jp nz,l5242h
   xor a
   ld (dubflag_fvar),a
@@ -2165,15 +2120,6 @@ the_names_are_different:
   ; end of dictionary
   jp push_hl ; return 0
 
-;; XXX OLD, timing:
-;;  ld a,0xff ; end of dictionary                 ;07
-;;  cp l ; maybe last word in the dictionary?     ;04
-;;  jp nz,compare_the_names                       ;01
-;;  cp h ; last word in the dictionary?           ;04
-;;  jp nz,compare_the_names                       ;01
-;;  ld hl,0x0000 ; not found                      ;10
-;;  jp push_hl ; return                           ;10
-                                                  ;37 total T Cycles
 ; --------------------------------------------------------------
   ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
 
@@ -2226,9 +2172,6 @@ l5330h:
   header d_plus_,"d+",0
 
   call pop_hl
-  ;push hl ; XXX OLD
-  ;pop bc ; XXX OLD
-  ; XXX NEW alternative:
   ld b,h
   ld c,l
   call pop_hl
@@ -2423,14 +2366,14 @@ number_part_2: equ $+1
   call push_de_hl
 negative_number_flags: equ $+1
   ld a,0x00 ; flags for negative number (bits 1 and 7)
-  cp 0x01 ; XXX OLD
-;;  and a ; XXX NEW
+  cp 0x01 ; XXX OLD ; XXX TODO --
+;;  and a ; XXX NEW ; XXX TODO --
   jp nz,number.return
   ld a,h
   or l
   jp nz,l53d8h
-  ld a,0x80 ; XXX OLD
-;;  dec a ; a=0xff ; XXX NEW
+  ld a,0x80 ; XXX OLD ; XXX TODO --
+;;  dec a ; a=0xff ; XXX NEW ; XXX TODO --
   ld (negative_number_flags),a
 
 l53d8h:
@@ -3178,11 +3121,6 @@ l5785h:
   jp (hl)
 
 l5789h:
-;; XXX OLD
-;;  jp l62cdh
-
-; XXX -- moved here, because it's called only from here
-;;l62cdh:
   pop de
   pop hl
   pop bc
@@ -3252,31 +3190,13 @@ sub_57a3h:
 
   header j_,"j",0
 
-  if false ; XXX OLD -- first method, based on SamForth's `i`
-    pop bc
-    pop de
-    pop hl
-    exx
-    pop bc
-    pop de
-    pop hl
-    call push_hl
-    push hl
-    push de
-    push bc
-    exx
-    push hl
-    push de
-    push bc
-    ret
-  else ; XXX NEW -- much faster
-    ld hl,0x000A
-    add hl,sp
-    ld a,(hl)
-    ld l,(hl)
-    ld h,a
-    jp push_hl
-  endif
+  ld hl,0x000A
+  add hl,sp
+  ld a,(hl)
+  ; XXX FIXME -- inc hl
+  ld l,(hl)
+  ld h,a
+  jp push_hl
 
 ; --------------------------------------------------------------
   ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94 ; {{{2
@@ -3286,23 +3206,12 @@ sub_57a3h:
 
   header i_,"i",0
 
-  if false ; XXX OLD -- original SamForth's method
-    pop bc
-    pop de
-    pop hl
-    push hl
-    push de
-    push bc
-    ; 63 T Cycles
-  else ; XXX NEW -- faster
-    ld hl,0x0004
-    add hl,sp
-    ld a,(hl)
-    inc hl
-    ld h,(hl)
-    ld l,a
-    ; 41 T Cycles
-  endif
+  ld hl,0x0004
+  add hl,sp
+  ld a,(hl)
+  inc hl
+  ld h,(hl)
+  ld l,a
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -3312,9 +3221,8 @@ sub_57a3h:
   header link_,"link",0
 
   call pop_hl
-link.l: ; XXX OLD symbol -- deprecated
   ld a,l
-link.a: ; XXX NEW symbol -- faster calls
+link.a:
 ;;  cp 0x03
 ;;  jr nz,link.other_than_3
 ;;  ; stream = 3
@@ -4911,46 +4819,6 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: draw ( -- ) zx ; {{{2
-  ;: XXX TODO adapt
-
-  header draw_,"draw",0
-
-  ret
-
-; --------------------------------------------------------------
-  ;: drawby ( -- ) sf ; {{{2
-  ;: XXX TODO adapt
-
-  header drawby_,"drawby",0
-
-;;  call pop_hl_de
-;;  ex de,hl
-;;  ld bc,(xcord_fvar)
-;;  add hl,bc
-;;  ld a,(ycord_fvar)
-;;  add a,e
-;;  ld e,a
-;;  ex de,hl
-;;  call push_de_hl
-  jp draw_
-
-; --------------------------------------------------------------
-  ;: ?scroll ( f -- ) sf ; {{{2
-  ;: XXX TODO adapt
-
-  header question_scroll_,"?scroll",0
-
-  ; XXX TODO -- rename this word
-  ; XXX TODO -- deactivate the scroll prompt by default
-  call pop_hl
-;;  ld a,0x01
-;;  xor l
-;;  ld (sprompt_var+0x4000),a
-;;  jp page_forth_hmp_in
-  ret
-
-; --------------------------------------------------------------
   ;: drive ( n -- ) sf ; {{{2
   ;: XXX TODO adapt
 
@@ -5116,7 +4984,7 @@ filename_store.move
   ld hl,(latest)
   ld (cold_latest),hl
   ld hl,(dp)
-;; XXX OLD -- not needed:
+;; XXX OLD -- not needed: ; XXX TODO --
 ;;  inc hl
 ;;  inc hl
 ;;  inc hl
