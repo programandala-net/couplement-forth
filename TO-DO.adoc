@@ -135,3 +135,5 @@ interpretation mode. non-immediate and compile-only words (e.g.
 2020-05-27: Fix: check the data stack in `interpret` with `?stack`.
 
 2020-05-27: Fix the ix_dsm version of `dup`.
+
+2020-05-28: Convert 0x80-terminated strings to counted strings.
