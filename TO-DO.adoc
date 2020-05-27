@@ -116,3 +116,6 @@ This adaptation is a work in progress.
 2020-05-27: Make the data stack grow from low memory to high memory,
 towards the return stack. This makes the space between both stacks
 shared. 
+
+2020-05-27: Remove all of the compilation security checks and the
+`structured` subroutine.

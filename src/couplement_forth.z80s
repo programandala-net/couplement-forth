@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.3.0+202005271658"
+    db "0.2.0-dev.3.1+202005271918"
   endm
 
 ; --------------------------------------------------------------
@@ -2905,6 +2905,8 @@ sp0: ; initial value of the data stack pointer
 
 if data_stack_method = ix_dsm
 
+; XXX TODO --
+; XXX FIXME --
 dsp: equ $+1 ; data stack pointer
   ld hl,data_stack_bottom
   jp push_hl
@@ -3164,7 +3166,7 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
 ; --------------------------------------------------------------
   ;: do ( -- do-sys ) ; XXX TODO -- stack ; {{{2
 
-  header do_,"do",compile_only
+  header do_,"do",immediate+compile_only
 
   ld de,do_do
   call compile_call_de
@@ -3269,7 +3271,7 @@ l62e0h:
 ; --------------------------------------------------------------
   ;: +loop ( do-sys - ) ; XXX TODO -- stack
 
-  header plus_loop_,"+loop",compile_only
+  header plus_loop_,"+loop",immediate+compile_only
 
   ld a,do_structure_id
   call structured
@@ -3293,7 +3295,7 @@ sub_57a3h:
 ; --------------------------------------------------------------
   ;: loop ( do-sys -- ) ; XXX TODO -- stack ; {{{2
 
-  header loop_,"loop",compile_only
+  header loop_,"loop",immediate+compile_only
 
   ld a,do_structure_id
   call structured
@@ -3448,7 +3450,7 @@ border.a:
 ; --------------------------------------------------------------
   ;: ." ( "ccc<quote>" -- )
 
-  header dot_quote_,'."',compile_only
+  header dot_quote_,'."',immediate+compile_only
 
   ; XXX TODO -- Rewrite with a porsing word.
 
@@ -3609,7 +3611,7 @@ return.a:
 ; --------------------------------------------------------------
   ;: begin ( -- begin-sys ) ; XXX TODO -- stack ; {{{2
 
-  header begin_,"begin",compile_only
+  header begin_,"begin",immediate+compile_only
 
   ld hl,(dp)
   call push_hl
@@ -3619,7 +3621,7 @@ return.a:
 ; --------------------------------------------------------------
   ;: until ( begin-sys -- )
 
-  header until_,"until",compile_only
+  header until_,"until",immediate+compile_only
 
   ld a,begin_structure_id
   call structured
@@ -4093,7 +4095,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: if ( -- if-sys ) ; XXX TODO -- stack ; {{{2
 
-  header if_,"if",compile_only
+  header if_,"if",immediate+compile_only
 
   ld de,question_branch_
   call compile_call_de
@@ -4108,7 +4110,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack ; {{{2
 
-  header else_,"else",compile_only
+  header else_,"else",immediate+compile_only
 
   ld a,if_structure_id
   call structured
@@ -4132,7 +4134,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: then ( if-sys -- ) ; XXX TODO -- stack ; {{{2
 
-  header then_,"then",compile_only
+  header then_,"then",immediate+compile_only
 
   ld a,if_structure_id
   call structured
@@ -4144,7 +4146,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  ;: <builds ( -- ) ; XXX TODO -- stack ; {{{2
+  ;: <builds ( "name" -- ) ; XXX TODO -- stack ; {{{2
 
   header builds_,"<builds",compile_only
 
@@ -4181,7 +4183,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: does> ( -- ) ; XXX TODO -- stack ; {{{2
 
-  header does_,"does>",compile_only
+  header does_,"does>",immediate+compile_only
 
   ld a,builds_structure_id
   call structured
@@ -4215,7 +4217,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack ; {{{2
 
-  header while_,"while",compile_only
+  header while_,"while",immediate+compile_only
 
   ld a,begin_structure_id
   call structured
@@ -4232,7 +4234,7 @@ word.parse:
 ; --------------------------------------------------------------
   ;: repeat ( begin-sys -- ) ; XXX TODO -- stack ; {{{2
 
-  header repeat_,"repeat",compile_only
+  header repeat_,"repeat",immediate+compile_only
 
   ld a,begin_structure_id
   call structured
