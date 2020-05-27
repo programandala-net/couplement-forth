@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.9.0+202005280030"
+    db "0.2.0-dev.9.1+202005280032"
   endm
 
 ; --------------------------------------------------------------
@@ -3201,7 +3201,7 @@ sub_57a3h:
   ld hl,0x000A
   add hl,sp
   ld a,(hl)
-  ; XXX FIXME -- inc hl
+  inc hl
   ld l,(hl)
   ld h,a
   jp push_hl
