@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.2.0+202005271620"
+    db "0.2.0-dev.3.0+202005271658"
   endm
 
 ; --------------------------------------------------------------
@@ -75,6 +75,7 @@ true:   equ 0xffff
 
 sp_dsm: equ %0001 ; use SP with the contents of `dsp`
 iy_dsm: equ %0010 ; use IY with the contents of `dsp`
+ix_dsm: equ %0100 ; use IX to hold the stack pointer permanently
 hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 
 ; The data stack method can be selected here, using one of the above
@@ -422,6 +423,7 @@ init_data_stack:
   endif
   ret
 
+; --------------------------------------------------------------
 if data_stack_method = sp_dsm ; {{{2
 
 ; This is the method used by SamForth.
@@ -566,11 +568,12 @@ endif
 
 endif
 
+; --------------------------------------------------------------
 if data_stack_method = iy_dsm ; {{{2
 
 ; XXX -- alternative data stack -- experimental
 
-; no over/underflow checks
+; no fast/slow variants: no over/underflow checks
 
 push_hl:
 slow_push_hl:
@@ -636,6 +639,7 @@ fast_pop_hl_de:
 
 endif
 
+; --------------------------------------------------------------
 if data_stack_method = hl_dsm ; {{{2
 
 push_hl:
@@ -825,6 +829,63 @@ fast_pop_hl_de:
   ret
 
 endif
+
+endif
+
+; --------------------------------------------------------------
+if data_stack_method = ix_dsm ; {{{2
+
+; `ix` always holds the data stack pointer. This is the fastest method.
+
+; XXX FIXME -- 2020-05-27: `ix` is still used by `interpret`.
+
+; no fast/slow variants: no over/underflow checks
+
+push_hl:
+slow_push_hl:
+fast_push_hl:
+                      ; T Cycles
+  dec ix              ;  10
+  ld (ix),h           ;  19
+  dec ix              ;  10
+  ld (ix),l           ;  19
+  ret                 ;  10
+                      ; 068 total
+
+pop_hl:
+slow_pop_hl:
+fast_pop_hl:
+  ld l,(ix)
+  inc ix
+  ld h,(ix)
+  inc ix
+  ret
+
+push_de_hl:
+slow_push_de_hl:
+fast_push_de_hl:
+  dec ix
+  ld (ix),d
+  dec ix
+  ld (ix),e
+  dec ix
+  ld (ix),h
+  dec ix
+  ld (ix),l
+  ret
+
+pop_hl_de:
+slow_pop_hl_de:
+fast_pop_hl_de:
+  ld l,(ix)
+  inc ix
+  ld h,(ix)
+  inc ix
+  ld e,(ix)
+  inc ix
+  ld d,(ix)
+  inc ix
+  ret
 
 endif
 
@@ -1545,16 +1606,29 @@ _previous_nfa: defl 0
   header to_body_,">body",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc de
-    inc de
-    inc de
-    ld (hl),d
-    dec hl
-    ld (hl),e
+    if data_stack_method = ix_dsm
+      ld l,(ix)
+      inc ix
+      ld h,(ix)
+      inc ix
+      inc hl
+      inc hl
+      inc hl
+      ld (ix),h
+      dec ix
+      ld (ix),l
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      inc de
+      inc de
+      inc de
+      ld (hl),d
+      dec hl
+      ld (hl),e
+    endif
     ret
   else
     call pop_hl
@@ -1572,15 +1646,27 @@ _previous_nfa: defl 0
   header two_minus_,"2-",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    dec de
-    dec de
-    ld (hl),d
-    dec hl
-    ld (hl),e
+    if data_stack_method = ix_dsm
+      ld l,(ix)
+      inc ix
+      ld h,(ix)
+      inc ix
+      dec hl
+      dec hl
+      ld (ix),h
+      dec ix
+      ld (ix),l
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      dec de
+      dec de
+      ld (hl),d
+      dec hl
+      ld (hl),e
+    endif
     ret
   else
     call pop_hl
@@ -1597,15 +1683,27 @@ _previous_nfa: defl 0
   header two_plus_,"2+",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc de
-    inc de
-    ld (hl),d
-    dec hl
-    ld (hl),e
+    if data_stack_method = ix_dsm
+      ld l,(ix)
+      inc ix
+      ld h,(ix)
+      inc ix
+      inc hl
+      inc hl
+      ld (ix),h
+      dec ix
+      ld (ix),l
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      inc de
+      inc de
+      ld (hl),d
+      dec hl
+      ld (hl),e
+    endif
     ret
   else
     call pop_hl
@@ -1622,14 +1720,25 @@ _previous_nfa: defl 0
   header one_minus_,"1-",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    dec de
-    ld (hl),d
-    dec hl
-    ld (hl),e
+    if data_stack_method = ix_dsm
+      ld l,(ix)
+      inc ix
+      ld h,(ix)
+      inc ix
+      dec hl
+      ld (ix),h
+      dec ix
+      ld (ix),l
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      dec de
+      ld (hl),d
+      dec hl
+      ld (hl),e
+    endif
     ret
   else
     call pop_hl
@@ -1645,14 +1754,25 @@ _previous_nfa: defl 0
   header one_plus_,"1+",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc de
-    ld (hl),d
-    dec hl
-    ld (hl),e
+    if data_stack_method = ix_dsm
+      ld l,(ix)
+      inc ix
+      ld h,(ix)
+      inc ix
+      inc hl
+      ld (ix),h
+      dec ix
+      ld (ix),l
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      inc de
+      ld (hl),d
+      dec hl
+      ld (hl),e
+    endif
     ret
   else
     call pop_hl
@@ -1782,11 +1902,18 @@ zero_branch_:
   header dup_,"dup",0
 
   if faster_stack_operations
-    ld hl,(dsp)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    ex de,hl
+    if data_stack_method = ix_dsm
+      ld e,(ix)
+      inc ix
+      ld d,(ix)
+      inc ix
+    else
+      ld hl,(dsp)
+      ld e,(hl)
+      inc hl
+      ld d,(hl)
+      ex de,hl
+    endif
   else
     call pop_hl
   endif
@@ -1910,6 +2037,7 @@ interpret.word_found:
 ;;  ld a,0
 ;;  bit precedence_bit,a ; XXX OLD
 nfa_found: equ $+2 ; XXX NEW
+  ; XXX FIXME -- 2020-05-27: using `ix` is incompatible with ix_dsm:
   ld ix,0 ; value stored here by paren_find ; XXX NEW
   bit precedence_bit,(ix-3) ; XXX NEW
   jp nz,interpret.execute
@@ -1922,6 +2050,7 @@ nfa_found: equ $+2 ; XXX NEW
   ; compiling a not immediate word
 ;;  ld a,(name_length_and_bits) ; XXX OLD
 ;;  bit compile_only_bit,a ; compile-only? ; XXX OLD
+  ; XXX FIXME -- 2020-05-27: using `ix` is incompatible with ix_dsm:
   bit compile_only_bit,(ix-3) ; XXX NEW
   jp z,interpret.execute
   ; it's not a compile word
@@ -2133,7 +2262,6 @@ l5330h:
   header plus_,"+",0
 
   call pop_hl_de
-  ;;and a ; XXX ? -- old, not needed
   add hl,de
   jp push_hl
 
@@ -2467,7 +2595,10 @@ l54cdh:
   jp l54b9h
 l54d1h:
   pop hl
-  if data_stack_method = any_dsm
+  if data_stack_method = ix_dsm
+    push ix
+    pop de
+  else
     ld de,(dsp)
   endif
   sbc hl,de
@@ -2772,17 +2903,32 @@ sp0: ; initial value of the data stack pointer
 
   header sp_fetch_,"sp@",0
 
+if data_stack_method = ix_dsm
+
 dsp: equ $+1 ; data stack pointer
   ld hl,data_stack_bottom
   jp push_hl
+
+else
+
+dsp: equ $+1 ; data stack pointer
+  ld hl,data_stack_bottom
+  jp push_hl
+
+endif
 
 ; --------------------------------------------------------------
   ;: sp! ( a -- )
 
   header sp_store_,"sp!",0
 
-  jp pop_hl
-  ld (dsp),hl
+  call pop_hl
+  if data_stack_method = ix_dsm
+    push hl
+    pop ix
+  else
+    ld (dsp),hl
+  endif
   ret
 
 ; --------------------------------------------------------------
@@ -4669,7 +4815,10 @@ l5f40h:
   ld e,l
   dec e
   rl e
-  if data_stack_method = any_dsm
+  if data_stack_method = ix_dsm
+    push ix
+    pop hl
+  else 
     ld hl,(dsp)
   endif
   ld d,0x00
@@ -5168,7 +5317,10 @@ to_in:
   header depth_,"depth",0
 
   ld hl,(sp0)
-  if data_stack_method = any_dsm
+  if data_stack_method = ix_dsm
+    push ix
+    pop de
+  else
     ld de,(dsp)
   endif
   sbc hl,de
