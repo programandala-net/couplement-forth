@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.6.1+202005272152"
+    db "0.2.0-dev.7.0+202005272215"
   endm
 
 ; --------------------------------------------------------------
@@ -792,8 +792,6 @@ endif ; data_stack_method = hl_dsm
 if data_stack_method = ix_dsm ; {{{2
 
 ; `ix` always holds the data stack pointer. This is the fastest method.
-
-; XXX FIXME -- 2020-05-27: `ix` is still used by `interpret`.
 
 ; no fast/slow variants: no over/underflow checks
 
@@ -1980,13 +1978,9 @@ l5242h:
 interpret.word_found:
   check "interpret.word_found:"
   ; hl = nfa of the word found
-;;name_length_and_bits: equ $+1 ; XXX OLD -- leng_fvar, make note in Samforth
-;;  ld a,0
-;;  bit precedence_bit,a ; XXX OLD
-nfa_found: equ $+2 ; XXX NEW
-  ; XXX FIXME -- 2020-05-27: using `ix` is incompatible with ix_dsm:
-  ld ix,0 ; value stored here by paren_find ; XXX NEW
-  bit precedence_bit,(ix-3) ; XXX NEW
+flags_field: equ $+1
+  ld a,0
+  bit precedence_bit,a
   jp nz,interpret.execute
 
   ; it's not an immediate word
@@ -1995,10 +1989,8 @@ nfa_found: equ $+2 ; XXX NEW
   jp nz,interpret.compile_non_immediate_word
 
   ; compiling a not immediate word
-;;  ld a,(name_length_and_bits) ; XXX OLD
-;;  bit compile_only_bit,a ; compile-only? ; XXX OLD
-  ; XXX FIXME -- 2020-05-27: using `ix` is incompatible with ix_dsm:
-  bit compile_only_bit,(ix-3) ; XXX NEW
+  ld a,(flags_field)
+  bit compile_only_bit,a ; compile-only?
   jp z,interpret.execute
   ; it's not a compile word
   ld a,(state)
@@ -2018,9 +2010,8 @@ interpret.execute:
 
 interpret.compile_non_immediate_word:
   ; compiling a non-immediate word
-;;  ld a,(name_length_and_bits) ; XXX OLD
-;;  bit compile_only_bit,a ; compile-only? ; XXX OLD
-  bit compile_only_bit,(ix-3) ; XXX NEW
+  ld a,(flags_field)
+  bit compile_only_bit,a ; compile-only?
   jp nz,interpret.execute
   call push_hl
   call compile_call_tos
@@ -2134,7 +2125,13 @@ compare_char:
   dec de ; XXX NOTE -- needed, checked!
   ld (ip_fvar),de
   pop de ; nfa of the dictionary word
-  ld (nfa_found),de ; needed by `interpret` later
+  dec de
+  dec de
+  dec de ; flags field address of the dictionary word
+  ex de,hl
+  ld a,(hl) ; contents of the flags field
+  ld (flags_field),a ; needed by `interpret` later
+  ex de,hl
   inc hl
   ; hl = cfa of the dictionary word
   jp push_hl ; return the cfa of the dictionary word
