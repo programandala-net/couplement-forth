@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.0.0+202005271315"
+    db "0.2.0-dev.0.0+202005271535"
   endm
 
 ; --------------------------------------------------------------
@@ -68,7 +68,7 @@ true:   equ 0xffff
 ; Assembling options {{{1
 
 ; --------------------------------------------------------------
-; Data stack method
+; Data stack method {{{2
 
 ; Couplement Forth can use different methods to manage its data stack.
 ; Every method has a constant identifier:
@@ -85,7 +85,7 @@ data_stack_method:  equ sf_dsm
 any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
 ; --------------------------------------------------------------
-; Execution speed
+; Execution speed {{{2
 
 ; Couplement Forth can run in two modes: slow and fast.  Slow mode is the
 ; default.  In fast mode, some stack checking is omited.  The words `slow` and
@@ -104,7 +104,7 @@ fast_mode_available: equ true
 faster_stack_operations: equ true
 
 ; --------------------------------------------------------------
-; Size
+; Size {{{2
 
 ; When size optimization is on, relative jumps are used when possible, and
 ; some inline code is replaced with calls.  Some bytes will be saved, but the
@@ -114,7 +114,7 @@ faster_stack_operations: equ true
 size_optimization: equ false
 
 ; --------------------------------------------------------------
-; Screen
+; Screen {{{2
 
 ; XXX TODO
 whole_screen: equ false ; does the input line uses the whole screen?
@@ -421,7 +421,7 @@ init_data_stack:
   endif
   ret
 
-if data_stack_method = sf_dsm
+if data_stack_method = sf_dsm ; {{{2
 
 ; SamForth's method
 ; Slow versions are the original
@@ -565,7 +565,7 @@ endif
 
 endif
 
-if data_stack_method = iy_unchecked_dsm
+if data_stack_method = iy_unchecked_dsm ; {{{2
 
 ; XXX -- alternative data stack -- experimental
 
@@ -635,7 +635,7 @@ fast_pop_hl_de:
 
 endif
 
-if data_stack_method = hl_unchecked_dsm
+if data_stack_method = hl_unchecked_dsm ; {{{2
 
 ; XXX -- alternative data stack -- experimental
 
@@ -711,7 +711,7 @@ fast_pop_hl_de:
 
 endif
 
-if data_stack_method = hl_dsm
+if data_stack_method = hl_dsm ; {{{2
 
 push_hl:
 slow_push_hl:
@@ -1406,7 +1406,7 @@ structured:
 
 _previous_nfa: defl 0
 
-  macro header,  label_,name,flags,previous
+  macro header, label_,name,flags,previous ; {{{2
 
     ; Create a word header in the dictionary
 
@@ -1441,7 +1441,7 @@ _previous_nfa: defl 0
   ; sf      = SamForth ; XXX TODO -- remove?
 
 ; --------------------------------------------------------------
-  ;: couplement_forth ( -- ) cf
+  ;: couplement_forth ( -- ) cf ; {{{2
   ;:
   ;: Noop word. If present, the program is running on Couplement Forth.
   ;: Intended for conditional compilation in portable programs.
@@ -1451,7 +1451,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  ;: (bootmessage) ( -- ) cf,gforth
+  ;: (bootmessage) ( -- ) cf,gforth ; {{{2
   ;:
   ;: Print the Couplement Forth boot message.
 
@@ -1467,7 +1467,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  ;: bootmessage ( -- ) cf,gforth
+  ;: bootmessage ( -- ) cf,gforth ; {{{2
   ;:
   ;: Print a boot message (Couplement Forth's boot message by default).
   ;: The behaviour of `bootmessage` can be changed with `is`.
@@ -1492,7 +1492,7 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: lit ( -- x ) fig,comus,gforth
+  ;: lit ( -- x ) fig,comus,gforth ; {{{2
   ;:
   ;: Push the content of the next cell to the data stack as a literal.
 
@@ -1508,7 +1508,7 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: literal ( compilation: x -- ) ( run-time: -- x ) 2012
+  ;: literal ( compilation: x -- ) ( run-time: -- x ) 2012 ; {{{2
   ;:
   ;:  Interpretation: Interpretation semantics for this word are undefined.
   ;:  Compilation: ( x -- )
@@ -1527,10 +1527,10 @@ _previous_nfa: defl 0
   jp compile_de
 
 ; --------------------------------------------------------------
-  ;: >body ( cfa -- pfa ) 94
+  ;: >body ( cfa -- pfa ) 94 ; {{{2
   ;:
   ;:  XXX TODO -- doc
-  ;: ( xt -- a-addr ) a-addr is the data-field address corresponding to xt.
+  ;: ( xt -- a-addr ) a-addr is the data-field address corresponding to xt. ; {{{2
   ;:  An ambiguous condition exists if xt is not for a word defined via CREATE.
 
   header to_body_,">body",0
@@ -1556,7 +1556,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 2- ( n1|u1 -- n2|u2 ) comus
+  ;: 2- ( n1|u1 -- n2|u2 ) comus ; {{{2
   ;:
   ;:  Subtract two (2) from n1|u1 giving the difference n2|u2.
 
@@ -1581,7 +1581,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 2+ ( n1|u1 -- n2|u2 ) comus
+  ;: 2+ ( n1|u1 -- n2|u2 ) comus ; {{{2
   ;:
   ;:  Add two (2) to n1|u1 giving the sum n2|u2.
 
@@ -1606,7 +1606,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 1- ( n1|u1 -- n2|u2 ) 94
+  ;: 1- ( n1|u1 -- n2|u2 ) 94 ; {{{2
   ;:
   ;:  Subtract one (1) from n1|u1 giving the difference n2|u2.
 
@@ -1629,7 +1629,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 1+ ( n1|u1 -- n2|u2 ) 94
+  ;: 1+ ( n1|u1 -- n2|u2 ) 94 ; {{{2
   ;:
   ;:  Add one (1) to n1|u1 giving the sum n2|u2.
 
@@ -1652,7 +1652,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: execute ( cfa -- ) 94
+  ;: execute ( cfa -- ) 94 ; {{{2
 
   header execute_,"execute",0
 
@@ -1660,7 +1660,7 @@ _previous_nfa: defl 0
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: perform ( a -- ) cf
+  ;: perform ( a -- ) cf ; {{{2
 
   header perform_,"perform",0
 
@@ -1676,7 +1676,7 @@ _previous_nfa: defl 0
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: prompt ( -- ) ( R: i*x -- ) gforth
+  ;: prompt ( -- ) ( R: i*x -- ) gforth ; {{{2
   ;:
   ;: Print the system prompt.
 
@@ -1689,7 +1689,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  ;: quit ( -- ) ( R: i*x -- ) 94
+  ;: quit ( -- ) ( R: i*x -- ) 94 ; {{{2
   ;:
   ;: Empty the return stack, store zero in `source-id` if it is present, make
   ;: the user input device the input source, and enter interpretation state.
@@ -1727,7 +1727,7 @@ quit.do:
   jp quit.do
 
 ; --------------------------------------------------------------
-  ;: branch ( -- ) comus
+  ;: branch ( -- ) comus ; {{{2
 
   header branch_,"branch",0
 
@@ -1739,7 +1739,7 @@ quit.do:
   ret
 
 ; --------------------------------------------------------------
-  ;: ?branch ( f -- ) 83
+  ;: ?branch ( f -- ) 83 ; {{{2
 
   header question_branch_,"?branch",0
 
@@ -1757,7 +1757,7 @@ zero_branch_:
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: swap ( x1 x2 -- x2 x1 ) hist,94
+  ;: swap ( x1 x2 -- x2 x1 ) hist,94 ; {{{2
 
   header swap_,"swap",0
 
@@ -1766,7 +1766,7 @@ zero_branch_:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: dup ( x -- x x ) hist,94
+  ;: dup ( x -- x x ) hist,94 ; {{{2
   ;:
   ;: Duplicate the cell on the top of the stack.
 
@@ -1785,7 +1785,7 @@ zero_branch_:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: ?dup ( x -- 0 | x x ) hist,94
+  ;: ?dup ( x -- 0 | x x ) hist,94 ; {{{2
   ;:
   ;: Duplicate the cell on the top of the stack if it is non-zero.
 
@@ -1809,7 +1809,7 @@ zero_branch_:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: drop ( x -- ) hist,94
+  ;: drop ( x -- ) hist,94 ; {{{2
 
   header drop_,"drop",0
 
@@ -2082,7 +2082,7 @@ the_names_are_different:
 ;;  jp push_hl ; return                           ;10
                                                   ;37 total T Cycles
 ; --------------------------------------------------------------
-  ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack
+  ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
 
   header u_mult_,"u*",0
 
@@ -2119,7 +2119,7 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  ;: + ( n1 n2 -- n3 ) hist,94
+  ;: + ( n1 n2 -- n3 ) hist,94 ; {{{2
 
   header plus_,"+",0
 
@@ -2129,7 +2129,7 @@ l5330h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack
+  ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
 
   header d_plus_,"d+",0
 
@@ -2153,7 +2153,7 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: within ( n1|u1 n2|u2 n3|u3 -- flag ) 2012
+  ;: within ( n1|u1 n2|u2 n3|u3 -- flag ) 2012 ; {{{2
   ;:
   ;: Perform a comparison of a test value n1|u1 with a lower limit n2|u2 and an
   ;: upper limit n3|u3, returning true if either (n2|u2 < n3|u3 and (n2|u2 <=
@@ -2183,7 +2183,7 @@ l5330h:
   jp u_less_
 
 ; --------------------------------------------------------------
-  ;: - ( n1 n2 -- n3 ) hist,94
+  ;: - ( n1 n2 -- n3 ) hist,94 ; {{{2
 
   header minus_,"-",0
 
@@ -2224,7 +2224,7 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: number ( ca -- n | d ) comus
+  ;: number ( ca -- n | d ) comus ; {{{2
   ;:
   ;: ca = address of the first char ; XXX ;: TODO -- confirm
   ;:
@@ -2357,7 +2357,7 @@ number.return:
   ret
 
 ; --------------------------------------------------------------
-  ;: space ( -- ) fig,79,83,94
+  ;: space ( -- ) fig,79,83,94 ; {{{2
   ;:
   ;: Display one space.
 
@@ -2367,7 +2367,7 @@ number.return:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: spaces ( u -- ) fig
+  ;: spaces ( u -- ) fig ; {{{2
   ;:
   ;: Display u spaces.
   ;:
@@ -2408,7 +2408,7 @@ spaces.hl:
   ret
 
 ; --------------------------------------------------------------
-  ;: emit ( c -- ) 94
+  ;: emit ( c -- ) 94 ; {{{2
 
   header emit_,"emit",0
 
@@ -2502,7 +2502,7 @@ de_hl_slash_mod.again:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: cls ( -- ) zx
+  ;: cls ( -- ) zx ; {{{2
   ;:
   ;: XXX TODO
   ;: Clear the screen.
@@ -2597,7 +2597,7 @@ create_header.store_char
   ret
 
 ; --------------------------------------------------------------
-  ;: noop ( <name> -- ) af,gforth,comus
+  ;: noop ( <name> -- ) af,gforth,comus ; {{{2
 
   header noop_,"noop",0
 
@@ -2640,7 +2640,7 @@ compile_jp_de:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: ; ( colon-sys -- ) ; XXX TODO -- stack
+  ;: ; ( colon-sys -- ) ; XXX TODO -- stack ; {{{2
 
   header semicolon_,";",immediate+compile_only
 
@@ -2664,7 +2664,7 @@ compile_jp_de:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: words ( -- ) 94
+  ;: words ( -- ) 94 ; {{{2
   ;:
   ;: List all the words in the context dictionary.
 
@@ -2876,7 +2876,7 @@ dsp: equ $+1 ; data stack pointer
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: on ( a -- ) comus
+  ;: on ( a -- ) comus ; {{{2
 
   header on_,"on",0
 
@@ -2885,7 +2885,7 @@ dsp: equ $+1 ; data stack pointer
   ret
 
 ; --------------------------------------------------------------
-  ;: off ( a -- ) comus
+  ;: off ( a -- ) comus ; {{{2
 
   header off_,"off",0
 
@@ -2894,7 +2894,7 @@ dsp: equ $+1 ; data stack pointer
   ret
 
 ; --------------------------------------------------------------
-  ;: dp ( -- a ) fig
+  ;: dp ( -- a ) fig ; {{{2
   ;:
   ;: Return the address of the dictionary pointer variable, which contains the
   ;: next free memory location above the dictionary. The value may be read by
@@ -2907,7 +2907,7 @@ dp: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: here ( -- a ) fig,79,83,94
+  ;: here ( -- a ) fig,79,83,94 ; {{{2
   ;:
   ;: Return the content of `dp`, the address of the next available memory
   ;: location above the dictionary.
@@ -2918,7 +2918,7 @@ dp: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: latest ( -- nfa ) fig,af,gforth
+  ;: latest ( -- nfa ) fig,af,gforth ; {{{2
   ;:
   ;: Return the name field address of the last word defined in the `current`
   ;: vocabulary.
@@ -2932,7 +2932,7 @@ latest: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: ;code ( colon-sys -- ) ; XXX TODO -- stack
+  ;: ;code ( colon-sys -- ) ; XXX TODO -- stack ; {{{2
 
   header semicolon_code_,";code",immediate
 
@@ -2967,7 +2967,7 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: in ( a -- c ) zx
+  ;: in ( a -- c ) zx ; {{{2
 
   header in_,"in",0
 
@@ -2980,7 +2980,7 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: out ( a c -- ) zx
+  ;: out ( a c -- ) zx ; {{{2
 
   header out_,"out",0
 
@@ -2991,7 +2991,7 @@ semicolon.end:
   ret
 
 ; --------------------------------------------------------------
-  ;: page ( -- ) 83,94
+  ;: page ( -- ) 83,94 ; {{{2
   ;:
   ;: On a terminal, clear the screen and resets the cursor position to the
   ;: upper left corner.  On a printer perform a form feed.
@@ -3007,7 +3007,7 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: do ( -- do-sys ) ; XXX TODO -- stack
+  ;: do ( -- do-sys ) ; XXX TODO -- stack ; {{{2
 
   header do_,"do",compile_only
 
@@ -3136,7 +3136,7 @@ sub_57a3h:
   ret
 
 ; --------------------------------------------------------------
-  ;: loop ( do-sys -- ) ; XXX TODO -- stack
+  ;: loop ( do-sys -- ) ; XXX TODO -- stack ; {{{2
 
   header loop_,"loop",compile_only
 
@@ -3148,7 +3148,7 @@ sub_57a3h:
   jp sub_57a3h
 
 ; --------------------------------------------------------------
-  ;: j ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 ) hist,94
+  ;: j ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 ) hist,94 ; {{{2
   ;:
   ;: Return a copy of the index of the next outer loop.  May only
   ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
@@ -3182,7 +3182,7 @@ sub_57a3h:
   endif
 
 ; --------------------------------------------------------------
-  ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94
+  ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94 ; {{{2
   ;:
   ;: Return a copy of the current (innermost) loop index. May only
   ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
@@ -3209,7 +3209,7 @@ sub_57a3h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: link ( n -- ) sf
+  ;: link ( n -- ) sf ; {{{2
   ;: XXX TODO adapt
 
   header link_,"link",0
@@ -3236,7 +3236,7 @@ link.a: ; XXX NEW symbol -- faster calls
   jp rom_chan_open
 
 ; --------------------------------------------------------------
-  ;: home ( -- ) comus,cf
+  ;: home ( -- ) comus,cf ; {{{2
   ;:
   ;: Make the next character displayed will appear in column 0, row 0 of the
   ;: user output device, the upper left corner.
@@ -3251,7 +3251,7 @@ link.a: ; XXX NEW symbol -- faster calls
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: at-xy ( u1 u2 -- ) 94,cf
+  ;: at-xy ( u1 u2 -- ) 94,cf ; {{{2
   ;:
   ;: Make the next character displayed will appear in column u1, row u2 of the
   ;: user output device, the upper left corner of which is column zero, row
@@ -3271,7 +3271,7 @@ link.a: ; XXX NEW symbol -- faster calls
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: border ( u -- ) zx
+  ;: border ( u -- ) zx ; {{{2
 
   header border_,"border",0
 
@@ -3283,7 +3283,7 @@ border.a:
   ret
 
 ; --------------------------------------------------------------
-  ;: beep ( u1 u2 -- ) zx
+  ;: beep ( u1 u2 -- ) zx ; {{{2
 
   header beep_,"beep",0
 
@@ -3452,7 +3452,7 @@ return.a:
   jp pop_hl
 
 ; --------------------------------------------------------------
-  ;: begin ( -- begin-sys ) ; XXX TODO -- stack
+  ;: begin ( -- begin-sys ) ; XXX TODO -- stack ; {{{2
 
   header begin_,"begin",compile_only
 
@@ -3523,7 +3523,7 @@ compare_de_hl_unsigned:
   ret
 
 ; --------------------------------------------------------------
-  ;: rdrop ( -- ) ( R: x -- )
+  ;: rdrop ( -- ) ( R: x -- ) ; {{{2
 
   header r_drop_,"rdrop",0
 
@@ -3533,7 +3533,7 @@ compare_de_hl_unsigned:
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: r@ ( -- x ) ( R: x --  )
+  ;: r@ ( -- x ) ( R: x --  ) ; {{{2
 
   header r_fetch_,"r@",0
 
@@ -3542,7 +3542,7 @@ compare_de_hl_unsigned:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: r> ( -- x ) ( R: x -- )
+  ;: r> ( -- x ) ( R: x -- ) ; {{{2
 
   header r_from_,"r>",0
 
@@ -3552,7 +3552,7 @@ compare_de_hl_unsigned:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: >r ( x -- ) ( R: -- x )
+  ;: >r ( x -- ) ( R: -- x ) ; {{{2
 
   header to_r_,">r",0
 
@@ -3723,7 +3723,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ret
 
 ; --------------------------------------------------------------
-  ;: -cursor ( n -- ) ; XXX NEW
+  ;: -cursor ( n -- ) ; XXX NEW ; {{{2
   ;:
   ;: Delete the cursor.
 
@@ -3936,7 +3936,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: if ( -- if-sys ) ; XXX TODO -- stack
+  ;: if ( -- if-sys ) ; XXX TODO -- stack ; {{{2
 
   header if_,"if",compile_only
 
@@ -3951,7 +3951,7 @@ word.parse:
   jp push_hl ; XXX TODO -- push_a?
 
 ; --------------------------------------------------------------
-  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack
+  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack ; {{{2
 
   header else_,"else",compile_only
 
@@ -3975,7 +3975,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: then ( if-sys -- ) ; XXX TODO -- stack
+  ;: then ( if-sys -- ) ; XXX TODO -- stack ; {{{2
 
   header then_,"then",compile_only
 
@@ -3989,7 +3989,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  ;: <builds ( -- ) ; XXX TODO -- stack
+  ;: <builds ( -- ) ; XXX TODO -- stack ; {{{2
 
   header builds_,"<builds",compile_only
 
@@ -4024,7 +4024,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: does> ( -- ) ; XXX TODO -- stack
+  ;: does> ( -- ) ; XXX TODO -- stack ; {{{2
 
   header does_,"does>",compile_only
 
@@ -4058,7 +4058,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack
+  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack ; {{{2
 
   header while_,"while",compile_only
 
@@ -4075,7 +4075,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack
+  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack ; {{{2
 
   header repeat_,"repeat",compile_only
 
@@ -4287,7 +4287,7 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: bl ( -- c ) 94
+  ;: bl ( -- c ) 94 ; {{{2
 
   header bl_,"bl",0
 
@@ -4295,7 +4295,7 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: count ( a -- a' u ) 94
+  ;: count ( a -- a' u ) 94 ; {{{2
 
   header count_,"count",0
 
@@ -4308,7 +4308,7 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: find (  -- ) ; XXX TODO -- stack
+  ;: find (  -- ) ; XXX TODO -- stack ; {{{2
 
   header find_,"find",0
 
@@ -4331,7 +4331,7 @@ find.skip_blank:
   jp paren_find_
 
 ; --------------------------------------------------------------
-  ;: (abort) ( i*x -- ) ( R: j*x -- ) comus
+  ;: (abort) ( i*x -- ) ( R: j*x -- ) comus ; {{{2
   ;:
   ;: Empty the data stack and perform the function of `quit`, which includes
   ;: emptying the return stack, without displaying a message.
@@ -4343,7 +4343,7 @@ find.skip_blank:
   jp quit_
 
 ; --------------------------------------------------------------
-  ;: abort ( i*x -- ) ( R: j*x -- ) 94
+  ;: abort ( i*x -- ) ( R: j*x -- ) 94 ; {{{2
   ;:
   ;: Empty the data stack and perform the function of QUIT, which includes
   ;: emptying the return stack, without displaying a message.
@@ -4356,7 +4356,7 @@ find.skip_blank:
   jp paren_abort_
 
 ; --------------------------------------------------------------
-  ;: cold ( -- ) fig,comus,gforth
+  ;: cold ( -- ) fig,comus,gforth ; {{{2
   ;:
   ;: The cold start procedure.  Adjust the dictionary pointer to the minimum
   ;: standard and restart via `abort`.  May be called from terminal to remove
@@ -4380,7 +4380,7 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   jp abort_
 
 ; --------------------------------------------------------------
-  ;: fence ( -- a ) fig
+  ;: fence ( -- a ) fig ; {{{2
   ;:
   ;: Return an address which contains the address below which `forget` will not operate.
 
@@ -4392,7 +4392,7 @@ fence:
   dw end_of_code ; address below which `forget` will not operate.
 
 ; --------------------------------------------------------------
-  ;: u/mod ( -- ) ; XXX TODO -- stack
+  ;: u/mod ( -- ) ; XXX TODO -- stack ; {{{2
 
   header u_slash_mod_,"u/mod",0
 
@@ -4442,7 +4442,7 @@ l5de3h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: <# ( -- ) ; XXX TODO -- stack
+  ;: <# ( -- ) ; XXX TODO -- stack ; {{{2
 
   header less_number_sign_,"<#",0
 
@@ -4452,7 +4452,7 @@ l5de3h:
   ret
 
 ; --------------------------------------------------------------
-  ;: #> ( -- ) ; XXX TODO -- stack
+  ;: #> ( -- ) ; XXX TODO -- stack ; {{{2
 
   header number_sign_greater_,"#>",0
 
@@ -4464,7 +4464,7 @@ l5de3h:
   jp minus_
 
 ; --------------------------------------------------------------
-  ;: # ( -- ) ; XXX TODO -- stack
+  ;: # ( -- ) ; XXX TODO -- stack ; {{{2
 
   header number_sign_,"#",0
 
@@ -4504,7 +4504,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  ;: #s ( -- ) ; XXX TODO -- stack
+  ;: #s ( -- ) ; XXX TODO -- stack ; {{{2
 
   header number_sign_s_,"#s",0
 
@@ -4545,7 +4545,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  ;: sign ( -- ) ; XXX TODO -- stack
+  ;: sign ( -- ) ; XXX TODO -- stack ; {{{2
 
   header sign_,"sign",0
 
@@ -4757,7 +4757,7 @@ char.return:
   ret
 
 ; --------------------------------------------------------------
-  ;: paper ( n -- ) zx
+  ;: paper ( n -- ) zx ; {{{2
 
   header paper_,"paper",0
 
@@ -4765,7 +4765,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: ink ( n -- ) zx
+  ;: ink ( n -- ) zx ; {{{2
 
   header ink_,"ink",0
 
@@ -4773,7 +4773,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: bright ( f -- ) zx
+  ;: bright ( f -- ) zx ; {{{2
 
   header bright_,"bright",0
 
@@ -4781,7 +4781,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: flash ( f -- ) zx
+  ;: flash ( f -- ) zx ; {{{2
 
   header flash_,"flash",0
 
@@ -4793,7 +4793,7 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: colour ( n1 n2 -- ) sf
+  ;: colour ( n1 n2 -- ) sf ; {{{2
   ;:
   ;: Sets the permanent screen colours. The parameters are paper code and pen
   ;: code.
@@ -4811,7 +4811,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: plot ( -- ) zx
+  ;: plot ( -- ) zx ; {{{2
   ;: XXX TODO adapt
 
   header plot_,"plot",0
@@ -4819,7 +4819,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: draw ( -- ) zx
+  ;: draw ( -- ) zx ; {{{2
   ;: XXX TODO adapt
 
   header draw_,"draw",0
@@ -4827,7 +4827,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: drawby ( -- ) sf
+  ;: drawby ( -- ) sf ; {{{2
   ;: XXX TODO adapt
 
   header drawby_,"drawby",0
@@ -4844,7 +4844,7 @@ print_a_and_tos:
   jp draw_
 
 ; --------------------------------------------------------------
-  ;: ?scroll ( f -- ) sf
+  ;: ?scroll ( f -- ) sf ; {{{2
   ;: XXX TODO adapt
 
   header question_scroll_,"?scroll",0
@@ -4859,7 +4859,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: drive ( n -- ) sf
+  ;: drive ( n -- ) sf ; {{{2
   ;: XXX TODO adapt
 
   header drive_,"drive",0
@@ -4868,7 +4868,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  ;: screen ( -- ) zx
+  ;: screen ( -- ) zx ; {{{2
   ;: XXX TODO adapt; rename?
 
   header screen_,"screen",0
@@ -4882,7 +4882,7 @@ print_a_and_tos:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: tab ( n -- ) zx
+  ;: tab ( n -- ) zx ; {{{2
   ;: XXX TODO adapt
 
   header tab_,"tab",0
@@ -4896,7 +4896,7 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: overp ( f -- ) zx
+  ;: overp ( f -- ) zx ; {{{2
 
   header overp_,"overp",0
 
@@ -4905,7 +4905,7 @@ print_a_and_tos:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: inverse ( f -- ) zx
+  ;: inverse ( f -- ) zx ; {{{2
 
   header inverse_,"inverse",0
 
@@ -4913,7 +4913,7 @@ print_a_and_tos:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: cat ( n -- ) sf
+  ;: cat ( n -- ) sf ; {{{2
 
   header cat_,"cat",0
 
@@ -4924,7 +4924,7 @@ print_a_and_tos:
   jp return.bc
 
 ; --------------------------------------------------------------
-  ;: bsave ( -- ) sf
+  ;: bsave ( -- ) sf ; {{{2
 
   header bsave_,"bsave",0
 
@@ -4961,7 +4961,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: dloaded ( a ca len -- ) sf
+  ;: dloaded ( a ca len -- ) sf ; {{{2
   ;:
   ;: Load a code file into memory.
   ;: ca len = filename
@@ -4976,7 +4976,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: dsaved ( a1 len1 ca2 len2 -- ) sf
+  ;: dsaved ( a1 len1 ca2 len2 -- ) sf ; {{{2
   ;:
   ;: a1 len1  = memory zone
   ;: ca2 len2 = filename
@@ -4987,7 +4987,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: push-hl ( -- x ) cf
+  ;: push-hl ( -- x ) cf ; {{{2
   ;: XXX TODO adapt?
 
   header push_hl_,"push-hl",0
@@ -4997,7 +4997,7 @@ push_hl_vector: equ $+1
   jp slow_push_hl
 
 ; --------------------------------------------------------------
-  ;: pop-hl ( x -- ) cf
+  ;: pop-hl ( x -- ) cf ; {{{2
   ;: XXX TODO adapt?
 
   header pop_hl_,"pop-hl",0
@@ -5007,7 +5007,7 @@ pop_hl_vector: equ $+1
   jp slow_push_hl
 
 ; --------------------------------------------------------------
-  ;: push-de-hl ( -- x1 x2 ) cf
+  ;: push-de-hl ( -- x1 x2 ) cf ; {{{2
   ;: XXX TODO adapt?
 
   header push_de_hl_,"push-de-hl",0
@@ -5017,7 +5017,7 @@ push_de_hl_vector: equ $+1
   jp slow_push_de_hl
 
 ; --------------------------------------------------------------
-  ;: pop-hl-de ( x1 x2 -- ) cf
+  ;: pop-hl-de ( x1 x2 -- ) cf ; {{{2
 
   header pop_hl_de_,"pop-hl-de",0
   ;: XXX TODO adapt?
@@ -5027,7 +5027,7 @@ pop_hl_de_vector: equ $+1
   jp slow_pop_hl_de
 
 ; --------------------------------------------------------------
-  ;: fast ( -- ) ace
+  ;: fast ( -- ) ace ; {{{2
 
   header fast_,"fast",0
 
@@ -5042,7 +5042,7 @@ pop_hl_de_vector: equ $+1
   ret
 
 ; --------------------------------------------------------------
-  ;: slow ( -- ) ace
+  ;: slow ( -- ) ace ; {{{2
 
   header slow_,"slow",0
 
@@ -5057,7 +5057,7 @@ pop_hl_de_vector: equ $+1
   ret
 
 ; --------------------------------------------------------------
-  ;: expand ( -- ) sf
+  ;: expand ( -- ) sf ; {{{2
 
   header expand_,"expand",0
   ;: XXX TODO adapt?
@@ -5076,7 +5076,7 @@ pop_hl_de_vector: equ $+1
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  ;: state ( -- a ) 94
+  ;: state ( -- a ) 94 ; {{{2
 
   header state_,"state",0
 
@@ -5086,7 +5086,7 @@ state:
   dw 0 ; compilation state flag (non-zero value when in compilation state)
 
 ; --------------------------------------------------------------
-  ;: bounds ( a n -- a' a ) comus
+  ;: bounds ( a n -- a' a ) comus ; {{{2
 
   header bounds_,"bounds",0
 
@@ -5095,7 +5095,7 @@ state:
   jp swap_
 
 ; --------------------------------------------------------------
-  ;: [ ( -- ) fig,83,94  "left-bracket"
+  ;: [ ( -- ) fig,83,94  "left-bracket" ; {{{2
 
   header left_bracket_,"[",immediate
 
@@ -5104,7 +5104,7 @@ state:
   ret
 
 ; --------------------------------------------------------------
-  ;: ] ( -- ) fig,83,94  "right-bracket"
+  ;: ] ( -- ) fig,83,94  "right-bracket" ; {{{2
 
   header right_bracket_,"]",0
 
@@ -5113,7 +5113,7 @@ state:
   ret
 
 ; --------------------------------------------------------------
-  ;: unused ( -- u ) 94
+  ;: unused ( -- u ) 94 ; {{{2
   ;:
   ;: Return the amount of space remaining in the region addressed by `here`, in
   ;: address units.
@@ -5126,7 +5126,7 @@ state:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: >in ( -- +n ) 83,94
+  ;: >in ( -- +n ) 83,94 ; {{{2
   ;:
   ;: Return the address of a cell containing the offset in characters from
   ;: the start of the input buffer to the start of the parse area.
@@ -5141,7 +5141,7 @@ to_in:
   dw 0x0000
 
 ; --------------------------------------------------------------
-  ;: depth ( -- +n ) 83,94
+  ;: depth ( -- +n ) 83,94 ; {{{2
   ;:
   ;: Return the number of single-cell (16-bit in this case) values contained in
   ;: the data stack before it was placed on the stack.
@@ -5159,7 +5159,7 @@ to_in:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: .s ( -- ) 94
+  ;: .s ( -- ) 94 ; {{{2
   ;:
   ;: Copy and display the values currently on the data stack.
 
