@@ -118,6 +118,12 @@ towards the return stack. This makes the space between both stacks
 shared. 
 
 2020-05-27: Remove all of the compilation security checks and the
-`structured` subroutine.
+`structured` subroutine. Replace them with the method used by Solo
+Forth: `csp`, `!csp` and `?csp`.
 
 2020-05-27: Fix: any number of "?" characteres is ignored.
+
+2020-05-27: Replace the unused old vectors `pop-hl`, `pop-hl-de`,
+`push-hl` and `push-de-hl` with constants `pop-hl_`, `pop-hl-de_`,
+`push-hl_` and `push-de-hl_` returning the address of the
+corresponding routines, to be used in assembly.
