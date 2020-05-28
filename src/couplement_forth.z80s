@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.15.0+202005281702"
+    db "0.2.0-dev.16.0+202005281724"
   endm
 
 ; --------------------------------------------------------------
@@ -390,6 +390,28 @@ if data_stack_method = sp_dsm ; {{{2
 ; This is the method used by SamForth.
 ; The stack-limit checks of the original code have been removed.
 
+push_de:
+
+                              ; T Cycles
+  ld (rsp_copy),sp            ;  20
+  ld sp,(dsp)                 ;  20
+  push de                     ;  11
+  ld (dsp),sp                 ;  20
+  ld sp,(rsp_copy)            ;  20
+  ret                         ;  10
+                              ; 101 total
+
+pop_de:
+
+                              ; T Cycles
+  ld (rsp_copy),sp            ;  20
+  ld sp,(dsp)                 ;  20
+  pop de                      ;  10
+  ld (dsp),sp                 ;  20
+  ld sp,(rsp_copy)            ;  20
+  ret                         ;  10
+                              ; 100 total
+
 push_hl:
 
                               ; T Cycles
@@ -443,6 +465,32 @@ endif ; data_stack_method = sp_dsm
 ; --------------------------------------------------------------
 if data_stack_method = iy_dsm ; {{{2
 
+push_de:
+                      ; T Cycles
+  push iy             ;  15
+  ld iy,(dsp)         ;  20
+  dec iy              ;  10
+  ld (iy),d           ;  19
+  dec iy              ;  10
+  ld (iy),e           ;  19
+  ld (dsp),iy         ;  20
+  pop iy              ;  14
+  ret                 ;  10
+                      ; 137 total
+
+pop_de:
+                      ; T Cycles
+  push iy             ;  15
+  ld iy,(dsp)         ;  20
+  ld e,(iy)           ;  19
+  inc iy              ;  10
+  ld d,(iy)           ;  19
+  inc iy              ;  10
+  ld (dsp),iy         ;  20
+  pop iy              ;  14
+  ret                 ;  10
+                      ; 137 total
+
 push_hl:
                       ; T Cycles
   push iy             ;  15
@@ -466,8 +514,8 @@ pop_hl:
   inc iy              ;  10
   ld (dsp),iy         ;  20
   pop iy              ;  14
-  ret
-                      ; 127 total
+  ret                 ;  10
+                      ; 137 total
 
 push_de_hl:
                       ; T Cycles
@@ -483,8 +531,8 @@ push_de_hl:
   ld (iy),l           ;  19
   ld (dsp),iy         ;  20
   pop iy              ;  14
-  ret
-                      ; 185 total
+  ret                 ;  10
+                      ; 195 total
 
 pop_hl_de:
                       ; T Cycles
@@ -500,13 +548,43 @@ pop_hl_de:
   inc iy              ;  10
   ld (dsp),iy         ;  20
   pop iy              ;  14
-  ret
-                      ; 185 total
+  ret                 ;  10
+                      ; 195 total
 
 endif ; data_stack_method = iy_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = hl_dsm ; {{{2
+
+push_de:
+
+                              ; T Cycles
+  push hl                     ;  11
+  push de                     ;  11
+  ld hl,(dsp)                 ;  20
+  dec hl                      ;  06
+  ld (hl),d                   ;  07
+  dec hl                      ;  06
+  ld (hl),e                   ;  07
+  ld (dsp),hl                 ;  16
+  pop de                      ;  10
+  pop hl                      ;  10
+  ret                         ;  10
+                              ; 114 total
+
+pop_de:
+
+                              ; T Cycles
+  push hl                     ;  11
+  ld hl,(dsp)                 ;  20
+  ld e,(hl)                   ;  07
+  inc hl                      ;  06
+  ld d,(hl)                   ;  07
+  inc hl                      ;  06
+  ld (dsp),hl                 ;  16
+  pop hl                      ;  10
+  ret                         ;  10
+                              ; 093 total
 
 push_hl:
 
@@ -584,9 +662,23 @@ endif ; data_stack_method = hl_dsm
 ; --------------------------------------------------------------
 if data_stack_method = ix_dsm ; {{{2
 
-; `ix` always holds the data stack pointer. This is the fastest method.
+push_de:
+                      ; T Cycles
+  dec ix              ;  10
+  ld (ix),d           ;  19
+  dec ix              ;  10
+  ld (ix),e           ;  19
+  ret                 ;  10
+                      ; 068 total
 
-; no fast/slow variants: no over/underflow checks
+pop_de:
+                      ; T Cycles
+  ld e,(ix)           ;  19
+  inc ix              ;  10
+  ld d,(ix)           ;  19
+  inc ix              ;  10
+  ret                 ;  10
+                      ; 068 total
 
 push_hl:
                       ; T Cycles
