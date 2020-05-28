@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.12.0+202005280144"
+    db "0.2.0-dev.13.0+202005281624"
   endm
 
 ; --------------------------------------------------------------
@@ -173,7 +173,7 @@ slen_fvar:
 
 ; XXX TODO -- move all variables into the code, except those shared with the BASIC loader
 
-ip_fvar:
+ip_fvar: ; XXX TODO -- make it standard
   ; Address of interpreter pointer within source being compiled
   dw 0x0000
 dubflag_fvar:
@@ -188,9 +188,6 @@ endf_fvar:
 etib_fvar: ; XXX OLD -- remove it; adapt the keyboard input code
   ; End address of Terminal Input Buffer
   dw tib_end ; XXX CHECK -- originally tib_start, why?
-ldflg_fvar:
-  ; Flag showing that source is being compiled ; XXX OLD
-  db 0x00
 errhld_fvar:
   ; Address of interpreter pointer position when an error occurred during source compilation
   dw 0x0000
@@ -1251,6 +1248,7 @@ return_stack_full_error:
   jr error_a
 inside_fence_error:
   ld a,0x07
+  jr error_a
 break_error:
   ld a,0x08
   jr error_a
@@ -3616,11 +3614,11 @@ previous_key equ $+1
   ; XXX TODO call `key?`
   ld a,(sys_last_k)
   ld (previous_key),a
-key.1
+key_.wait
   ld a,(sys_last_k)
 previous_key equ $+1
   cp 0 ; a different key?
-  jp z,key.1
+  jp z,key_.wait
   ld l,a ; save the key
   xor a
   ld (sys_last_k),a ; delete the last key
@@ -4379,7 +4377,6 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   ld (fence),hl
   call save_dictionary_pointers
   call left_bracket_
-;;  ld (ldflg_fvar),a ; XXX OLD -- formerly used by the BASIC interface
   call page_
   call bootmessage_
   ; XXX NOTE -- 2013-02-02 quit_ changed to abort_, after FIG-Forth.
@@ -4591,14 +4588,6 @@ sign_.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: inkey ( -- c )
-
-  header inkey_,"inkey",0
-
-  ; XXX TODO
-  jp key_
-
-; --------------------------------------------------------------
   ;: forget ( "name" -- )
 
   header forget_,"forget",0
@@ -4638,11 +4627,11 @@ sign_.end:
   header paren_,"(",immediate
 
   ld hl,(ip_fvar)
-l5f40h:
+paren_.next:
   inc hl
-  ld a,0x29
+  ld a,')'
   cp (hl)
-  jr nz,l5f40h
+  jr nz,paren_.next
   ld (ip_fvar),hl
   ret
 
@@ -4933,11 +4922,6 @@ filename_store.move
   ld hl,(latest)
   ld (cold_latest),hl
   ld hl,(dp)
-;; XXX OLD -- not needed: ; XXX TODO --
-;;  inc hl
-;;  inc hl
-;;  inc hl
-;;  inc hl
   ld (cold_dp),hl
   ld (fence),hl
   jp save_dictionary_pointers
@@ -4947,9 +4931,7 @@ filename_store.move
 
   header state_,"state",0
 
-  ; XXX TODO -- fix/improve
-  ld hl,state
-  jp push_hl
+  call do_variable
 state:
   dw 0 ; compilation state flag (non-zero value when in compilation state)
 
