@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.20.0+202005281920"
+    db "0.2.0-dev.20.0+202005281930"
   endm
 
 ; --------------------------------------------------------------
@@ -1231,21 +1231,21 @@ _previous_nfa: defl 0
   ; sf      = SamForth ; XXX TODO -- remove?
 
 ; --------------------------------------------------------------
-  ;: couplement_forth ( -- ) cf ; {{{2
+  header couplement_forth_,"couplement-forth",0 ; {{{2
+
+  ;: couplement_forth ( -- ) cf
   ;:
   ;: Noop word. If present, the program is running on Couplement Forth.
   ;: Intended for conditional compilation in portable programs.
 
-  header couplement_forth_,"couplement-forth",0
-
   ret
 
 ; --------------------------------------------------------------
-  ;: (bootmessage) ( -- ) cf,gforth ; {{{2
+  header paren_bootmessage_,"(bootmessage)",0 ; {{{2
+
+  ;: (bootmessage) ( -- ) cf,gforth
   ;:
   ;: Print the Couplement Forth boot message.
-
-  header paren_bootmessage_,"(bootmessage)",0
 
   call print_inline_message
   db "Couplement Forth",cr_char
@@ -1257,12 +1257,12 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  ;: bootmessage ( -- ) cf,gforth ; {{{2
+  header bootmessage_,"bootmessage",0 ; {{{2
+
+  ;: bootmessage ( -- ) cf,gforth
   ;:
   ;: Print a boot message (Couplement Forth's boot message by default).
   ;: The behaviour of `bootmessage` can be changed with `is`.
-
-  header bootmessage_,"bootmessage",0
 
   jp paren_bootmessage_
 
@@ -1282,11 +1282,11 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: lit ( -- x ) fig,comus,gforth ; {{{2
+  header lit_,"lit",0 ; {{{2
+
+  ;: lit ( -- x ) fig,comus,gforth
   ;:
   ;: Push the content of the next cell to the data stack as a literal.
-
-  header lit_,"lit",0
 
   pop hl ; address of the literal
   ld e,(hl)
@@ -1298,15 +1298,15 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: literal ( compilation: x -- ) ( run-time: -- x ) 2012 ; {{{2
+  header literal_,"literal",immediate+compile_only ; {{{2
+
+  ;: literal ( compilation: x -- ) ( run-time: -- x ) 2012
   ;:
   ;:  Interpretation: Interpretation semantics for this word are undefined.
   ;:  Compilation: ( x -- )
   ;:    Append the run-time semantics given below to the current definition.
   ;:  Run-time: ( -- x )
   ;:    Place x on the stack.
-
-  header literal_,"literal",immediate+compile_only
 
   ; XXX TODO -- write
   ld de,lit_
@@ -1317,14 +1317,14 @@ _previous_nfa: defl 0
   jp compile_de
 
 ; --------------------------------------------------------------
-  ;: >body ( cfa -- pfa ) 94 ; {{{2
+  header to_body_,">body",0 ; {{{2
+
+  ;: >body ( cfa -- pfa ) 94
   ;:
   ;:  XXX TODO -- doc
   ;: ( xt -- a-addr ) a-addr is the data-field address corresponding to xt. ; {{{2
   ;:  An ambiguous condition exists if xt is not for a word defined via CREATE.
 
-  header to_body_,">body",0
-
   if faster_stack_operations
     if data_stack_method = ix_dsm
       ld l,(ix)
@@ -1359,12 +1359,12 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 2- ( n1|u1 -- n2|u2 ) comus ; {{{2
+  header two_minus_,"2-",0 ; {{{2
+
+  ;: 2- ( n1|u1 -- n2|u2 ) comus
   ;:
   ;:  Subtract two (2) from n1|u1 giving the difference n2|u2.
 
-  header two_minus_,"2-",0
-
   if faster_stack_operations
     if data_stack_method = ix_dsm
       ld l,(ix)
@@ -1396,12 +1396,12 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 2+ ( n1|u1 -- n2|u2 ) comus ; {{{2
+  header two_plus_,"2+",0 ; {{{2
+
+  ;: 2+ ( n1|u1 -- n2|u2 ) comus
   ;:
   ;:  Add two (2) to n1|u1 giving the sum n2|u2.
 
-  header two_plus_,"2+",0
-
   if faster_stack_operations
     if data_stack_method = ix_dsm
       ld l,(ix)
@@ -1433,11 +1433,11 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 1- ( n1|u1 -- n2|u2 ) 94 ; {{{2
+  header one_minus_,"1-",0 ; {{{2
+
+  ;: 1- ( n1|u1 -- n2|u2 ) 94
   ;:
   ;:  Subtract one (1) from n1|u1 giving the difference n2|u2.
-
-  header one_minus_,"1-",0
 
   if faster_stack_operations
     if data_stack_method = ix_dsm
@@ -1467,11 +1467,11 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: 1+ ( n1|u1 -- n2|u2 ) 94 ; {{{2
+  header one_plus_,"1+",0 ; {{{2
+
+  ;: 1+ ( n1|u1 -- n2|u2 ) 94
   ;:
   ;:  Add one (1) to n1|u1 giving the sum n2|u2.
-
-  header one_plus_,"1+",0
 
   if faster_stack_operations
     if data_stack_method = ix_dsm
@@ -1501,17 +1501,17 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  ;: execute ( cfa -- ) 94 ; {{{2
+  header execute_,"execute",0 ; {{{2
 
-  header execute_,"execute",0
+  ;: execute ( cfa -- ) 94
 
   call pop_hl
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: perform ( a -- ) cf ; {{{2
+  header perform_,"perform",0 ; {{{2
 
-  header perform_,"perform",0
+  ;: perform ( a -- ) cf
 
   call pop_hl
   ld a,(hl)
@@ -1523,11 +1523,11 @@ _previous_nfa: defl 0
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: prompt ( -- ) ( R: i*x -- ) gforth ; {{{2
+  header prompt_,"prompt",0 ; {{{2
+
+  ;: prompt ( -- ) ( R: i*x -- ) gforth
   ;:
   ;: Print the system prompt.
-
-  header prompt_,"prompt",0
 
   ; XXX TODO -- Gforth prints "compiled" in compiling state.
   call print_inline_message
@@ -1536,7 +1536,9 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  ;: quit ( -- ) ( R: i*x -- ) 94 ; {{{2
+  header quit_,"quit",0 ; {{{2
+
+  ;: quit ( -- ) ( R: i*x -- ) 94
   ;:
   ;: Empty the return stack, store zero in `source-id` if it is present, make
   ;: the user input device the input source, and enter interpretation state.
@@ -1548,8 +1550,6 @@ _previous_nfa: defl 0
   ;: - Display the implementation-defined system prompt if in interpretation
   ;: state, all processing has been completed, and no ambiguous condition
   ;: exists.
-
-  header quit_,"quit",0
 
   ; clear the return stack:
   di ; XXX ? -- needed?
@@ -1574,9 +1574,9 @@ quit.do:
   jp quit.do
 
 ; --------------------------------------------------------------
-  ;: branch ( -- ) comus ; {{{2
+  header branch_,"branch",0 ; {{{2
 
-  header branch_,"branch",0
+  ;: branch ( -- ) comus
 
   pop hl
   ld c,(hl)
@@ -1586,9 +1586,9 @@ quit.do:
   ret
 
 ; --------------------------------------------------------------
-  ;: ?branch ( f -- ) ; {{{2
+  header question_branch_,"?branch",0 ; {{{2
 
-  header question_branch_,"?branch",0
+  ;: ?branch ( f -- )
 
   call pop_hl
   ld a,l
@@ -1600,9 +1600,9 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: 0branch ( f -- ) ; {{{2
+  header zero_branch_,"0branch",0 ; {{{2
 
-  header zero_branch_,"0branch",0
+  ;: 0branch ( f -- )
 
   call pop_hl
   ld a,l
@@ -1614,20 +1614,20 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: swap ( x1 x2 -- x2 x1 ) hist,94 ; {{{2
+  header swap_,"swap",0 ; {{{2
 
-  header swap_,"swap",0
+  ;: swap ( x1 x2 -- x2 x1 ) hist,94
 
   call pop_hl_de
   ex de,hl
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: dup ( x -- x x ) hist,94 ; {{{2
+  header dup_,"dup",0 ; {{{2
+
+  ;: dup ( x -- x x ) hist,94
   ;:
   ;: Duplicate the cell on the top of the stack.
-
-  header dup_,"dup",0
 
   if faster_stack_operations
     if data_stack_method = ix_dsm
@@ -1654,11 +1654,11 @@ quit.do:
   endif
 
 ; --------------------------------------------------------------
-  ;: ?dup ( x -- 0 | x x ) hist,94 ; {{{2
+  header question_dup_,"?dup",0 ; {{{2
+
+  ;: ?dup ( x -- 0 | x x ) hist,94
   ;:
   ;: Duplicate the cell on the top of the stack if it is non-zero.
-
-  header question_dup_,"?dup",0
 
   call pop_hl ; XXX TODO -- faster: just read it, don't pop
   ld a,h
@@ -1688,9 +1688,9 @@ quit.do:
   endif
 
 ; --------------------------------------------------------------
-  ;: drop ( x -- ) hist,94 ; {{{2
+  header drop_,"drop",0 ; {{{2
 
-  header drop_,"drop",0
+  ;: drop ( x -- ) hist,94
 
   if data_stack_method = ix_dsm
     inc ix
@@ -1957,9 +1957,9 @@ the_names_are_different:
   jp push_hl ; return 0
 
 ; --------------------------------------------------------------
-  ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
+  header u_mult_,"u*",0 ; {{{2
 
-  header u_mult_,"u*",0
+  ;: u* ( u1 u2 -- du ) ; XXX TODO -- 2020-05-27: Confirm stack
 
   call pop_hl_de
   ld b,h
@@ -1994,18 +1994,18 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  ;: + ( n1 n2 -- n3 ) ; {{{2
+  header plus_,"+",0 ; {{{2
 
-  header plus_,"+",0
+  ;: + ( n1 n2 -- n3 )
 
   call pop_hl_de
   add hl,de
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: +! ( n a -- ) ; {{{2
+  header plus_store_,"+!",0 ; {{{2
 
-  header plus_store_,"+!",0
+  ;: +! ( n a -- )
 
   call pop_hl_de
 	; hl = address
@@ -2020,9 +2020,9 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
+  header d_plus_,"d+",0 ; {{{2
 
-  header d_plus_,"d+",0
+  ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack
 
   call pop_hl
   ld b,h
@@ -2041,15 +2041,15 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: within ( n1|u1 n2|u2 n3|u3 -- flag ) 2012 ; {{{2
+  header within_,"within",0 ; {{{2
+
+  ;: within ( n1|u1 n2|u2 n3|u3 -- flag ) 2012
   ;:
   ;: Perform a comparison of a test value n1|u1 with a lower limit n2|u2 and an
   ;: upper limit n3|u3, returning true if either (n2|u2 < n3|u3 and (n2|u2 <=
   ;: n1|u1 and n1|u1 < n3|u3)) or (n2|u2 > n3|u3 and (n2|u2 <= n1|u1 or n1|u1 <
   ;: n3|u3)) is true, returning false otherwise.  An ambiguous condition exists
   ;: if n1|u1, n2|u2, and n3|u3 are not all the same type.
-
-  header within_,"within",0
 
   ; DZX-Forth:
   ;     pop hl
@@ -2071,9 +2071,9 @@ l5330h:
   jp u_less_
 
 ; --------------------------------------------------------------
-  ;: - ( n1 n2 -- n3 ) hist,94 ; {{{2
+  header minus_,"-",0 ; {{{2
 
-  header minus_,"-",0
+  ;: - ( n1 n2 -- n3 ) hist,94
 
   call pop_hl_de
   ex de,hl ; XXX TODO -- remove this and write pop_de_hl
@@ -2112,15 +2112,15 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: number ( ca -- n | d ) comus ; {{{2
+  header number_,"number",0 ; {{{2
+
+  ;: number ( ca -- n | d ) comus
   ;:
   ;: ca = address of the first char ; XXX ;: TODO -- confirm
   ;:
   ;: Convert the ASCII characters in the input buffer or source code area into
   ;: a double precision number. If the number is below 65536 convert it into a
   ;: single precision number.
-
-  header number_,"number",0
 
   call pop_hl
 number_hl:
@@ -2245,17 +2245,19 @@ number.return:
   ret
 
 ; --------------------------------------------------------------
-  ;: space ( -- ) fig,79,83,94 ; {{{2
+  header space_,"space",0 ; {{{2
+
+  ;: space ( -- ) fig,79,83,94
   ;:
   ;: Display one space.
-
-  header space_,"space",0
 
   ld a,space_char
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: spaces ( u -- ) fig ; {{{2
+  header spaces_,"spaces",0 ; {{{2
+
+  ;: spaces ( u -- ) fig
   ;:
   ;: Display u spaces.
   ;:
@@ -2274,8 +2276,6 @@ number.return:
   ;: Couplement Forth's `spaces` behaves like fig-Forth's. It's simpler and
   ;: faster and 0..65535 spaces can be printed. When printing 0..32,767 spaces
   ;: U uses an unsigned 16-bit number instead.
-
-  header spaces_,"spaces",0
 
   call pop_hl
   ld a,l
@@ -2296,9 +2296,9 @@ spaces.hl:
   ret
 
 ; --------------------------------------------------------------
-  ;: emit ( c -- ) 94 ; {{{2
+  header emit_,"emit",0 ; {{{2
 
-  header emit_,"emit",0
+  ;: emit ( c -- ) 94
 
   call pop_hl
   ld a,l
@@ -2395,12 +2395,12 @@ de_hl_slash_mod.again:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: cls ( -- ) zx ; {{{2
+  header cls_,"cls",0 ; {{{2
+
+  ;: cls ( -- ) zx
   ;:
   ;: XXX TODO
   ;: Clear the screen.
-
-  header cls_,"cls",0
 
   jp rom_cl_all
 
@@ -2490,9 +2490,9 @@ create_header.store_char
   ret
 
 ; --------------------------------------------------------------
-  ;: noop ( <name> -- ) af,gforth,comus ; {{{2
+  header noop_,"noop",0 ; {{{2
 
-  header noop_,"noop",0
+  ;: noop ( <name> -- ) af,gforth,comus
 
   ret
 
@@ -2533,9 +2533,9 @@ compile_jp_de:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: ; ( colon-sys -- ) ; XXX TODO -- stack ; {{{2
+  header semicolon_,";",immediate+compile_only ; {{{2
 
-  header semicolon_,";",immediate+compile_only
+  ;: ; ( colon-sys -- ) ; XXX TODO -- stack
 
   call pop_hl
   ld a,colon_structure_id
@@ -2557,11 +2557,11 @@ compile_jp_de:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: words ( -- ) 94 ; {{{2
+  header words_,"words",0 ; {{{2
+
+  ;: words ( -- ) 94
   ;:
   ;: List all the words in the context dictionary.
-
-  header words_,"words",0
 
   ; XXX TODO -- print word info
 
@@ -2770,54 +2770,54 @@ endif
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: on ( a -- ) comus ; {{{2
+  header on_,"on",0 ; {{{2
 
-  header on_,"on",0
+  ;: on ( a -- ) comus
 
   call pop_hl
   ld (hl),true
   ret
 
 ; --------------------------------------------------------------
-  ;: off ( a -- ) comus ; {{{2
+  header off_,"off",0 ; {{{2
 
-  header off_,"off",0
+  ;: off ( a -- ) comus
 
   call pop_hl
   ld (hl),false
   ret
 
 ; --------------------------------------------------------------
-  ;: dp ( -- a ) fig ; {{{2
+  header dp_,"dp",0 ; {{{2
+
+  ;: dp ( -- a ) fig
   ;:
   ;: Return the address of the dictionary pointer variable, which contains the
   ;: next free memory location above the dictionary. The value may be read by
   ;: `here` and altered by `allot`.
-
-  header dp_,"dp",0
 
 dp: equ $+1
   ld hl,end_of_code
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: here ( -- a ) fig,79,83,94 ; {{{2
+  header here_,"here",0 ; {{{2
+
+  ;: here ( -- a ) fig,79,83,94
   ;:
   ;: Return the content of `dp`, the address of the next available memory
   ;: location above the dictionary.
-
-  header here_,"here",0
 
   ld hl,(dp)
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: latest ( -- nfa ) fig,af,gforth ; {{{2
+  ; XXX TODO -- `current` is not implemented yet ; {{{2
+
+  ;: latest ( -- nfa ) fig,af,gforth
   ;:
   ;: Return the name field address of the last word defined in the `current`
   ;: vocabulary.
-
-  ; XXX TODO -- `current` is not implemented yet
 
   header latest_,"latest",0
 
@@ -2826,9 +2826,9 @@ latest: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: ;code ( colon-sys -- ) ; XXX TODO -- stack ; {{{2
+  header semicolon_code_,";code",immediate ; {{{2
 
-  header semicolon_code_,";code",immediate
+  ;: ;code ( colon-sys -- ) ; XXX TODO -- stack
 
   ; XXX TODO adapt, test
 
@@ -2861,9 +2861,9 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: in ( a -- c ) zx ; {{{2
+  header in_,"in",0 ; {{{2
 
-  header in_,"in",0
+  ;: in ( a -- c ) zx
 
   call pop_hl
   ld b,h
@@ -2874,9 +2874,9 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: out ( a c -- ) zx ; {{{2
+  header out_,"out",0 ; {{{2
 
-  header out_,"out",0
+  ;: out ( a c -- ) zx
 
   call pop_hl_de
   ld b,h
@@ -2885,12 +2885,12 @@ semicolon.end:
   ret
 
 ; --------------------------------------------------------------
-  ;: page ( -- ) 83,94 ; {{{2
+  header page_,"page",0 ; {{{2
+
+  ;: page ( -- ) 83,94
   ;:
   ;: On a terminal, clear the screen and resets the cursor position to the
   ;: upper left corner.  On a printer perform a form feed.
-
-  header page_,"page",0
 
 linked_stream: equ $+1 ; XXX TODO make it a variable
   ld a,$00
@@ -2901,9 +2901,9 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: do ( -- do-sys ) ; XXX TODO -- stack ; {{{2
+  header do_,"do",immediate+compile_only ; {{{2
 
-  header do_,"do",immediate+compile_only
+  ;: do ( -- do-sys ) ; XXX TODO -- stack
 
   ld de,do_do
   call compile_call_de
@@ -3025,9 +3025,9 @@ sub_57a3h:
   ret
 
 ; --------------------------------------------------------------
-  ;: loop ( do-sys -- ) ; XXX TODO -- stack ; {{{2
+  header loop_,"loop",immediate+compile_only ; {{{2
 
-  header loop_,"loop",immediate+compile_only
+  ;: loop ( do-sys -- ) ; XXX TODO -- stack
 
   ld a,do_structure_id
   call structured
@@ -3037,12 +3037,12 @@ sub_57a3h:
   jp sub_57a3h
 
 ; --------------------------------------------------------------
-  ;: j ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 ) hist,94 ; {{{2
+  header j_,"j",0 ; {{{2
+
+  ;: j ( -- n|u ) ( R: loop-sys1 loop-sys2 -- loop-sys1 loop-sys2 ) hist,94
   ;:
   ;: Return a copy of the index of the next outer loop.  May only
   ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
-
-  header j_,"j",0
 
   ld hl,$000A
   add hl,sp
@@ -3053,12 +3053,12 @@ sub_57a3h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94 ; {{{2
+  header i_,"i",0 ; {{{2
+
+  ;: i ( -- n|u ) ( R: loop-sys -- loop-sys ) hist,94
   ;:
   ;: Return a copy of the current (innermost) loop index. May only
   ;: be used within a nested `do`-`loop` or `do`-`+loop` structure.
-
-  header i_,"i",0
 
   ld hl,$0004
   add hl,sp
@@ -3069,10 +3069,10 @@ sub_57a3h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: link ( n -- ) sf ; {{{2
-  ;: XXX TODO adapt
+  header link_,"link",0 ; {{{2
 
-  header link_,"link",0
+  ;: link ( n -- ) sf
+  ;: XXX TODO adapt
 
   call pop_hl
   ld a,l
@@ -3095,12 +3095,12 @@ link.a:
   jp rom_chan_open
 
 ; --------------------------------------------------------------
-  ;: home ( -- ) comus,cf ; {{{2
+  header home_,"home",0 ; {{{2
+
+  ;: home ( -- ) comus,cf
   ;:
   ;: Make the next character displayed will appear in column 0, row 0 of the
   ;: user output device, the upper left corner.
-
-  header home_,"home",0
 
   ld a,at_char
   call print_a
@@ -3110,14 +3110,14 @@ link.a:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: at-xy ( u1 u2 -- ) 94,cf ; {{{2
+  header at_xy_,"at-xy",0 ; {{{2
+
+  ;: at-xy ( u1 u2 -- ) 94,cf
   ;:
   ;: Make the next character displayed will appear in column u1, row u2 of the
   ;: user output device, the upper left corner of which is column zero, row
   ;: zero.
   ;: Note: In Couplement Forth, the upper bytes of the parameters are ignored.
-
-  header at_xy_,"at-xy",0
 
   ld a,at_char
   call print_a
@@ -3130,9 +3130,9 @@ link.a:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: border ( u -- ) zx ; {{{2
+  header border_,"border",0 ; {{{2
 
-  header border_,"border",0
+  ;: border ( u -- ) zx
 
   ; XXX TODO adapt
   call pop_hl
@@ -3142,9 +3142,9 @@ border.a:
   ret
 
 ; --------------------------------------------------------------
-  ;: beep ( u1 u2 -- ) zx ; {{{2
+  header beep_,"beep",0 ; {{{2
 
-  header beep_,"beep",0
+  ;: beep ( u1 u2 -- ) zx
 
   ; XXX TODO
   ret
@@ -3311,9 +3311,9 @@ return.a:
   jp pop_hl
 
 ; --------------------------------------------------------------
-  ;: begin ( -- begin-sys ) ; XXX TODO -- stack ; {{{2
+  header begin_,"begin",immediate+compile_only ; {{{2
 
-  header begin_,"begin",immediate+compile_only
+  ;: begin ( -- begin-sys ) ; XXX TODO -- stack
 
   ld hl,(dp)
   call push_hl
@@ -3382,9 +3382,9 @@ compare_de_hl_unsigned:
   ret
 
 ; --------------------------------------------------------------
-  ;: rdrop ( -- ) ( R: x -- ) ; {{{2
+  header r_drop_,"rdrop",0 ; {{{2
 
-  header r_drop_,"rdrop",0
+  ;: rdrop ( -- ) ( R: x -- )
 
   ; XXX TODO test (old code: pop hl / ret)
   pop hl
@@ -3392,18 +3392,18 @@ compare_de_hl_unsigned:
   jp (hl)
 
 ; --------------------------------------------------------------
-  ;: r@ ( -- x ) ( R: x --  ) ; {{{2
+  header r_fetch_,"r@",0 ; {{{2
 
-  header r_fetch_,"r@",0
+  ;: r@ ( -- x ) ( R: x --  )
 
   pop hl
   push hl
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: r> ( -- x ) ( R: x -- ) ; {{{2
+  header r_from_,"r>",0 ; {{{2
 
-  header r_from_,"r>",0
+  ;: r> ( -- x ) ( R: x -- )
 
   pop bc
   pop hl
@@ -3411,9 +3411,9 @@ compare_de_hl_unsigned:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: >r ( x -- ) ( R: -- x ) ; {{{2
+  header to_r_,">r",0 ; {{{2
 
-  header to_r_,">r",0
+  ;: >r ( x -- ) ( R: -- x )
 
   call pop_hl
   pop bc
@@ -3582,11 +3582,11 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ret
 
 ; --------------------------------------------------------------
-  ;: -cursor ( n -- ) ; XXX NEW ; {{{2
+  header minus_cursor_,"-cursor",0 ; {{{2
+
+  ;: -cursor ( n -- ) ; XXX NEW
   ;:
   ;: Delete the cursor.
-
-  header minus_cursor_,"-cursor",0
 
   call space_
   call c_lit_
@@ -3795,9 +3795,9 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: if ( -- if-sys ) ; XXX TODO -- stack ; {{{2
+  header if_,"if",immediate+compile_only ; {{{2
 
-  header if_,"if",immediate+compile_only
+  ;: if ( -- if-sys ) ; XXX TODO -- stack
 
   ld de,zero_branch_
   call compile_call_de
@@ -3810,9 +3810,9 @@ word.parse:
   jp push_hl ; XXX TODO -- push_a?
 
 ; --------------------------------------------------------------
-  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack ; {{{2
+  header else_,"else",immediate+compile_only ; {{{2
 
-  header else_,"else",immediate+compile_only
+  ;: else ( if-sys -- if-sys ) ; XXX TODO -- stack
 
   ld a,if_structure_id
   call structured
@@ -3834,9 +3834,9 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: then ( if-sys -- ) ; XXX TODO -- stack ; {{{2
+  header then_,"then",immediate+compile_only ; {{{2
 
-  header then_,"then",immediate+compile_only
+  ;: then ( if-sys -- ) ; XXX TODO -- stack
 
   ld a,if_structure_id
   call structured
@@ -3848,9 +3848,9 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  ;: <builds ( "name" -- ) ; XXX TODO -- stack ; {{{2
+  header builds_,"<builds",compile_only ; {{{2
 
-  header builds_,"<builds",compile_only
+  ;: <builds ( "name" -- ) ; XXX TODO -- stack
 
   ; XXX TODO -- remove, adapt
   ld de,create_header
@@ -3883,9 +3883,9 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: does> ( -- ) ; XXX TODO -- stack ; {{{2
+  header does_,"does>",immediate+compile_only ; {{{2
 
-  header does_,"does>",immediate+compile_only
+  ;: does> ( -- ) ; XXX TODO -- stack
 
   ld a,builds_structure_id
   call structured
@@ -3917,9 +3917,9 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack ; {{{2
+  header while_,"while",immediate+compile_only ; {{{2
 
-  header while_,"while",immediate+compile_only
+  ;: while ( begin-sys -- begin-sys ) ; XXX TODO -- stack
 
   ld a,begin_structure_id
   call structured
@@ -3934,9 +3934,9 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack ; {{{2
+  header repeat_,"repeat",immediate+compile_only ; {{{2
 
-  header repeat_,"repeat",immediate+compile_only
+  ;: repeat ( begin-sys -- ) ; XXX TODO -- stack
 
   ld a,begin_structure_id
   call structured
@@ -4141,17 +4141,17 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: bl ( -- c ) 94 ; {{{2
+  header bl_,"bl",0 ; {{{2
 
-  header bl_,"bl",0
+  ;: bl ( -- c ) 94
 
   ld hl,space_char
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: count ( a -- a' u ) 94 ; {{{2
+  header count_,"count",0 ; {{{2
 
-  header count_,"count",0
+  ;: count ( a -- a' u ) 94
 
   call pop_hl
   ld a,(hl)
@@ -4162,9 +4162,9 @@ l5d4bh:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: find ( "name" -- cfa ) ; ; {{{2
+  header find_,"find",0 ; {{{2
 
-  header find_,"find",0
+  ;: find ( "name" -- cfa ) ;
 
   ; XXX TODO -- rewrite according to ANS; now it simply skips leading blanks!
   ; XXX TODO -- move this code to `(find)`
@@ -4185,24 +4185,24 @@ find.skip_blank:
   jp paren_find_
 
 ; --------------------------------------------------------------
-  ;: (abort) ( i*x -- ) ( R: j*x -- ) comus ; {{{2
+  header paren_abort_,"(abort)",0 ; {{{2
+
+  ;: (abort) ( i*x -- ) ( R: j*x -- ) comus
   ;:
   ;: Empty the data stack and perform the function of `quit`, which includes
   ;: emptying the return stack, without displaying a message.
-
-  header paren_abort_,"(abort)",0
 
   ; XXX TODO -- test, confirm
   call init_data_stack
   jp quit_
 
 ; --------------------------------------------------------------
-  ;: abort ( i*x -- ) ( R: j*x -- ) 94 ; {{{2
+  header abort_,"abort",0 ; {{{2
+
+  ;: abort ( i*x -- ) ( R: j*x -- ) 94
   ;:
   ;: Empty the data stack and perform the function of QUIT, which includes
   ;: emptying the return stack, without displaying a message.
-
-  header abort_,"abort",0
 
   ; XXX NEW -- 2013-02-02
   ; XXX TODO -- test, confirm
@@ -4210,13 +4210,13 @@ find.skip_blank:
   jp paren_abort_
 
 ; --------------------------------------------------------------
-  ;: cold ( -- ) fig,comus,gforth ; {{{2
+  header cold_,"cold",0 ; {{{2
+
+  ;: cold ( -- ) fig,comus,gforth
   ;:
   ;: The cold start procedure.  Adjust the dictionary pointer to the minimum
   ;: standard and restart via `abort`.  May be called from terminal to remove
   ;: the application program and restart.
-
-  header cold_,"cold",0
 
 cold_latest: equ $+1 ; nfa of the last Forth word in dictionary at cold start
   ld hl,current_latest
@@ -4233,11 +4233,11 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   jp abort_
 
 ; --------------------------------------------------------------
-  ;: fence ( -- a ) fig ; {{{2
+  header fence_,"fence",0 ; {{{2
+
+  ;: fence ( -- a ) fig
   ;:
   ;: Return an address which contains the address below which `forget` will not operate.
-
-  header fence_,"fence",0
 
   ld hl,fence
   jp push_hl
@@ -4245,9 +4245,9 @@ fence:
   dw end_of_code ; address below which `forget` will not operate.
 
 ; --------------------------------------------------------------
-  ;: u/mod ( -- ) ; XXX TODO -- stack ; {{{2
+  header u_slash_mod_,"u/mod",0 ; {{{2
 
-  header u_slash_mod_,"u/mod",0
+  ;: u/mod ( -- ) ; XXX TODO -- stack
 
   call pop_hl
   ld b,h
@@ -4295,9 +4295,9 @@ l5de3h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  ;: <# ( -- ) ; XXX TODO -- stack ; {{{2
+  header less_number_sign_,"<#",0 ; {{{2
 
-  header less_number_sign_,"<#",0
+  ;: <# ( -- ) ; XXX TODO -- stack
 
   call pad_
   call pop_hl
@@ -4305,9 +4305,9 @@ l5de3h:
   ret
 
 ; --------------------------------------------------------------
-  ;: #> ( -- ) ; XXX TODO -- stack ; {{{2
+  header number_sign_greater_,"#>",0 ; {{{2
 
-  header number_sign_greater_,"#>",0
+  ;: #> ( -- ) ; XXX TODO -- stack
 
   call pop_hl_de
   ld hl,(hlds_fvar)
@@ -4317,9 +4317,9 @@ l5de3h:
   jp minus_
 
 ; --------------------------------------------------------------
-  ;: # ( -- ) ; XXX TODO -- stack ; {{{2
+  header number_sign_,"#",0 ; {{{2
 
-  header number_sign_,"#",0
+  ;: # ( -- ) ; XXX TODO -- stack
 
   ; XXX TODO -- avoid fetching base every time `#s` calls `#`:
   ld hl,(base)
@@ -4357,9 +4357,9 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  ;: #s ( -- ) ; XXX TODO -- stack ; {{{2
+  header number_sign_s_,"#s",0 ; {{{2
 
-  header number_sign_s_,"#s",0
+  ;: #s ( -- ) ; XXX TODO -- stack
 
   call number_sign_
   call over_ ; XXX TODO -- over over -> 2dup
@@ -4397,10 +4397,10 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  ;: sign ( n d -- ) ; XXX TODO -- stack ; {{{2
-  ;: sign ( n -- ) ; XXX TODO -- standard
+  header sign_,"sign",0 ; {{{2
 
-  header sign_,"sign",0
+  ;: sign ( n d -- ) ; XXX TODO -- stack
+  ;: sign ( n -- ) ; XXX TODO -- standard
 
   call rot_ ; XXX TODO -- this is not standard
   call zero_less_
@@ -4597,33 +4597,33 @@ char.return:
   ret
 
 ; --------------------------------------------------------------
-  ;: paper ( n -- ) zx ; {{{2
+  header paper_,"paper",0 ; {{{2
 
-  header paper_,"paper",0
+  ;: paper ( n -- ) zx
 
   ld a,paper_char
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: ink ( n -- ) zx ; {{{2
+  header ink_,"ink",0 ; {{{2
 
-  header ink_,"ink",0
+  ;: ink ( n -- ) zx
 
   ld a,ink_char
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: bright ( f -- ) zx ; {{{2
+  header bright_,"bright",0 ; {{{2
 
-  header bright_,"bright",0
+  ;: bright ( f -- ) zx
 
   ld a,bright_char
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: flash ( f -- ) zx ; {{{2
+  header flash_,"flash",0 ; {{{2
 
-  header flash_,"flash",0
+  ;: flash ( f -- ) zx
 
   ld a,flash_char
 print_a_and_tos:
@@ -4633,33 +4633,33 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: tab ( -- ) zx ; {{{2
+  header tab_,"tab",0 ; {{{2
 
-  header tab_,"tab",0
+  ;: tab ( -- ) zx
 
   ld a,tab_char
   jp print_a
 
 ; --------------------------------------------------------------
-  ;: overprint ( f -- ) zx ; {{{2
+  header overprint_,"overprint",0 ; {{{2
 
-  header overprint_,"overprint",0
+  ;: overprint ( f -- ) zx
 
   ld a,over_char
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: inverse ( f -- ) zx ; {{{2
+  header inverse_,"inverse",0 ; {{{2
 
-  header inverse_,"inverse",0
+  ;: inverse ( f -- ) zx
 
   ld a,inverse_char
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  ;: cat ( n -- ) sf ; {{{2
+  header cat_,"cat",0 ; {{{2
 
-  header cat_,"cat",0
+  ;: cat ( n -- ) sf
 
   call pop_hl
   ld a,l
@@ -4668,9 +4668,9 @@ print_a_and_tos:
   jp return.bc
 
 ; --------------------------------------------------------------
-  ;: bsave ( -- ) sf ; {{{2
+  header bsave_,"bsave",0 ; {{{2
 
-  header bsave_,"bsave",0
+  ;: bsave ( -- ) sf
 
 ; XXX TODO -- rewrite
   ret
@@ -4705,13 +4705,13 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: dloaded ( a ca len -- ) sf ; {{{2
+  header dload_,"dloaded",0 ; {{{2
+
+  ;: dloaded ( a ca len -- ) sf
   ;:
   ;: Load a code file into memory.
   ;: ca len = filename
   ;: a      = memory address
-
-  header dload_,"dloaded",0
 
   call pop_hl
   ld (file_address),hl
@@ -4720,52 +4720,52 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  ;: dsaved ( a1 len1 ca2 len2 -- ) sf ; {{{2
+  header dsaved_,"dsaved",0 ; {{{2
+
+  ;: dsaved ( a1 len1 ca2 len2 -- ) sf
   ;:
   ;: a1 len1  = memory zone
   ;: ca2 len2 = filename
-
-  header dsaved_,"dsaved",0
 
 ; XXX TODO -- rewrite
   ret
 
 ; --------------------------------------------------------------
-  ;: push-hl_ ( -- x ) cf ; {{{2
+  header push_hl_,"push-hl_",0 ; {{{2
 
-  header push_hl_,"push-hl_",0
-
-  call do_constant
-  dw push_hl
-
-; --------------------------------------------------------------
-  ;: pop-hl_ ( x -- ) cf ; {{{2
-
-  header pop_hl_,"pop-hl_",0
+  ;: push-hl_ ( -- x ) cf
 
   call do_constant
   dw push_hl
 
 ; --------------------------------------------------------------
-  ;: push-de-hl_ ( -- x1 x2 ) cf ; {{{2
+  header pop_hl_,"pop-hl_",0 ; {{{2
 
-  header push_de_hl_,"push-de-hl_",0
+  ;: pop-hl_ ( x -- ) cf
+
+  call do_constant
+  dw push_hl
+
+; --------------------------------------------------------------
+  header push_de_hl_,"push-de-hl_",0 ; {{{2
+
+  ;: push-de-hl_ ( -- x1 x2 ) cf
 
   call do_constant
   dw push_de_hl
 
 ; --------------------------------------------------------------
-  ;: pop-hl-de_ ( x1 x2 -- ) cf ; {{{2
+  header pop_hl_de_,"pop-hl-de_",0 ; {{{2
 
-  header pop_hl_de_,"pop-hl-de_",0
+  ;: pop-hl-de_ ( x1 x2 -- ) cf
 
   call do_constant
   dw pop_hl_de
 
 ; --------------------------------------------------------------
-  ;: expand ( -- ) sf ; {{{2
+  header expand_,"expand",0 ; {{{2
 
-  header expand_,"expand",0
+  ;: expand ( -- ) sf
   ;: XXX TODO adapt?
 
   ; XXX TODO -- write "save-system" or similar; rename?
@@ -4777,49 +4777,49 @@ filename_store.move
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  ;: state ( -- a ) 94 ; {{{2
+  header state_,"state",0 ; {{{2
 
-  header state_,"state",0
+  ;: state ( -- a ) 94
 
   call do_variable
 state:
   dw 0 ; compilation state flag (non-zero value when in compilation state)
 
 ; --------------------------------------------------------------
-  ;: bounds ( a n -- a' a ) comus ; {{{2
+  header bounds_,"bounds",0 ; {{{2
 
-  header bounds_,"bounds",0
+  ;: bounds ( a n -- a' a ) comus
 
   call over_
   call plus_
   jp swap_
 
 ; --------------------------------------------------------------
-  ;: [ ( -- ) fig,83,94  "left-bracket" ; {{{2
+  header left_bracket_,"[",immediate ; {{{2
 
-  header left_bracket_,"[",immediate
+  ;: [ ( -- ) fig,83,94  "left-bracket"
 
   ld hl,false
   ld (state),hl
   ret
 
 ; --------------------------------------------------------------
-  ;: ] ( -- ) fig,83,94  "right-bracket" ; {{{2
+  header right_bracket_,"]",0 ; {{{2
 
-  header right_bracket_,"]",0
+  ;: ] ( -- ) fig,83,94  "right-bracket"
 
   ld hl,true
   ld (state),hl
   ret
 
 ; --------------------------------------------------------------
-  ;: unused ( -- u ) 94 ; {{{2
+  header unused_,"unused",0 ; {{{2
+
+  ;: unused ( -- u ) 94
   ;:
   ;: Return the amount of space remaining in the region addressed by `here`, in
   ;: address units.
   ;: XXX TODO adapt -- implement and use the heap pointer as top limit
-
-  header unused_,"unused",0
 
   ld de,(dp)
   ld hl,$0000
@@ -4827,12 +4827,12 @@ state:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: >in ( -- +n ) 83,94 ; {{{2
+  header to_in_,"to_in",0 ; {{{2
+
+  ;: >in ( -- +n ) 83,94
   ;:
   ;: Return the address of a cell containing the offset in characters from
   ;: the start of the input buffer to the start of the parse area.
-
-  header to_in_,"to_in",0
 
   ; XXX TODO -- not used yet
   ; XXX TODO -- convert `ip_fvar`, an absolute address, to `to_in`.
@@ -4842,12 +4842,12 @@ to_in:
   dw $0000
 
 ; --------------------------------------------------------------
-  ;: depth ( -- +n ) 83,94 ; {{{2
+  header depth_,"depth",0 ; {{{2
+
+  ;: depth ( -- +n ) 83,94
   ;:
   ;: Return the number of single-cell (16-bit in this case) values contained in
   ;: the data stack before it was placed on the stack.
-
-  header depth_,"depth",0
 
   ld hl,(sp0)
   if data_stack_method = ix_dsm
@@ -4863,11 +4863,11 @@ to_in:
   jp push_hl
 
 ; --------------------------------------------------------------
-  ;: .s ( -- ) 94 ; {{{2
+  header dot_s_,".s",0 ; {{{2
+
+  ;: .s ( -- ) 94
   ;:
   ;: Copy and display the values currently on the data stack.
-
-  header dot_s_,".s",0
 
   ret
 
