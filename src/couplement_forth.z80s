@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.16.0+202005281724"
+    db "0.2.0-dev.17.0+202005281732"
   endm
 
 ; --------------------------------------------------------------
@@ -74,7 +74,6 @@ true:   equ 0xffff
 ; stack. Every method has a constant identifier:
 
 sp_dsm: equ %0001 ; use SP with the contents of `dsp`
-iy_dsm: equ %0010 ; use IY with the contents of `dsp`
 ix_dsm: equ %0100 ; use IX to hold the stack pointer permanently
 hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 
@@ -461,97 +460,6 @@ pop_hl_de:
                               ; 110 total
 
 endif ; data_stack_method = sp_dsm
-
-; --------------------------------------------------------------
-if data_stack_method = iy_dsm ; {{{2
-
-push_de:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  dec iy              ;  10
-  ld (iy),d           ;  19
-  dec iy              ;  10
-  ld (iy),e           ;  19
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 137 total
-
-pop_de:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  ld e,(iy)           ;  19
-  inc iy              ;  10
-  ld d,(iy)           ;  19
-  inc iy              ;  10
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 137 total
-
-push_hl:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  dec iy              ;  10
-  ld (iy),h           ;  19
-  dec iy              ;  10
-  ld (iy),l           ;  19
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 137 total
-
-pop_hl:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  ld l,(iy)           ;  19
-  inc iy              ;  10
-  ld h,(iy)           ;  19
-  inc iy              ;  10
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 137 total
-
-push_de_hl:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  dec iy              ;  10
-  ld (iy),d           ;  19
-  dec iy              ;  10
-  ld (iy),e           ;  19
-  dec iy              ;  10
-  ld (iy),h           ;  19
-  dec iy              ;  10
-  ld (iy),l           ;  19
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 195 total
-
-pop_hl_de:
-                      ; T Cycles
-  push iy             ;  15
-  ld iy,(dsp)         ;  20
-  ld l,(iy)           ;  19
-  inc iy              ;  10
-  ld h,(iy)           ;  19
-  inc iy              ;  10
-  ld e,(iy)           ;  19
-  inc iy              ;  10
-  ld d,(iy)           ;  19
-  inc iy              ;  10
-  ld (dsp),iy         ;  20
-  pop iy              ;  14
-  ret                 ;  10
-                      ; 195 total
-
-endif ; data_stack_method = iy_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = hl_dsm ; {{{2
