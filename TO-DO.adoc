@@ -147,3 +147,11 @@ restore_dictionary_pointers.
 
 2020-05-28: Fix `.` (negative numbers are not right), `u.`... Rewrite
 everything after a standard factoring, like Solo Forth.
+
+2020-05-28: Make `dp` a variable and update `here`.
+
+2020-05-28: Rename `push_hl` routine to `hl_to_stack`, `pop_hl` to
+`stack_to_hl` (`hl_from_stack`?), `push_hl_de` to `hlde_to_stack`,
+etc. This seems a clearer notation in an assembly context. The words
+that return their addresses can be renamed to `hl>stack`, `stack>hl`,
+etc.
