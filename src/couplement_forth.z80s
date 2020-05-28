@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.19.0+202005281819"
+    db "0.2.0-dev.20.0+202005281847"
   endm
 
 ; --------------------------------------------------------------
@@ -1994,13 +1994,30 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  ;: + ( n1 n2 -- n3 ) hist,94 ; {{{2
+  ;: + ( n1 n2 -- n3 ) ; {{{2
 
   header plus_,"+",0
 
   call pop_hl_de
   add hl,de
   jp push_hl
+
+; --------------------------------------------------------------
+  ;: +! ( n a -- ) ; {{{2
+
+  header plus_store_,"+!",0
+
+  call pop_hl_de
+	; hl = address
+	; de = number
+	ld a,(hl)
+	add a,e
+	ld (hl),a
+	inc hl
+	ld a,(hl)
+	adc a,d
+	ld (hl),a
+  ret
 
 ; --------------------------------------------------------------
   ;: d+ ( n1 n2 -- d ) ; XXX TODO -- 2020-05-27: Confirm stack ; {{{2
@@ -4008,7 +4025,9 @@ do_constant:
   ld hl,0x0000
   sbc hl,de
   ld a,"-"
+  push hl
   call print_a
+  pop hl
 dot_code_field.do:
   call push_hl
   jp u_dot_

@@ -121,7 +121,8 @@ shared.
 `structured` subroutine. Replace them with the method used by Solo
 Forth: `csp`, `!csp` and `?csp`.
 
-2020-05-27: Fix: any number of "?" characteres is ignored.
+2020-05-27: Fix: any number of "?" characteres is ignored on the
+command line.
 
 2020-05-27: Fix: immediate and compile-only words can be executed in
 interpretation mode. non-immediate and compile-only words (e.g.
@@ -143,3 +144,6 @@ interpretation mode. non-immediate and compile-only words (e.g.
 
 2020-05-28: Remove routines: save_dictionary_pointers and
 restore_dictionary_pointers.
+
+2020-05-28: Fix `.` (negative numbers are not right), `u.`... Rewrite
+everything after a standard factoring, like Solo Forth.
