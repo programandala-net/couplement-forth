@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.13.0+202005281624"
+    db "0.2.0-dev.15.0+202005281702"
   endm
 
 ; --------------------------------------------------------------
@@ -86,11 +86,6 @@ any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
 ; --------------------------------------------------------------
 ; Execution speed {{{2
-
-; Couplement Forth can be compiled in two modes: normal
-; (default) and safe. In safe mode, the data stack limits are.
-
-safe_mode: equ false
 
 ; Some stack operations can be faster by manipulating the stack
 ; directly (thus without any error checking) instead of calling
@@ -367,11 +362,6 @@ tib_end:
 pad_start:
   defs 0xff
 
-if data_stack_method = hl_dsm
-  ; Force the data stack range from 0x??00 to 0x??ff
-  ; in order to make the under/overflow checks faster.
-  org ($+0x0100) and 0xff00
-endif
 data_stack_max_top:
   ; The data stack grows from bottom (high memory) to top (low memory)
   defs 0x0100
@@ -398,30 +388,10 @@ init_data_stack:
 if data_stack_method = sp_dsm ; {{{2
 
 ; This is the method used by SamForth.
-; Slow versions are the original ones.
-; Fast versions have no checks.
+; The stack-limit checks of the original code have been removed.
 
 push_hl:
 
-if safe_mode
-
-                              ; T Cycles
-  push hl                     ;  11
-  ld (rsp_copy),sp            ;  20
-  ld sp,(dsp)                 ;  20
-  push hl                     ;  11
-  ld hl,data_stack_max_top    ;  10
-  sbc hl,sp                   ;  15
-  jp nc,stack_full_error      ;  01 (if no jump)
-  ld (dsp),sp                 ;  20
-rsp_copy: equ $+1
-  ld sp,return_stack_bottom   ;  10
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 138 Total
-
-else
-
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -430,27 +400,10 @@ else
 rsp_copy: equ $+1
   ld sp,return_stack_bottom   ;  10
   ret                         ;  10
-                              ;  91 Total
-
-endif
+                              ;  91 total
 
 pop_hl:
 
-if safe_mode
-
-                              ; T Cycles
-  ld (rsp_copy),sp            ;  20
-  ld sp,(dsp)                 ;  20
-  ld hl,(sp0)                 ;  20
-  sbc hl,sp                   ;  15
-  jp z,stack_empty_error ;  01 (if no jump)
-  pop hl                      ;  10
-  ld (dsp),sp                 ;  20
-  ld sp,(rsp_copy)            ;  20
-  ret                         ;  10
-                              ; 136 Total
-else
-
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
   ld sp,(dsp)                 ;  20
@@ -458,29 +411,10 @@ else
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 100 Total
-
-endif
+                              ; 100 total
 
 push_de_hl:
 
-if safe_mode
-
-                              ; T Cycles
-  push hl                     ;  11
-  ld (rsp_copy),sp            ;  20
-  ld sp,(dsp)                 ;  20
-  push de                     ;  11
-  push hl                     ;  11
-  ld hl,data_stack_max_top    ;  10
-  sbc hl,sp                   ;  15
-  jp nc,stack_full_error ;  01 (if no jump)
-  ld (dsp),sp                 ;  20
-  ld sp,(rsp_copy)            ;  20
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 159 Total
-else
 
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
@@ -490,28 +424,9 @@ else
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 102 Total
-endif
-
+                              ; 102 total
 pop_hl_de:
 
-if safe_mode
-
-  ; Modified SamForth's version, with one check
-                              ; T Cycles
-  ld (rsp_copy),sp            ;  20
-  ld sp,(dsp)                 ;  20
-  ld hl,(sp0)                 ;  20
-  sbc hl,sp                   ;  15
-  jp z,stack_empty_error ;  01 (if no jump)
-  pop hl                      ;  10
-  pop de                      ;  10
-  ld (dsp),sp                 ;  20
-  ld sp,(rsp_copy)            ;  20
-  ret                         ;  10
-                              ; 146 Total
-
-else
 
                               ; T Cycles
   ld (rsp_copy),sp            ;  20
@@ -521,18 +436,12 @@ else
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 110 Total
-
-endif
+                              ; 110 total
 
 endif ; data_stack_method = sp_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = iy_dsm ; {{{2
-
-; XXX -- alternative data stack -- experimental
-
-; no fast/slow variants: no over/underflow checks
 
 push_hl:
                       ; T Cycles
@@ -548,45 +457,51 @@ push_hl:
                       ; 137 total
 
 pop_hl:
-  push iy
-  ld iy,(dsp)
-  ld l,(iy)
-  inc iy
-  ld h,(iy)
-  inc iy
-  ld (dsp),iy
-  pop iy
+                      ; T Cycles
+  push iy             ;  15
+  ld iy,(dsp)         ;  20
+  ld l,(iy)           ;  19
+  inc iy              ;  10
+  ld h,(iy)           ;  19
+  inc iy              ;  10
+  ld (dsp),iy         ;  20
+  pop iy              ;  14
   ret
+                      ; 127 total
 
 push_de_hl:
-  push iy
-  ld iy,(dsp)
-  dec iy
-  ld (iy),d
-  dec iy
-  ld (iy),e
-  dec iy
-  ld (iy),h
-  dec iy
-  ld (iy),l
-  ld (dsp),iy
-  pop iy
+                      ; T Cycles
+  push iy             ;  15
+  ld iy,(dsp)         ;  20
+  dec iy              ;  10
+  ld (iy),d           ;  19
+  dec iy              ;  10
+  ld (iy),e           ;  19
+  dec iy              ;  10
+  ld (iy),h           ;  19
+  dec iy              ;  10
+  ld (iy),l           ;  19
+  ld (dsp),iy         ;  20
+  pop iy              ;  14
   ret
+                      ; 185 total
 
 pop_hl_de:
-  push iy
-  ld iy,(dsp)
-  ld l,(iy)
-  inc iy
-  ld h,(iy)
-  inc iy
-  ld e,(iy)
-  inc iy
-  ld d,(iy)
-  inc iy
-  ld (dsp),iy
-  pop iy
+                      ; T Cycles
+  push iy             ;  15
+  ld iy,(dsp)         ;  20
+  ld l,(iy)           ;  19
+  inc iy              ;  10
+  ld h,(iy)           ;  19
+  inc iy              ;  10
+  ld e,(iy)           ;  19
+  inc iy              ;  10
+  ld d,(iy)           ;  19
+  inc iy              ;  10
+  ld (dsp),iy         ;  20
+  pop iy              ;  14
   ret
+                      ; 185 total
 
 endif ; data_stack_method = iy_dsm
 
@@ -595,30 +510,6 @@ if data_stack_method = hl_dsm ; {{{2
 
 push_hl:
 
-if safe_mode
-
-                              ; T Cycles
-  push af                     ;  11
-  push hl                     ;  11
-  push de                     ;  11
-  ex de,hl                    ;  04
-  ld hl,(dsp)                 ;  20
-  dec hl                      ;  06
-  ld a,l                      ;  09
-  and a                       ;  04
-  jp z,stack_full_error  ;  01 (if no jump)
-  ld (hl),d                   ;  07
-  dec hl                      ;  06
-  ld (hl),e                   ;  07
-  ld (dsp),hl                 ;  16
-  pop de                      ;  10
-  pop hl                      ;  10
-  pop af                      ;  10
-  ret                         ;  10
-                              ; 146 Total
-
-else
-
                               ; T Cycles
   push hl                     ;  11
   push de                     ;  11
@@ -632,132 +523,61 @@ else
   pop de                      ;  10
   pop hl                      ;  10
   ret                         ;  10
-                              ; 118 Total
-
-endif
+                              ; 118 total
 
 pop_hl:
 
-if safe_mode
-
-  push af
-  push de
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld a,l
-  and a
-  jp z,stack_empty_error
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  ex de,hl
-  pop de
-  pop af
-  ret
-
-else
-
-  push de
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  ex de,hl
-  pop de
-  ret
-
-endif
+                              ; T Cycles
+  push de                     ;  11
+  ld hl,(dsp)                 ;  20
+  ld e,(hl)                   ;  07
+  inc hl                      ;  06
+  ld d,(hl)                   ;  07
+  inc hl                      ;  06
+  ld (dsp),hl                 ;  16
+  ex de,hl                    ;  04
+  pop de                      ;  10
+  ret                         ;  10
+                              ; 097 total
 
 push_de_hl:
 
-if safe_mode
-
-  push af
-  push de
-  push hl
-  ld hl,(dsp)
-  dec hl
-  ld a,l
-  and a
-  jp z,stack_full_error
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  dec hl
-  pop de
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  ld (dsp),hl
-  pop hl
-  ex de,hl
-  pop af
-  ret
-
-else
-
-  push de
-  push hl
-  ld hl,(dsp)
-  dec hl
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  dec hl
-  pop de
-  ld (hl),d
-  dec hl
-  ld (hl),e
-  ld (dsp),hl
-  pop hl
-  ex de,hl
-  ret
-
-endif
+                              ; T Cycles
+  push de                     ;  11
+  push hl                     ;  11
+  ld hl,(dsp)                 ;  20
+  dec hl                      ;  06
+  ld (hl),d                   ;  07
+  dec hl                      ;  06
+  ld (hl),e                   ;  07
+  dec hl                      ;  06
+  pop de                      ;  10
+  ld (hl),d                   ;  07
+  dec hl                      ;  06
+  ld (hl),e                   ;  07
+  ld (dsp),hl                 ;  16
+  pop hl                      ;  10
+  ex de,hl                    ;  04
+  ret                         ;  10
+                              ; 144 total
 
 pop_hl_de:
 
-if safe_mode
-
-  push af
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld a,l
-  and a
-  jp z,stack_empty_error
-  ld d,(hl)
-  push de
-  inc hl
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  pop hl
-  pop af
-  ret
-
-else
-
-  ld hl,(dsp)
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  push de
-  inc hl
-  ld e,(hl)
-  inc hl
-  ld d,(hl)
-  inc hl
-  ld (dsp),hl
-  pop hl
-  ret
-
-endif
+                              ; T Cycles
+  ld hl,(dsp)                 ;  20
+  ld e,(hl)                   ;  07
+  inc hl                      ;  06
+  ld d,(hl)                   ;  07
+  push de                     ;  11
+  inc hl                      ;  06
+  ld e,(hl)                   ;  07
+  inc hl                      ;  06
+  ld d,(hl)                   ;  07
+  inc hl                      ;  06
+  ld (dsp),hl                 ;  16
+  pop hl                      ;  10
+  ret                         ;  10
+                              ; 119 total
 
 endif ; data_stack_method = hl_dsm
 
@@ -778,34 +598,39 @@ push_hl:
                       ; 068 total
 
 pop_hl:
-  ld l,(ix)
-  inc ix
-  ld h,(ix)
-  inc ix
-  ret
+                      ; T Cycles
+  ld l,(ix)           ;  19
+  inc ix              ;  10
+  ld h,(ix)           ;  19
+  inc ix              ;  10
+  ret                 ;  10
+                      ; 068 total
 
 push_de_hl:
-  dec ix
-  ld (ix),d
-  dec ix
-  ld (ix),e
-  dec ix
-  ld (ix),h
-  dec ix
-  ld (ix),l
-  ret
+                      ; T Cycles
+  dec ix              ;  10
+  ld (ix),d           ;  19
+  dec ix              ;  10
+  ld (ix),e           ;  19
+  dec ix              ;  10
+  ld (ix),h           ;  19
+  dec ix              ;  10
+  ld (ix),l           ;  19
+  ret                 ;  10
+                      ; 126 total
 
 pop_hl_de:
-
-  ld l,(ix)
-  inc ix
-  ld h,(ix)
-  inc ix
-  ld e,(ix)
-  inc ix
-  ld d,(ix)
-  inc ix
-  ret
+                      ; T Cycles
+  ld l,(ix)           ;  19
+  inc ix              ;  10
+  ld h,(ix)           ;  19
+  inc ix              ;  10
+  ld e,(ix)           ;  19
+  inc ix              ;  10
+  ld d,(ix)           ;  19
+  inc ix              ;  10
+  ret                 ;  10
+                      ; 126 total
 
 endif ; data_stack_method = ix_dsm
 
