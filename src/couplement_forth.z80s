@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.18.0+202005281808"
+    db "0.2.0-dev.19.0+202005281819"
   endm
 
 ; --------------------------------------------------------------
@@ -83,13 +83,8 @@ hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 data_stack_method:  equ sp_dsm
 any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
-; --------------------------------------------------------------
-; Execution speed {{{2
-
-; Some stack operations can be faster by manipulating the stack
-; directly (thus without any error checking) instead of calling
-; the push/pop routines.  This configuration is independent from
-; the speed mode above.
+; Some stack operations can be faster (though also larger) by manipulating the
+; data stack directly, instead of calling the push/pop routines:
 
 faster_stack_operations: equ true
 
@@ -1676,11 +1671,21 @@ quit.do:
 
   header nip_,"nip",0
 
-  call pop_hl
-  push hl
-  call pop_hl
-  pop hl
-  jp push_hl
+  if faster_stack_operations and (data_stack_method = ix_dsm)
+    ld l,(ix+0)
+    ld h,(ix+1)
+    ld (ix+2),l
+    ld (ix+3),h
+    inc ix
+    inc ix
+    ret
+  else
+    call pop_hl
+    push hl
+    call pop_hl
+    pop hl
+    jp push_hl
+  endif
 
 ; --------------------------------------------------------------
   ;: drop ( x -- ) hist,94 ; {{{2

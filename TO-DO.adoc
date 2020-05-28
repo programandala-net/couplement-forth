@@ -139,9 +139,7 @@ interpretation mode. non-immediate and compile-only words (e.g.
 
 2020-05-28: Replace inner variable `etib_fvar` with standard `>in`.
 
-2020-05-28: Fix "[" and "]" cannot be used.
-
-2020-05-28: Improve `nip` for ix_dsm.
+2020-05-28: Fix "[" and "]" cannot be typed.
 
 2020-05-28: Remove routines: save_dictionary_pointers and
 restore_dictionary_pointers.
