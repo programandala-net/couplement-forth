@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.20.0+202005281847"
+    db "0.2.0-dev.20.0+202005281920"
   endm
 
 ; --------------------------------------------------------------
@@ -44,11 +44,11 @@ compile_only:         equ 1 << compile_only_bit ; bit mask
 interpret_only_bit:   equ 0
 interpret_only:       equ 1 << interpret_only_bit ; bit mask
 
-colon_structure_id:   equ 0x01
-do_structure_id:      equ 0x02
-begin_structure_id:   equ 0x03
-if_structure_id:      equ 0x04
-builds_structure_id:  equ 0x09
+colon_structure_id:   equ $01
+do_structure_id:      equ $02
+begin_structure_id:   equ $03
+if_structure_id:      equ $04
+builds_structure_id:  equ $09
 
 ; --------------------------------------------------------------
 ; ZX Spectrum
@@ -60,8 +60,8 @@ builds_structure_id:  equ 0x09
 ; --------------------------------------------------------------
 ; Other
 
-false:  equ 0x0000
-true:   equ 0xffff
+false:  equ $0000
+true:   equ $FFFF
 ; XXX FIXME -- the legacy code uses 1 as true flag
 
 ; ==============================================================
@@ -153,48 +153,48 @@ svblk_fvar:
 ; Flag used during LOAD, SAVE and DIR commands
 ; Now its offset is +6.
 ; XXX TODO -- use a system variable or BC instead?
-  dw 0x0000
+  dw $0000
 slen_fvar:
 ; XXX OLD -- used only by the BASIC loader
 ; Length of source to be saved
 ; Now its offset is +8.
-  dw 0x0000
+  dw $0000
 
 ; XXX TODO -- move all variables into the code, except those shared with the BASIC loader
 
 ip_fvar: ; XXX TODO -- make it standard
   ; Address of interpreter pointer within source being compiled
-  dw 0x0000
+  dw $0000
 dubflag_fvar:
   ; Flag indicating double number
-  db 0x00
+  db $00
 numbit_fvar:
   ; Temporary store used during number output
-  dw 0x0000
+  dw $0000
 endf_fvar:
   ; Temporary store used during number output
-  dw 0x0000
+  dw $0000
 etib_fvar: ; XXX OLD -- remove it; adapt the keyboard input code
   ; End address of Terminal Input Buffer
   dw tib_end ; XXX CHECK -- originally tib_start, why?
 errhld_fvar:
   ; Address of interpreter pointer position when an error occurred during source compilation
-  dw 0x0000
+  dw $0000
 hlds_fvar:
   ; Temporary store during number formatting
-  dw 0x0000
+  dw $0000
 pairs_fvar:
   ; Flags to indicate whether pairs such as DO-LOOP match up during compilation
-  dw 0x0000
+  dw $0000
 ;#smode_fvar: ; XXX CHECK -- why not the system var?
 ;#; Indicates SAM screen mode 1, 2, 3 or 4
-;#  dw 0x0000
+;#  dw $0000
 len2_fvar:
   ; Used to increase or decrease length of source during editing
-  dw 0x0000
+  dw $0000
 len1_fvar:
   ; Used to increase or decrease length of source during editing
-  dw 0x0000
+  dw $0000
 
 ; ==============================================================
 ; Debugging tools {{{1
@@ -339,7 +339,7 @@ check.string.de_b:
     if 0;debug
       push af
       ld a,color
-      out (0xfe),a
+      out ($FE),a
       pop af
     endif
   endm
@@ -350,20 +350,20 @@ check.string.de_b:
 ; XXX TODO -- choose better names for the bounds
 
 tib_start:
-  defs 0x80 ; XXX TODO -- increase after Forth-2012
+  defs $80 ; XXX TODO -- increase after Forth-2012
 tib_end:
 
 pad_start:
-  defs 0xff
+  defs $FF
 
 data_stack_max_top:
   ; The data stack grows from bottom (high memory) to top (low memory)
-  defs 0x0100
+  defs $0100
 data_stack_bottom:
 
 return_stack_max_top:
   ; The return stack grows from bottom (high memory) to top (low memory)
-  defs 0x0100
+  defs $0100
 return_stack_bottom:
 
 ; ==============================================================
@@ -636,13 +636,13 @@ endif ; data_stack_method = ix_dsm
 
 cursor_address:
   ; Address of the cursor in the input buffer
-  dw 0x0000
+  dw $0000
 chars_on_the_left_of_the_cursor:
   ; Length of the input line before the cursor
-  db 0x00
+  db $00
 chars_on_the_right_of_the_cursor:
   ; Length of the input line after the cursor
-  db 0x00
+  db $00
 
 keyboard_input:
 
@@ -654,7 +654,7 @@ keyboard_input:
   ld (chars_on_the_right_of_the_cursor),a
 
   if not whole_screen
-    ld a,0x01 ; usually channel "K", lower screen I/O
+    ld a,$01 ; usually channel "K", lower screen I/O
     call link.a
     call rom_cls_lower
   endif
@@ -684,9 +684,9 @@ keyboard_input.next_key:
 
   else
 
-;  cp 0x00 ; XXX TODO adapt, how?
+;  cp $00 ; XXX TODO adapt, how?
 ;  jp z,keyboard_input.delete_right
-;  cp 0x00 ; XXX TODO adapt, how?
+;  cp $00 ; XXX TODO adapt, how?
 ;  jp z,keyboard_input.delete_until_end_of_line
   cp caps_char ; 6
   jp z,toggle_caps_lock
@@ -739,7 +739,7 @@ overwrite_mode_flag: equ $+1
 
 toggle_caps_lock:
   ld a,(sys_flags2)
-  xor 0x08
+  xor $08
   ld (sys_flags2),a
   jp keyboard_input.next_key
 
@@ -750,14 +750,14 @@ keyboard_input.cr:
   ld a,(chars_on_the_right_of_the_cursor)
   add a,c
   ld c,a
-  ld b,0x00
+  ld b,$00
   add hl,bc
   ld (hl),cr_char
   ld (etib_fvar),hl
 
   if not whole_screen
     call rom_cls_lower
-    ld a,0x02 ; usually channel "S", upper screen I/O
+    ld a,$02 ; usually channel "S", upper screen I/O
     call link.a
   endif
 
@@ -773,7 +773,7 @@ keyboard_input.cr:
 
   else
 
-    ld b,0x00
+    ld b,$00
     jp print_bc_chars_at_hl_or_nothing
 
   endif
@@ -795,7 +795,7 @@ keyboard_input.move_a_chars_from_hl_to_de:
   and a
   jr z,keyboard_input.no_move_needed
   ld c,a
-  ld b,0x00
+  ld b,$00
   ldir
 keyboard_input.no_move_needed:
   ld hl,(cursor_address)
@@ -866,7 +866,7 @@ keyboard_input.cursor_down:
   ld c,a
   xor a
   ld (chars_on_the_right_of_the_cursor),a
-  ld b,0x00
+  ld b,$00
   ld hl,(tib_address)
   add hl,bc
   ld (cursor_address),hl
@@ -880,7 +880,7 @@ sub_4f54h:
   ld a,(chars_on_the_right_of_the_cursor)
   add a,c
   ld c,a
-  ld b,0x00
+  ld b,$00
   add hl,bc
   ld (etib_fvar),hl
   ld a,(chars_on_the_right_of_the_cursor)
@@ -894,7 +894,7 @@ sub_4f54h:
 
 toggle_overwrite_mode:
   ld a,(overwrite_mode_flag)
-  xor 0x01
+  xor $01
   ld (overwrite_mode_flag),a
   jp keyboard_input.next_key
 
@@ -926,7 +926,7 @@ line_cleared:
   and a
   jr z,print_cursor
   ld c,a
-  ld b,0x00
+  ld b,$00
   call print_bc_chars_at_hl
 print_cursor:
   ld hl,cursor
@@ -942,7 +942,7 @@ print_cursor.do:
   and a
   jr z,print_trailing_space
   ld c,a
-  ld b,0x00
+  ld b,$00
   call print_bc_chars_at_hl
 print_trailing_space:
   jp space_ ; needed when a char has been deleted
@@ -987,7 +987,7 @@ print_table_message:
 skip_message:
   ld a,(hl)
   inc hl
-  and 0x80
+  and $80
   jr z,skip_message
   ex af,af'
   jr print_table_message
@@ -1047,44 +1047,44 @@ wrap_print_message_at_hl.end_of_message_found:
 
 ; XXX TODO -- move to `throw`
 stack_empty_error:
-  ld a,0x01
+  ld a,$01
   jr error_a
 stack_full_error:
-  ld a,0x02
+  ld a,$02
   jr error_a
 undefined_word_error:
   ; XXX TODO -- print the offending word
-  ld a,0x03
+  ld a,$03
   jr error_a
 compile_only_error:
   ; XXX TODO -- print the offending word
-  ld a,0x04
+  ld a,$04
   jr error_a
 division_by_zero_error:
-  ld a,0x05
+  ld a,$05
   jr error_a
 return_stack_full_error:
-  ld a,0x06
+  ld a,$06
   jr error_a
 inside_fence_error:
-  ld a,0x07
+  ld a,$07
   jr error_a
 break_error:
-  ld a,0x08
+  ld a,$08
   jr error_a
 unstructured_error:
   ; XXX TODO -- print the offending word
-  ld a,0x09
+  ld a,$09
   jr error_a
 not_found_error:
   ; XXX TODO -- print the offending word
-  ld a,0x0a
+  ld a,$0A
   jr error_a
 empty_name_error:
-  ld a,0x0b
+  ld a,$0B
   jr error_a
 
-; XXX NEW routine ,0x1d bytes, longer, but one byte less per message
+; XXX NEW routine ,$1D bytes, longer, but one byte less per message
 ; XXX TODO -- convert to error_hl ?
 error_a:
 ; XXX TODO -- print error number too:
@@ -1117,30 +1117,30 @@ error_a:
 
 ; XXX TODO -- move the messages to their own file and ram page
 error_messages:
-  db "Stack empt" ; Error number 0x01 ; XXX -- -4 in ANS Forth
-  db "y"+0x80
-  db "Stack ful" ; Error number 0x02 ; XXX -- -3 in ANS Forth
-  db "l"+0x80
-  db "Undefined wor" ; Error number 0x03 ; XXX -- -13 in ANS Forth
-  db "d"+0x80
-  db "Interpreting a compile-only wor" ; Error number 0x04 ; XXX -- -14 in ANS Forth
-  db "d"+0x80
-  db "Division by zer" ; Error number 0x05 ; XXX -- -10 in ANS Forth
-  db "o"+0x80
-  db "Return stack ful" ; Error number 0x06 ; XXX -- not used -- -5 in ANS Forth
-  db "l"+0x80
-  db "Inside fenc" ; Error number 0x07 ; XXX -- -15 in ANS Forth "invalid FORGET"
-  db "e"+0x80
-  db "Brea" ; Error number 0x08 ; XXX -- not used, not in ANS Forth
-  db "k"+0x80
-  db "Unstructure" ; Error number 0x09 ; XXX -- -10 in ANS Forth
-  db "d"+0x80
-  db "Not foun" ; Error number 0x0a ; XXX -- used only by `;` -- (-13 in ANS Forth?)
-  db "d"+0x80
-  db "Attempt to use zero-lenght string as a nam" ; Error number 0x0b ; XXX -- -16 in ANS Forth
-  db "e"+0x80
+  db "Stack empt" ; Error number $01 ; XXX -- -4 in ANS Forth
+  db "y"+$80
+  db "Stack ful" ; Error number $02 ; XXX -- -3 in ANS Forth
+  db "l"+$80
+  db "Undefined wor" ; Error number $03 ; XXX -- -13 in ANS Forth
+  db "d"+$80
+  db "Interpreting a compile-only wor" ; Error number $04 ; XXX -- -14 in ANS Forth
+  db "d"+$80
+  db "Division by zer" ; Error number $05 ; XXX -- -10 in ANS Forth
+  db "o"+$80
+  db "Return stack ful" ; Error number $06 ; XXX -- not used -- -5 in ANS Forth
+  db "l"+$80
+  db "Inside fenc" ; Error number $07 ; XXX -- -15 in ANS Forth "invalid FORGET"
+  db "e"+$80
+  db "Brea" ; Error number $08 ; XXX -- not used, not in ANS Forth
+  db "k"+$80
+  db "Unstructure" ; Error number $09 ; XXX -- -10 in ANS Forth
+  db "d"+$80
+  db "Not foun" ; Error number $0A ; XXX -- used only by `;` -- (-13 in ANS Forth?)
+  db "d"+$80
+  db "Attempt to use zero-lenght string as a nam" ; Error number $0B ; XXX -- -16 in ANS Forth
+  db "e"+$80
 ;  db "Return stack empt" ; XXX -- not used yet ; xxx -- -6 in ANS Forth
-;  db "y"+0x80
+;  db "y"+$80
 
 ; ==============================================================
 ; Entry points  {{{1
@@ -1150,7 +1150,7 @@ cold_start:
   ld (saved_basic_sp),sp
   ld sp,(rp0)
   ei
-  ld a,0x02 ; usually channel "S", upper screen I/O
+  ld a,$02 ; usually channel "S", upper screen I/O
   call link.a
   jp cold_
 
@@ -1253,7 +1253,7 @@ _previous_nfa: defl 0
   db cr_char
   db "By Marcos Cruz",cr_char
   db "(programandala.net), 2015, 2016,",cr_char
-  db "2020",cr_char+0x80
+  db "2020",cr_char+$80
   ret
 
 ; --------------------------------------------------------------
@@ -1532,7 +1532,7 @@ _previous_nfa: defl 0
   ; XXX TODO -- Gforth prints "compiled" in compiling state.
   call print_inline_message
   db " o"
-  db "k"+0x80
+  db "k"+$80
   ret
 
 ; --------------------------------------------------------------
@@ -1739,7 +1739,7 @@ interpret.skip_space:
   ld a,h
   or l
   jp z,l520ah
-  ld a,0x01 ; XXX OLD -- not needed, because A<>0 ; XXX TODO --
+  ld a,$01 ; XXX OLD -- not needed, because A<>0 ; XXX TODO --
   ld (dubflag_fvar),a
   call push_hl
 l520ah:
@@ -1748,7 +1748,7 @@ l520ah:
   jp z,l5242h ; jump if executing
   ; compiling:
   ld a,(dubflag_fvar)
-  cp 0x01 ; XXX OLD ; XXX TODO --
+  cp $01 ; XXX OLD ; XXX TODO --
 ;  and a ; XXX NEW ; XXX TODO --
   jp nz,l521fh
   call pop_hl_de
@@ -1767,7 +1767,7 @@ l521fh:
   inc hl
   ld (dp),hl
   ld a,(dubflag_fvar)
-  cp 0x01 ; XXX OLD ; XXX TODO --
+  cp $01 ; XXX OLD ; XXX TODO --
 ;  and a ; XXX NEW ; XXX TODO --
   jp nz,l5242h
   xor a
@@ -1831,7 +1831,7 @@ compile_call_tos:
 
 compile_call_de:
   ld hl,(dp)
-  ld (hl),0xcd ; Z80 `call`
+  ld (hl),$CD ; Z80 `call`
   inc hl
 
 compile_de_at_hl:
@@ -1849,7 +1849,7 @@ compile_de_at_hl:
 
   ld de,(ip_fvar) ; address of the name to be searched for
   ;;push de ; XXX TMP -- debugging
-  ld b,0x00 ; char count
+  ld b,$00 ; char count
 
   ; XXX TODO -- study: use HL and A instead of DE and B, to save commands later:
 paren_find.parse_name:
@@ -1886,7 +1886,7 @@ compare_the_names:
 ;;no_check:
 
 length_of_name_searched_for: equ $+1
-  ld a,0x00 ; length of the name searched for
+  ld a,$00 ; length of the name searched for
   cp (hl) ; lengths are equal?
   jp nz,the_names_are_different
   ; lengths are equal
@@ -1973,21 +1973,21 @@ the_names_are_different:
   pop de
   ld c,d
   add hl,bc
-  adc a,0x00
+  adc a,$00
   ld d,l
   ld l,h
   ld h,a
   jp push_de_hl
 
 sub_5324h:
-  ld hl,0x0000
-  ld c,0x08
+  ld hl,$0000
+  ld c,$08
 l5329h:
   add hl,hl
   rla
   jp nc,l5330h
   add hl,de
-  adc a,0x00
+  adc a,$00
 l5330h:
   dec c
   jp nz,l5329h
@@ -2087,7 +2087,7 @@ l5330h:
 
   call pop_hl
   ex de,hl ; XXX TODO -- remove this and write pop_de
-  ld hl,0x0000
+  ld hl,$0000
   sbc hl,de
   jp push_hl
 
@@ -2130,14 +2130,14 @@ number_hl:
 
   ; negative number
   inc hl
-  ld a,0x01 ; XXX TODO -- remove?, because a<>0; check how this flag is used later... no way, several bits are used apart
+  ld a,$01 ; XXX TODO -- remove?, because a<>0; check how this flag is used later... no way, several bits are used apart
   ld (negative_number_flags),a
 
 l53f1h:
   xor a
   ld (endf_fvar),a
   ex de,hl
-  ld hl,0x0000
+  ld hl,$0000
   ld (number_part_1),hl
   ld (number_part_2),hl
 l5400h:
@@ -2147,7 +2147,7 @@ l5400h:
   jp c,undefined_word_error
   ld c,a
   ld a,(base)
-  ld b,0x0a
+  ld b,$0A
   cp b ; base 10?
   jp nc,l5415h
   add a,"0"
@@ -2156,18 +2156,18 @@ l5400h:
   jp c,undefined_word_error
 l5415h:
   ld a,c
-  cp 0x3a
+  cp $3A
   jp nc,l5477h
-  sub 0x30
+  sub $30
 l541ch:
-  ld h,0x00
+  ld h,$00
   ld l,a
   call push_hl
   inc de
   ld a,(de)
   cp space_char
   jp z,l5470h
-  cp 0x0d
+  cp $0D
   jp z,l5470h
 l542ch:
   dec de
@@ -2189,26 +2189,26 @@ l542ch:
   call pop_hl
   ld (number_part_2),hl
   ld a,(endf_fvar)
-  cp 0x01
+  cp $01
   jp z,l53beh
   ld de,(numbit_fvar)
   inc de
   jp l5400h
 
 l5470h:
-  ld a,0x01
+  ld a,$01
   ld (endf_fvar),a
   jp l542ch
 
 l5477h:
   ld c,a
   ld a,(base)
-  add a,0x37
+  add a,$37
   cp c
   check "undefined 3"
   jp c,undefined_word_error
   ld a,c
-  sub 0x37
+  sub $37
   jp l541ch
 
 l53beh:
@@ -2218,24 +2218,24 @@ number_part_2: equ $+1
   ld de,0x000
   call push_de_hl
 negative_number_flags: equ $+1
-  ld a,0x00 ; flags for negative number (bits 1 and 7)
-  cp 0x01 ; XXX OLD ; XXX TODO --
+  ld a,$00 ; flags for negative number (bits 1 and 7)
+  cp $01 ; XXX OLD ; XXX TODO --
 ;;  and a ; XXX NEW ; XXX TODO --
   jp nz,number.return
   ld a,h
   or l
   jp nz,l53d8h
-  ld a,0x80 ; XXX OLD ; XXX TODO --
-;;  dec a ; a=0xff ; XXX NEW ; XXX TODO --
+  ld a,$80 ; XXX OLD ; XXX TODO --
+;;  dec a ; a=$FF ; XXX NEW ; XXX TODO --
   ld (negative_number_flags),a
 
 l53d8h:
   call d_negate_
   ld a,(negative_number_flags)
-  cp 0x80
+  cp $80
   jp nz,number.return
   call pop_hl ; XXX TODO -- call drop instead?
-  ld hl,0x0000
+  ld hl,$0000
   call push_hl
 
 number.return:
@@ -2303,8 +2303,8 @@ spaces.hl:
   call pop_hl
   ld a,l
 print_a:
-  rst 0x10
-  ld a,0xff
+  rst $10
+  ld a,$FF
   ld(sys_scr_ct),a ; no "scroll?" message
   ret
 
@@ -2328,10 +2328,10 @@ l54a3h:
   call swap_
   ; XXX TODO -- pop_l or pop_a would be useful here
   call pop_hl ; XXX ? -- why not simply here?
-  ld a,0x09
+  ld a,$09
   cp l
   jr c,l54cdh ; base >9?
-  ld a,0x30
+  ld a,$30
 l54b9h:
   add a,l
   ld l,a
@@ -2344,7 +2344,7 @@ l54b9h:
   call push_hl
   jp l54a3h
 l54cdh:
-  ld a,0x37
+  ld a,$37
   jp l54b9h
 l54d1h:
   pop hl
@@ -2385,7 +2385,7 @@ de_hl_slash_mod:
   and a
   ld b,d
   ld c,e
-  ld de,0xffff
+  ld de,$FFFF
 de_hl_slash_mod.again:
   inc de
   sbc hl,bc
@@ -2443,7 +2443,7 @@ create_header.skip_blanks:
   ; hl=nfa of the new header
 
   push de ; start of the new word name
-  ld b,0x00 ; char counter
+  ld b,$00 ; char counter
 create_header.next_char:
   ld a,(de)
   cp space_char
@@ -2509,7 +2509,7 @@ create_header.store_char
   ; XXX TODO convert this into a word
 compile_jp_de:
   ld hl,(dp)
-  ld (hl),0xc3 ; Z80 `jp`
+  ld (hl),$C3 ; Z80 `jp`
   inc hl
   ld (hl),e
   inc hl
@@ -2542,7 +2542,7 @@ compile_jp_de:
   cp l
   jp nz,not_found_error ; XXX ? -- why this error message?
   ld hl,(dp)
-  ld (hl),0xc9 ; Z80 ret
+  ld (hl),$C9 ; Z80 ret
   inc hl
   ld (dp),hl
   call left_bracket_
@@ -2553,7 +2553,7 @@ compile_jp_de:
 
   header cr_,"cr",0
 
-  ld a,0x0d
+  ld a,$0D
   jp print_a
 
 ; --------------------------------------------------------------
@@ -2571,7 +2571,7 @@ compile_jp_de:
 words.print_word:
   ; hl = nfa
   push hl
-  ld b,0x00
+  ld b,$00
   ld c,(hl)
   inc hl
   call print_bc_chars_at_hl
@@ -2594,7 +2594,7 @@ words.print_word:
 
   call do_variable
 base: ; current number base
-  dw 0x000A
+  dw $000A
 
 ; --------------------------------------------------------------
   ;: rp0 ( -- a )
@@ -2674,7 +2674,7 @@ endif
 
   header decimal_,"decimal",0
 
-  ld a,0x0a
+  ld a,$0A
   ld (base),a
   ret
 
@@ -2683,7 +2683,7 @@ endif
 
   header hex_,"hex",0
 
-  ld a,0x10
+  ld a,$10
   ld (base),a
   ret
 
@@ -2766,7 +2766,7 @@ endif
 
   call pop_hl
   ld l,(hl)
-  ld h,0x00
+  ld h,$00
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -2870,7 +2870,7 @@ semicolon.end:
   ld c,l
   in a,(c)
   ld l,a
-  ld h,0x00
+  ld h,$00
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -2893,8 +2893,8 @@ semicolon.end:
   header page_,"page",0
 
 linked_stream: equ $+1 ; XXX TODO make it a variable
-  ld a,0x00
-  cp 0x03 ; printing?
+  ld a,$00
+  cp $03 ; printing?
   jp nz,cls_
   ; printing
   ld a,form_feed_char
@@ -2927,7 +2927,7 @@ l574fh:
   pop bc
   push hl
   push bc
-  ld a,0x80
+  ld a,$80
   xor d
   ld d,a
   call pop_hl
@@ -2939,7 +2939,7 @@ l574fh:
   push af
   ld b,h
   ld c,l
-  ld a,0x80
+  ld a,$80
   xor h
   ld h,a
   pop af
@@ -2958,7 +2958,7 @@ l5772h:
 l5779h:
   pop hl
   push bc
-  ld a,0x80
+  ld a,$80
   xor d
   ld d,a
   push de
@@ -3044,7 +3044,7 @@ sub_57a3h:
 
   header j_,"j",0
 
-  ld hl,0x000A
+  ld hl,$000A
   add hl,sp
   ld a,(hl)
   inc hl
@@ -3060,7 +3060,7 @@ sub_57a3h:
 
   header i_,"i",0
 
-  ld hl,0x0004
+  ld hl,$0004
   add hl,sp
   ld a,(hl)
   inc hl
@@ -3077,17 +3077,17 @@ sub_57a3h:
   call pop_hl
   ld a,l
 link.a:
-;;  cp 0x03
+;;  cp $03
 ;;  jr nz,link.other_than_3
 ;;  ; stream = 3
 ;; XXX OLD:
-;;  set 7,(iy+0x00)
+;;  set 7,(iy+$00)
 ;;  jp link.do
 ;;  ; link to channel p
 ;;link.other_than_3:
 ;;  ; stream <> 3
 ;; XXX OLD:
-;;  res 7,(iy+0x00)
+;;  res 7,(iy+$00)
 ;;  xor a
 ;; link.do:
 
@@ -3138,7 +3138,7 @@ link.a:
   call pop_hl
   ld a,l
 border.a:
-  out (0xfe),a
+  out ($FE),a
   ret
 
 ; --------------------------------------------------------------
@@ -3164,15 +3164,15 @@ border.a:
 l5812h:
   inc de
   ld a,(de)
-  cp 0x22
+  cp $22
   jr z,l5820h
-  cp 0x0d
+  cp $0D
   jr z,l5820h
   ld (hl),a
   inc hl
   jp l5812h
 l5820h:
-  ld (hl),0xff
+  ld (hl),$FF
   inc hl
   ld (dp),hl
   ld (ip_fvar),de
@@ -3182,7 +3182,7 @@ l582bh:
   pop hl
 l582ch:
   ld a,(hl)
-  cp 0xff
+  cp $FF
   jr z,l5837h
   call print_a
   inc hl
@@ -3218,8 +3218,8 @@ l5837h:
 saved_basic_sp: equ $+1 ; Sinclair BASIC's stack pointer
   ld hl,0
   ld sp,hl
-  rst 0x08     ; error
-  db 0xff      ; 0: "OK"
+  rst $08     ; error
+  db $FF      ; 0: "OK"
 
 ; --------------------------------------------------------------
   ;: return ( n -- )
@@ -3248,7 +3248,7 @@ return.a:
 
   header dir_,"dir",0
 
-  ld a,0x03 ; dir id
+  ld a,$03 ; dir id
   jp return.a
 
 ; --------------------------------------------------------------
@@ -3533,14 +3533,14 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
 ;to_in_lfa:
 ;  dw pad_name
 ;to_in_nfa:
-;  db 0x03
+;  db $03
 ;to_in_name:
 ;  db ">in"
 ;to_in_:
 ;  ld hl,to_in
 ;  jp push_hl
 ;to_in:
-;  dw 0x0000 ; character offset within the input stream
+;  dw $0000 ; character offset within the input stream
 
 ; --------------------------------------------------------------
   ;: query ( -- )
@@ -3775,7 +3775,7 @@ word.skip_leading_delimiter:
   jp z,word.skip_leading_delimiter
   ; hl=address of the first valid char to parse
   push hl
-  ld bc,0x0000 ; char count
+  ld bc,$0000 ; char count
 word.parse:
   inc c
   inc hl
@@ -3856,7 +3856,7 @@ word.parse:
   ld de,create_header
   call compile_call_de
   ; hl = dp
-  ld (hl),0x11
+  ld (hl),$11
   inc hl
   call push_hl
   inc hl
@@ -3865,13 +3865,13 @@ word.parse:
   ld de,compile_call_de
   call compile_call_de
   ; hl = dp
-  ld (hl),0x36
+  ld (hl),$36
   inc hl
-  ld (hl),0xc9  ; Z80 "ret"
+  ld (hl),$C9  ; Z80 "ret"
   inc hl
-  ld (hl),0x23
+  ld (hl),$23
   inc hl
-  ld (hl),0x22
+  ld (hl),$22
   inc hl
   ld bc,dp
   ld (hl),c
@@ -3890,7 +3890,7 @@ word.parse:
   ld a,builds_structure_id
   call structured
   ld hl,(dp)
-  ld (hl),0xc9  ; Z80 "ret"
+  ld (hl),$C9  ; Z80 "ret"
   inc hl
   ld (dp),hl
   ld d,h
@@ -3900,13 +3900,13 @@ word.parse:
   inc hl
   ld (hl),d
   ld hl,(dp)
-  ld (hl),0xe1  ; Z80 "pop hl"
+  ld (hl),$E1  ; Z80 "pop hl"
   inc hl
-  ld (hl),0xe5  ; Z80 "push hl"
+  ld (hl),$E5  ; Z80 "push hl"
   inc hl
-  ld (hl),0x23  ; Z80 "inc hl"
+  ld (hl),$23  ; Z80 "inc hl"
   inc hl
-  ld (hl),0xcd  ; Z80 "call...
+  ld (hl),$CD  ; Z80 "call...
   inc hl
   ld bc,push_hl
   ld (hl),c
@@ -4022,7 +4022,7 @@ do_constant:
   jr z,dot_code_field.do
   ; negative number
   ex de,hl
-  ld hl,0x0000
+  ld hl,$0000
   sbc hl,de
   ld a,"-"
   push hl
@@ -4103,9 +4103,9 @@ cmove.end:
   cp l
   inc hl
   jr z,l5d4bh
-  ld l,0x00
+  ld l,$00
 l5d4bh:
-  ld h,0x00
+  ld h,$00
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -4258,11 +4258,11 @@ fence:
   ld a,h
   sbc a,b
   jr c,l5dc3h
-  ld hl,0xffff
-  ld de,0xffff
+  ld hl,$FFFF
+  ld de,$FFFF
   jp l5de3h
 l5dc3h:
-  ld a,0x10
+  ld a,$10
 l5dc5h:
   add hl,hl
   rla
@@ -4326,24 +4326,24 @@ l5de3h:
   call push_hl
   call sub_5fc2h
   call rot_
-  ld hl,0x0009
+  ld hl,$0009
   call push_hl
   call over_
   call less_
   call zero_branch_
   dw branch_5e39
-  ld hl,0x0007
+  ld hl,$0007
   call push_hl
   call plus_
 branch_5e39:
-  ld hl,0x0030
+  ld hl,$0030
   call push_hl
   call plus_
   jp hold_
 
 sub_5fc2h:
   call r_from_
-  ld hl,0x0000
+  ld hl,$0000
   call push_hl
   call to_r_
   call dup_
@@ -4420,7 +4420,7 @@ sign_.end:
   call pop_hl
   ld a,l
   or h
-  ld hl,0x0000
+  ld hl,$0000
   jp nz,push_hl
   dec hl
   jp push_hl
@@ -4432,7 +4432,7 @@ sign_.end:
 
   call pop_hl
   bit 7,h
-  ld hl,0x0000
+  ld hl,$0000
   jp z,push_hl
   dec hl
   jp push_hl
@@ -4503,7 +4503,7 @@ paren_.next:
   else
     ld hl,(dsp)
   endif
-  ld d,0x00
+  ld d,$00
   add hl,de
   ld c,(hl)
   inc hl
@@ -4570,7 +4570,7 @@ char.restore:
   ld (ip_fvar),hl
   ld l,b ; get the preserved char
 char.return:
-  ld h,0x00
+  ld h,$00
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -4822,7 +4822,7 @@ state:
   header unused_,"unused",0
 
   ld de,(dp)
-  ld hl,0x0000
+  ld hl,$0000
   sbc hl,de
   jp push_hl
 
@@ -4839,7 +4839,7 @@ state:
   ld hl,to_in
   jp push_hl
 to_in:
-  dw 0x0000
+  dw $0000
 
 ; --------------------------------------------------------------
   ;: depth ( -- +n ) 83,94 ; {{{2
