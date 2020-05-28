@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.17.0+202005281732"
+    db "0.2.0-dev.18.0+202005281808"
   endm
 
 ; --------------------------------------------------------------
@@ -398,7 +398,7 @@ push_de:
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 101 total
+                              ; 101 total (101.5 average with pop_de)
 
 pop_de:
 
@@ -409,7 +409,7 @@ pop_de:
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 100 total
+                              ; 100 total (101.5 average with push_de)
 
 push_hl:
 
@@ -421,7 +421,7 @@ push_hl:
 rsp_copy: equ $+1
   ld sp,return_stack_bottom   ;  10
   ret                         ;  10
-                              ;  91 total
+                              ;  91 total (95.5 average with pop_hl)
 
 pop_hl:
 
@@ -432,7 +432,7 @@ pop_hl:
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 100 total
+                              ; 100 total (95.5 average with push_hl)
 
 push_de_hl:
 
@@ -445,7 +445,7 @@ push_de_hl:
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 102 total
+                              ; 102 total (106 average with pop_hl_de)
 pop_hl_de:
 
 
@@ -457,7 +457,7 @@ pop_hl_de:
   ld (dsp),sp                 ;  20
   ld sp,(rsp_copy)            ;  20
   ret                         ;  10
-                              ; 110 total
+                              ; 110 total (106 average with push_hl_de)
 
 endif ; data_stack_method = sp_dsm
 
@@ -478,7 +478,7 @@ push_de:
   pop de                      ;  10
   pop hl                      ;  10
   ret                         ;  10
-                              ; 114 total
+                              ; 114 total (103.5 average with pop_de)
 
 pop_de:
 
@@ -492,7 +492,7 @@ pop_de:
   ld (dsp),hl                 ;  16
   pop hl                      ;  10
   ret                         ;  10
-                              ; 093 total
+                              ; 093 total (103.5 average with pop_de)
 
 push_hl:
 
@@ -509,7 +509,7 @@ push_hl:
   pop de                      ;  10
   pop hl                      ;  10
   ret                         ;  10
-                              ; 118 total
+                              ; 118 total (107.5 average with pop_hl)
 
 pop_hl:
 
@@ -524,7 +524,7 @@ pop_hl:
   ex de,hl                    ;  04
   pop de                      ;  10
   ret                         ;  10
-                              ; 097 total
+                              ; 097 total (107.5 average with push_hl)
 
 push_de_hl:
 
@@ -545,7 +545,7 @@ push_de_hl:
   pop hl                      ;  10
   ex de,hl                    ;  04
   ret                         ;  10
-                              ; 144 total
+                              ; 144 total (131.5 average with pop_hl_de)
 
 pop_hl_de:
 
@@ -563,7 +563,7 @@ pop_hl_de:
   ld (dsp),hl                 ;  16
   pop hl                      ;  10
   ret                         ;  10
-                              ; 119 total
+                              ; 119 total (131.5 average with push_hl_de)
 
 endif ; data_stack_method = hl_dsm
 
@@ -577,7 +577,7 @@ push_de:
   dec ix              ;  10
   ld (ix),e           ;  19
   ret                 ;  10
-                      ; 068 total
+                      ; 068 total (68 average with pop_de)
 
 pop_de:
                       ; T Cycles
@@ -586,7 +586,7 @@ pop_de:
   ld d,(ix)           ;  19
   inc ix              ;  10
   ret                 ;  10
-                      ; 068 total
+                      ; 068 total (68 average with push_de)
 
 push_hl:
                       ; T Cycles
@@ -595,7 +595,7 @@ push_hl:
   dec ix              ;  10
   ld (ix),l           ;  19
   ret                 ;  10
-                      ; 068 total
+                      ; 068 total (68 average with pop_hl)
 
 pop_hl:
                       ; T Cycles
@@ -604,7 +604,7 @@ pop_hl:
   ld h,(ix)           ;  19
   inc ix              ;  10
   ret                 ;  10
-                      ; 068 total
+                      ; 068 total (68 average with push_hl)
 
 push_de_hl:
                       ; T Cycles
@@ -617,7 +617,7 @@ push_de_hl:
   dec ix              ;  10
   ld (ix),l           ;  19
   ret                 ;  10
-                      ; 126 total
+                      ; 126 total (126 average with pop_de_hl)
 
 pop_hl_de:
                       ; T Cycles
@@ -630,7 +630,7 @@ pop_hl_de:
   ld d,(ix)           ;  19
   inc ix              ;  10
   ret                 ;  10
-                      ; 126 total
+                      ; 126 total (126 average with push_hl_de)
 
 endif ; data_stack_method = ix_dsm
 
@@ -2609,9 +2609,9 @@ rp0: ; initial value of the return stack pointer
 
   header sp0_,"sp0",0
 
-sp0: equ $+1 ; initial value of the data stack pointer
-  ld hl,data_stack_bottom
-  jp push_hl
+  call do_constant
+sp0:
+  dw data_stack_bottom
 
 ; --------------------------------------------------------------
   ;: sp@ ( -- a )
@@ -2670,6 +2670,7 @@ endif
 
   header c_comma_,"c,",0
 
+  ; XXX TODO -- pop_de and `ld (hl),e`
   call pop_hl
   ld a,l
   ld hl,(dp)
