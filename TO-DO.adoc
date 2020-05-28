@@ -132,3 +132,13 @@ interpretation mode. non-immediate and compile-only words (e.g.
 2020-05-28: Convert 0x80-terminated strings to counted strings.
 
 2020-05-28: Add `0exit` and `?exit`.
+
+2020-05-28: Remove error messages. Make error handling standard.
+
+2020-05-28: Rewrite everything related to parsing. Make it standard.
+
+2020-05-28: Replace inner variable `etib_fvar` with standard `>in`.
+
+2020-05-28: Fix "[" and "]" cannot be used.
+
+2020-05-28: Improve `nip` for ix_dsm.
