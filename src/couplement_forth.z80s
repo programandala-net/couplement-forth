@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.21.0+202005282016"
+    db "0.2.0-dev.22.0+202005282158"
   endm
 
 ; --------------------------------------------------------------
@@ -1633,6 +1633,36 @@ quit.do:
   ld b,(hl)
   push bc
   ret
+
+; --------------------------------------------------------------
+  header question_exit_,"?exit",0 ; {{{2
+
+  ; doc{
+  ;
+  ; ?exit ( f -- )
+  ;
+  ; }doc
+
+  call pop_hl
+  ld a,l
+  cp h
+  ret nz
+  jp (hl)
+  
+; --------------------------------------------------------------
+  header zero_exit_,"0exit",0 ; {{{2
+
+  ; doc{
+  ;
+  ; 0exit ( f -- )
+  ;
+  ; }doc
+
+  call pop_hl
+  ld a,l
+  cp h
+  ret z
+  jp (hl)
 
 ; --------------------------------------------------------------
   header question_branch_,"?branch",0 ; {{{2
@@ -4957,18 +4987,17 @@ sub_5fc2h:
   ; doc{
   ;
   ; sign ( n d -- ) ; XXX TODO -- stack
+  ;
   ; sign ( n -- ) ; XXX TODO -- standard
   ;
   ; }doc
 
   call rot_ ; XXX TODO -- this is not standard
   call zero_less_
-  call zero_branch_ ; XXX TODO -- use `0exit`
-  dw sign_.end
+  call zero_exit_
   call c_lit_
   db "-"
   call hold_
-sign_.end:
   ret
 
 ; --------------------------------------------------------------

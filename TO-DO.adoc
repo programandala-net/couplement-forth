@@ -132,8 +132,6 @@ interpretation mode. non-immediate and compile-only words (e.g.
 
 2020-05-28: Convert 0x80-terminated strings to counted strings.
 
-2020-05-28: Add `0exit` and `?exit`.
-
 2020-05-28: Remove error messages. Make error handling standard.
 
 2020-05-28: Rewrite everything related to parsing. Make it standard.
@@ -155,3 +153,5 @@ everything after a standard factoring, like Solo Forth.
 etc. This seems a clearer notation in an assembly context. The words
 that return their addresses can be renamed to `hl>stack`, `stack>hl`,
 etc.
+
+2020-05-28: Write `pop_ae_and_test` to factor `0exit` and `?exit`.
