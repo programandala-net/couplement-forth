@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.23.0+202005291110"
+    db "0.2.0-dev.24.0+202005291131"
   endm
 
 ; --------------------------------------------------------------
@@ -3633,10 +3633,9 @@ return.a:
   ;
   ; }doc
 
-  ; XXX TODO -- write "<>"
   call pop_hl_de
   if size_optimization
-    call compare_de_hl_unsigned:
+    call compare_de_hl_unsigned
     jp z,true_
     jp false_
   else
@@ -3660,11 +3659,10 @@ return.a:
 
   call pop_hl_de
   if size_optimization
-    call compare_de_hl_unsigned:
+    call compare_de_hl_unsigned
     jp z,false_
     jp true_
   else
-    ; XXX TODO test it
     ld a,l  ; 09 T
     cp e    ; 04 T
     jp nz,true_
@@ -3764,11 +3762,11 @@ l5a4fh:
   jp less_
 
 ; --------------------------------------------------------------
-  header u_less_,"u<",0 ; XXX TMP name
+  header u_less_,"u<",0
 
   ; doc{
   ;
-  ; u< ( n1 n2 -- f )
+  ; u< ( u1 u2 -- f )
   ;
   ; }doc
 
@@ -3799,7 +3797,6 @@ compare_de_hl_unsigned:
   ;
   ; }doc
 
-  ; XXX TODO test (old code: pop hl / ret)
   pop hl
   pop de
   jp (hl)
@@ -4592,7 +4589,7 @@ cmove.end:
 
   ; doc{
   ;
-  ; and ( x1 x2 -- f )
+  ; and ( x1 x2 -- x3 )
   ;
   ; }doc
 
@@ -4610,7 +4607,7 @@ cmove.end:
 
   ; doc{
   ;
-  ; or ( x1 x2 -- f )
+  ; or ( x1 x2 -- x3 )
   ;
   ; }doc
 
@@ -4628,7 +4625,7 @@ cmove.end:
 
   ; doc{
   ;
-  ; xor ( x1 x2 -- f )
+  ; xor ( x1 x2 -- x3 )
   ;
   ; }doc
 
@@ -4642,26 +4639,6 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header not_,"not",0 ; {{{2
-
-  ; doc{
-  ;
-  ; not ( x1 -- x2 )
-  ;
-  ; }doc
-
-  ; XXX TODO --- investigate, rename "0=" or "invert"
-  call pop_hl
-  xor a
-  cp l
-  inc hl
-  jr z,l5d4bh
-  ld l,$00
-l5d4bh:
-  ld h,$00
-  jp push_hl
-
-; --------------------------------------------------------------
   header false_,"false",0 ; {{{2
 
   ; doc{
@@ -4670,7 +4647,7 @@ l5d4bh:
   ;
   ; }doc
 
-  ld hl,0
+  ld hl,false
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -4682,7 +4659,7 @@ l5d4bh:
   ;
   ; }doc
 
-  ld hl,-1
+  ld hl,true
   jp push_hl
 
 ; --------------------------------------------------------------
@@ -5046,10 +5023,8 @@ sub_5fc2h:
   call pop_hl
   ld a,l
   or h
-  ld hl,$0000
-  jp nz,push_hl
-  dec hl
-  jp push_hl
+  jp z,false
+  jp true
 
 ; --------------------------------------------------------------
   header zero_less_,"0<",0 ; {{{2
@@ -5062,10 +5037,8 @@ sub_5fc2h:
 
   call pop_hl
   bit 7,h
-  ld hl,$0000
-  jp z,push_hl
-  dec hl
-  jp push_hl
+  jp z,false
+  jp true
 
 ; --------------------------------------------------------------
   header forget_,"forget",0 ; {{{2

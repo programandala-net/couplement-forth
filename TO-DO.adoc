@@ -154,5 +154,6 @@ etc.
 
 2020-05-28: Write `pop_ae_and_test` to factor `0exit` and `?exit`.
 
-2020-05-29: Improve words that return a flag: jump directly to `false`
-or `true`.
+2020-05-29: Write `u>`, `invert`.
+
+2020-05-29: Improve `=`, `<>` and similar words after Solo Forth.
