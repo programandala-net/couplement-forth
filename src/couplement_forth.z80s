@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.24.0+202005291131"
+    db "0.2.0-dev.24.0+202005291857"
   endm
 
 ; --------------------------------------------------------------
@@ -1212,7 +1212,7 @@ _previous_nfa: defl 0
   endm
 
 ; --------------------------------------------------------------
-  header couplement_forth_,"couplement-forth",0 ; {{{2
+  header couplement_forth_,'couplement-forth',0 ; {{{2
 
   ; doc{
   ;
@@ -1226,7 +1226,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  header paren_bootmessage_,"(bootmessage)",0 ; {{{2
+  header paren_bootmessage_,'(bootmessage)',0 ; {{{2
 
   ; doc{
   ;
@@ -1246,7 +1246,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  header bootmessage_,"bootmessage",0 ; {{{2
+  header bootmessage_,'bootmessage',0 ; {{{2
 
   ; doc{
   ;
@@ -1262,7 +1262,7 @@ _previous_nfa: defl 0
   jp paren_bootmessage_
 
 ; --------------------------------------------------------------
-  header c_lit_,"clit",0
+  header c_lit_,'clit',0
 
   ; doc{
   ;
@@ -1281,7 +1281,7 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  header lit_,"lit",0 ; {{{2
+  header lit_,'lit',0 ; {{{2
 
   ; doc{
   ;
@@ -1303,7 +1303,7 @@ _previous_nfa: defl 0
   jp push_hl
 
 ; --------------------------------------------------------------
-  header literal_,"literal",immediate+compile_only ; {{{2
+  header literal_,'literal',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -1326,7 +1326,7 @@ _previous_nfa: defl 0
   jp compile_de
 
 ; --------------------------------------------------------------
-  header to_body_,">body",0 ; {{{2
+  header to_body_,'>body',0 ; {{{2
 
   ; doc{
   ;
@@ -1372,7 +1372,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  header two_minus_,"2-",0 ; {{{2
+  header two_minus_,'2-',0 ; {{{2
 
   ; doc{
   ;
@@ -1413,7 +1413,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  header two_plus_,"2+",0 ; {{{2
+  header two_plus_,'2+',0 ; {{{2
 
   ; doc{
   ;
@@ -1454,7 +1454,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  header one_minus_,"1-",0 ; {{{2
+  header one_minus_,'1-',0 ; {{{2
 
   ; doc{
   ;
@@ -1492,7 +1492,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  header one_plus_,"1+",0 ; {{{2
+  header one_plus_,'1+',0 ; {{{2
 
   ; doc{
   ;
@@ -1530,7 +1530,7 @@ _previous_nfa: defl 0
   endif
 
 ; --------------------------------------------------------------
-  header execute_,"execute",0 ; {{{2
+  header execute_,'execute',0 ; {{{2
 
   ; doc{
   ;
@@ -1542,7 +1542,7 @@ _previous_nfa: defl 0
   jp (hl)
 
 ; --------------------------------------------------------------
-  header perform_,"perform",0 ; {{{2
+  header perform_,'perform',0 ; {{{2
 
   ; doc{
   ;
@@ -1560,7 +1560,7 @@ _previous_nfa: defl 0
   jp (hl)
 
 ; --------------------------------------------------------------
-  header prompt_,"prompt",0 ; {{{2
+  header prompt_,'prompt',0 ; {{{2
 
   ; doc{
   ;
@@ -1577,7 +1577,7 @@ _previous_nfa: defl 0
   ret
 
 ; --------------------------------------------------------------
-  header quit_,"quit",0 ; {{{2
+  header quit_,'quit',0 ; {{{2
 
   ; doc{
   ;
@@ -1619,7 +1619,7 @@ quit.do:
   jp quit.do
 
 ; --------------------------------------------------------------
-  header branch_,"branch",0 ; {{{2
+  header branch_,'branch',0 ; {{{2
 
   ; doc{
   ;
@@ -1635,7 +1635,7 @@ quit.do:
   ret
 
 ; --------------------------------------------------------------
-  header question_exit_,"?exit",0 ; {{{2
+  header question_exit_,'?exit',0 ; {{{2
 
   ; doc{
   ;
@@ -1650,7 +1650,7 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header zero_exit_,"0exit",0 ; {{{2
+  header zero_exit_,'0exit',0 ; {{{2
 
   ; doc{
   ;
@@ -1665,7 +1665,7 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header question_branch_,"?branch",0 ; {{{2
+  header question_branch_,'?branch',0 ; {{{2
 
   ; doc{
   ;
@@ -1683,7 +1683,7 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header zero_branch_,"0branch",0 ; {{{2
+  header zero_branch_,'0branch',0 ; {{{2
 
   ; doc{
   ;
@@ -1701,7 +1701,7 @@ quit.do:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header swap_,"swap",0 ; {{{2
+  header swap_,'swap',0 ; {{{2
 
   ; doc{
   ;
@@ -1714,7 +1714,7 @@ quit.do:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header dup_,"dup",0 ; {{{2
+  header dup_,'dup',0 ; {{{2
 
   ; doc{
   ;
@@ -1749,7 +1749,7 @@ quit.do:
   endif
 
 ; --------------------------------------------------------------
-  header question_dup_,"?dup",0 ; {{{2
+  header question_dup_,'?dup',0 ; {{{2
 
   ; doc{
   ;
@@ -1766,7 +1766,7 @@ quit.do:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header nip_,"nip",0 ; {{{2
+  header nip_,'nip',0 ; {{{2
 
   ; doc{
   ;
@@ -1791,7 +1791,7 @@ quit.do:
   endif
 
 ; --------------------------------------------------------------
-  header drop_,"drop",0 ; {{{2
+  header drop_,'drop',0 ; {{{2
 
   ; doc{
   ;
@@ -1808,7 +1808,7 @@ quit.do:
   endif
 
 ; --------------------------------------------------------------
-  header interpret_,"interpret",0 ; {{{2
+  header interpret_,'interpret',0 ; {{{2
 
   ; doc{
   ;
@@ -1954,7 +1954,7 @@ compile_de_at_hl:
   ret
 
 ; --------------------------------------------------------------
-  header paren_find_,"(find)",0 ; {{{2
+  header paren_find_,'(find)',0 ; {{{2
 
   ; doc{
   ;
@@ -2072,7 +2072,7 @@ the_names_are_different:
   jp push_hl ; return 0
 
 ; --------------------------------------------------------------
-  header u_mult_,"u*",0 ; {{{2
+  header u_mult_,'u*',0 ; {{{2
 
   ; doc{
   ;
@@ -2113,7 +2113,7 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  header plus_,"+",0 ; {{{2
+  header plus_,'+',0 ; {{{2
 
   ; doc{
   ;
@@ -2126,7 +2126,7 @@ l5330h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header plus_store_,"+!",0 ; {{{2
+  header plus_store_,'+!',0 ; {{{2
 
   ; doc{
   ;
@@ -2147,7 +2147,7 @@ l5330h:
   ret
 
 ; --------------------------------------------------------------
-  header d_plus_,"d+",0 ; {{{2
+  header d_plus_,'d+',0 ; {{{2
 
   ; doc{
   ;
@@ -2172,7 +2172,7 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header within_,"within",0 ; {{{2
+  header within_,'within',0 ; {{{2
 
   ; doc{
   ;
@@ -2206,7 +2206,7 @@ l5330h:
   jp u_less_
 
 ; --------------------------------------------------------------
-  header minus_,"-",0 ; {{{2
+  header minus_,'-',0 ; {{{2
 
   ; doc{
   ;
@@ -2220,7 +2220,7 @@ l5330h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header negate_,"negate",0 ; {{{2
+  header negate_,'negate',0 ; {{{2
 
   ; doc{
   ;
@@ -2235,7 +2235,7 @@ l5330h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header d_negate_,"dnegate",0 ; {{{2
+  header d_negate_,'dnegate',0 ; {{{2
 
   ; doc{
   ;
@@ -2259,7 +2259,7 @@ l5330h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header number_,"number",0 ; {{{2
+  header number_,'number',0 ; {{{2
 
   ; doc{
   ;
@@ -2396,7 +2396,7 @@ number.return:
   ret
 
 ; --------------------------------------------------------------
-  header space_,"space",0 ; {{{2
+  header space_,'space',0 ; {{{2
 
   ; doc{
   ;
@@ -2410,7 +2410,7 @@ number.return:
   jp print_a
 
 ; --------------------------------------------------------------
-  header spaces_,"spaces",0 ; {{{2
+  header spaces_,'spaces',0 ; {{{2
 
   ; doc{
   ;
@@ -2455,7 +2455,7 @@ spaces.hl:
   ret
 
 ; --------------------------------------------------------------
-  header emit_,"emit",0 ; {{{2
+  header emit_,'emit',0 ; {{{2
 
   ; doc{
   ;
@@ -2474,7 +2474,7 @@ print_a:
 ;  include "inc/emit.z80s" ; XXX TODO
 
 ; --------------------------------------------------------------
-  header u_dot_,"u.",0 ; {{{2
+  header u_dot_,'u.',0 ; {{{2
 
   ; doc{
   ;
@@ -2535,7 +2535,7 @@ l54dch:
   jp space_
 
 ; --------------------------------------------------------------
-  header slash_mod_,"/mod",0 ; {{{2
+  header slash_mod_,'/mod',0 ; {{{2
 
   ; doc{
   ;
@@ -2566,7 +2566,7 @@ de_hl_slash_mod.again:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header cls_,"cls",0 ; {{{2
+  header cls_,'cls',0 ; {{{2
 
   ; doc{
   ;
@@ -2585,7 +2585,7 @@ de_hl_slash_mod.again:
 ;  jp rom_chan_open
 
 ; --------------------------------------------------------------
-  header create_,"create",0 ; {{{2
+  header create_,'create',0 ; {{{2
 
   ; doc{
   ;
@@ -2670,7 +2670,7 @@ create_header.store_char
   ret
 
 ; --------------------------------------------------------------
-  header noop_,"noop",0 ; {{{2
+  header noop_,'noop',0 ; {{{2
 
   ; doc{
   ;
@@ -2681,7 +2681,7 @@ create_header.store_char
   ret
 
 ; --------------------------------------------------------------
-  header defer_,"defer",0 ; {{{2
+  header defer_,'defer',0 ; {{{2
 
   ; doc{
   ;
@@ -2707,7 +2707,7 @@ compile_jp_de:
   ret
 
 ; --------------------------------------------------------------
-  header colon_,":",0 ; {{{2
+  header colon_,':',0 ; {{{2
 
   ; doc{
   ;
@@ -2725,7 +2725,7 @@ compile_jp_de:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header semicolon_,";",immediate+compile_only ; {{{2
+  header semicolon_,';',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -2745,7 +2745,7 @@ compile_jp_de:
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header cr_,"cr",0 ; {{{2
+  header cr_,'cr',0 ; {{{2
 
   ; doc{
   ;
@@ -2757,7 +2757,7 @@ compile_jp_de:
   jp print_a
 
 ; --------------------------------------------------------------
-  header words_,"words",0 ; {{{2
+  header words_,'words',0 ; {{{2
 
   ; doc{
   ;
@@ -2792,7 +2792,7 @@ words.print_word:
   ret
 
 ; --------------------------------------------------------------
-  header base_,"base",0 ; {{{2
+  header base_,'base',0 ; {{{2
 
   ; doc{
   ;
@@ -2805,7 +2805,7 @@ base: ; current number base
   dw $000A
 
 ; --------------------------------------------------------------
-  header rp0_,"rp0",0 ; {{{2
+  header rp0_,'rp0',0 ; {{{2
 
   ; doc{
   ;
@@ -2819,7 +2819,7 @@ rp0: ; initial value of the return stack pointer
   dw return_stack_bottom
 
 ; --------------------------------------------------------------
-  header rp_fetch_,"rp@",0 ; {{{2
+  header rp_fetch_,'rp@',0 ; {{{2
 
   ; doc{
   ;
@@ -2832,7 +2832,7 @@ rp0: ; initial value of the return stack pointer
   jp push_hl
 
 ; --------------------------------------------------------------
-  header rp_store_,"rp!",0 ; {{{2
+  header rp_store_,'rp!',0 ; {{{2
 
   ; doc{
   ;
@@ -2847,7 +2847,7 @@ rp0: ; initial value of the return stack pointer
   ret
 
 ; --------------------------------------------------------------
-  header sp0_,"sp0",0 ; {{{2
+  header sp0_,'sp0',0 ; {{{2
 
   ; doc{
   ;
@@ -2860,7 +2860,7 @@ sp0:
   dw data_stack_bottom
 
 ; --------------------------------------------------------------
-  header sp_fetch_,"sp@",0 ; {{{2
+  header sp_fetch_,'sp@',0 ; {{{2
 
   ; doc{
   ;
@@ -2883,7 +2883,7 @@ endif
   jp push_hl
 
 ; --------------------------------------------------------------
-  header sp_store_,"sp!",0 ; {{{2
+  header sp_store_,'sp!',0 ; {{{2
 
   ; doc{
   ;
@@ -2902,7 +2902,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header decimal_,"decimal",0 ; {{{2
+  header decimal_,'decimal',0 ; {{{2
 
   ; doc{
   ;
@@ -2915,7 +2915,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header hex_,"hex",0 ; {{{2
+  header hex_,'hex',0 ; {{{2
 
   ; doc{
   ;
@@ -2928,7 +2928,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header c_comma_,"c,",0 ; {{{2
+  header c_comma_,'c,',0 ; {{{2
 
   ; doc{
   ;
@@ -2946,7 +2946,7 @@ endif
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header comma_,",",0 ; {{{2
+  header comma_,',',0 ; {{{2
 
   ; doc{
   ;
@@ -2965,7 +2965,7 @@ endif
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header allot_,"allot",0 ; {{{2
+  header allot_,'allot',0 ; {{{2
 
   ; doc{
   ;
@@ -2980,7 +2980,7 @@ endif
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header store_,"!",0 ; {{{2
+  header store_,'!',0 ; {{{2
 
   ; doc{
   ;
@@ -2995,7 +2995,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header c_store_,"c!",0 ; {{{2
+  header c_store_,'c!',0 ; {{{2
 
   ; doc{
   ;
@@ -3008,7 +3008,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header fetch_,"@",0 ; {{{2
+  header fetch_,'@',0 ; {{{2
 
   ; doc{
   ;
@@ -3024,7 +3024,7 @@ endif
   jp push_hl ; XXX TODO -- push_de ?
 
 ; --------------------------------------------------------------
-  header c_fetch_,"c@",0 ; {{{2
+  header c_fetch_,'c@',0 ; {{{2
 
   ; doc{
   ;
@@ -3038,7 +3038,7 @@ endif
   jp push_hl
 
 ; --------------------------------------------------------------
-  header on_,"on",0 ; {{{2
+  header on_,'on',0 ; {{{2
 
   ; doc{
   ;
@@ -3051,7 +3051,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header off_,"off",0 ; {{{2
+  header off_,'off',0 ; {{{2
 
   ; doc{
   ;
@@ -3064,7 +3064,7 @@ endif
   ret
 
 ; --------------------------------------------------------------
-  header dp_,"dp",0 ; {{{2
+  header dp_,'dp',0 ; {{{2
 
   ; doc{
   ;
@@ -3081,7 +3081,7 @@ dp:
   dw end_of_code
 
 ; --------------------------------------------------------------
-  header here_,"here",0 ; {{{2
+  header here_,'here',0 ; {{{2
 
   ; doc{
   ;
@@ -3096,7 +3096,7 @@ dp:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header latest_,"latest",0 ; {{{2
+  header latest_,'latest',0 ; {{{2
 
   ; doc{
   ;
@@ -3114,7 +3114,7 @@ latest: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  header semicolon_code_,";code",immediate ; {{{2
+  header semicolon_code_,';code',immediate ; {{{2
 
   ; doc{
   ;
@@ -3139,7 +3139,7 @@ semicolon.end:
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header code_colon_,"code:",immediate ; {{{2
+  header code_colon_,'code:',immediate ; {{{2
 
   ; doc{
   ;
@@ -3157,7 +3157,7 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header in_,"in",0 ; {{{2
+  header in_,'in',0 ; {{{2
 
   ; doc{
   ;
@@ -3174,7 +3174,7 @@ semicolon.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header out_,"out",0 ; {{{2
+  header out_,'out',0 ; {{{2
 
   ; doc{
   ;
@@ -3189,7 +3189,7 @@ semicolon.end:
   ret
 
 ; --------------------------------------------------------------
-  header page_,"page",0 ; {{{2
+  header page_,'page',0 ; {{{2
 
   ; doc{
   ;
@@ -3209,7 +3209,7 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   jp print_a
 
 ; --------------------------------------------------------------
-  header do_,"do",immediate+compile_only ; {{{2
+  header do_,'do',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -3313,7 +3313,7 @@ l62e0h:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header plus_loop_,"+loop",immediate+compile_only ; {{{2
+  header plus_loop_,'+loop',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -3341,7 +3341,7 @@ sub_57a3h:
   ret
 
 ; --------------------------------------------------------------
-  header loop_,"loop",immediate+compile_only ; {{{2
+  header loop_,'loop',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -3357,7 +3357,7 @@ sub_57a3h:
   jp sub_57a3h
 
 ; --------------------------------------------------------------
-  header j_,"j",0 ; {{{2
+  header j_,'j',0 ; {{{2
 
   ; doc{
   ;
@@ -3377,7 +3377,7 @@ sub_57a3h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header i_,"i",0 ; {{{2
+  header i_,'i',0 ; {{{2
 
   ; doc{
   ;
@@ -3397,7 +3397,7 @@ sub_57a3h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header link_,"link",0 ; {{{2
+  header link_,'link',0 ; {{{2
 
   ; doc{
   ;
@@ -3428,7 +3428,7 @@ link.a:
   jp rom_chan_open
 
 ; --------------------------------------------------------------
-  header home_,"home",0 ; {{{2
+  header home_,'home',0 ; {{{2
 
   ; doc{
   ;
@@ -3447,7 +3447,7 @@ link.a:
   jp print_a
 
 ; --------------------------------------------------------------
-  header at_xy_,"at-xy",0 ; {{{2
+  header at_xy_,'at-xy',0 ; {{{2
 
   ; doc{
   ;
@@ -3471,7 +3471,7 @@ link.a:
   jp print_a
 
 ; --------------------------------------------------------------
-  header border_,"border",0 ; {{{2
+  header border_,'border',0 ; {{{2
 
   ; doc{
   ;
@@ -3487,7 +3487,7 @@ border.a:
   ret
 
 ; --------------------------------------------------------------
-  header beep_,"beep",0 ; {{{2
+  header beep_,'beep',0 ; {{{2
 
   ; doc{
   ;
@@ -3545,7 +3545,7 @@ l5837h:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header star_,"*",0 ; {{{2
+  header star_,'*',0 ; {{{2
 
   ; doc{
   ;
@@ -3557,7 +3557,7 @@ l5837h:
   jp pop_hl
 
 ; --------------------------------------------------------------
-  header type_,"type",0 ; {{{2
+  header type_,'type',0 ; {{{2
 
   ; doc{
   ;
@@ -3572,7 +3572,7 @@ l5837h:
   jp print_bc_chars_at_hl
 
 ; --------------------------------------------------------------
-  header bye_,"bye",0 ; {{{2
+  header bye_,'bye',0 ; {{{2
 
   ; doc{
   ;
@@ -3587,7 +3587,7 @@ saved_basic_sp: equ $+1 ; Sinclair BASIC's stack pointer
   db $FF      ; 0: "OK"
 
 ; --------------------------------------------------------------
-  header return_,"return",0 ; {{{2
+  header return_,'return',0 ; {{{2
 
   ; doc{
   ;
@@ -3613,7 +3613,7 @@ return.a:
   jr return.bc
 
 ; --------------------------------------------------------------
-  header dir_,"dir",0 ; {{{2
+  header dir_,'dir',0 ; {{{2
 
   ; doc{
   ;
@@ -3625,7 +3625,7 @@ return.a:
   jp return.a
 
 ; --------------------------------------------------------------
-  header equals_,"=",0 ; {{{2
+  header equals_,'=',0 ; {{{2
 
   ; doc{
   ;
@@ -3649,7 +3649,7 @@ return.a:
   endif
 
 ; --------------------------------------------------------------
-  header not_equals_,"<>",0 ; {{{2
+  header not_equals_,'<>',0 ; {{{2
 
   ; doc{
   ;
@@ -3673,7 +3673,7 @@ return.a:
   endif
 
 ; --------------------------------------------------------------
-  header slash_,"/",0 ; {{{2
+  header slash_,'/',0 ; {{{2
 
   ; doc{
   ;
@@ -3686,7 +3686,7 @@ return.a:
   jp pop_hl
 
 ; --------------------------------------------------------------
-  header mod_,"mod",0 ; {{{2
+  header mod_,'mod',0 ; {{{2
 
   ; doc{
   ;
@@ -3698,7 +3698,7 @@ return.a:
   jp pop_hl
 
 ; --------------------------------------------------------------
-  header begin_,"begin",immediate+compile_only ; {{{2
+  header begin_,'begin',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -3712,7 +3712,7 @@ return.a:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header until_,"until",immediate+compile_only ; {{{2
+  header until_,'until',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -3728,7 +3728,7 @@ return.a:
   jp sub_57a3h
 
 ; --------------------------------------------------------------
-  header less_,"<",0 ; {{{2
+  header less_,'<',0 ; {{{2
 
   ; doc{
   ;
@@ -3749,7 +3749,7 @@ l5a4fh:
   jp true_
 
 ; --------------------------------------------------------------
-  header greater_,">",0 ; {{{2
+  header greater_,'>',0 ; {{{2
 
   ; doc{
   ;
@@ -3762,7 +3762,7 @@ l5a4fh:
   jp less_
 
 ; --------------------------------------------------------------
-  header u_less_,"u<",0
+  header u_less_,'u<',0
 
   ; doc{
   ;
@@ -3789,7 +3789,7 @@ compare_de_hl_unsigned:
   ret
 
 ; --------------------------------------------------------------
-  header r_drop_,"rdrop",0 ; {{{2
+  header r_drop_,'rdrop',0 ; {{{2
 
   ; doc{
   ;
@@ -3802,7 +3802,7 @@ compare_de_hl_unsigned:
   jp (hl)
 
 ; --------------------------------------------------------------
-  header r_fetch_,"r@",0 ; {{{2
+  header r_fetch_,'r@',0 ; {{{2
 
   ; doc{
   ;
@@ -3815,7 +3815,7 @@ compare_de_hl_unsigned:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header r_from_,"r>",0 ; {{{2
+  header r_from_,'r>',0 ; {{{2
 
   ; doc{
   ;
@@ -3829,7 +3829,7 @@ compare_de_hl_unsigned:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header to_r_,">r",0 ; {{{2
+  header to_r_,'>r',0 ; {{{2
 
   ; doc{
   ;
@@ -3849,7 +3849,7 @@ compare_de_hl_unsigned:
 ;  jp (hl)
 
 ; --------------------------------------------------------------
-  header key_question_,"key?",0 ; {{{2
+  header key_question_,'key?',0 ; {{{2
 
   ; doc{
   ;
@@ -3881,7 +3881,7 @@ previous_key equ $+1
   endif
 
 ; --------------------------------------------------------------
-  header key_,"key",0 ; {{{2
+  header key_,'key',0 ; {{{2
 
   ; doc{
   ;
@@ -3904,7 +3904,7 @@ previous_key equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  header over_,"over",0 ; {{{2
+  header over_,'over',0 ; {{{2
 
   ; doc{
   ;
@@ -3918,7 +3918,7 @@ previous_key equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  header rot_,"rot",0 ; {{{2
+  header rot_,'rot',0 ; {{{2
 
   ; doc{
   ;
@@ -3938,7 +3938,7 @@ previous_key equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  header two_dup_,"2dup",0 ; {{{2
+  header two_dup_,'2dup',0 ; {{{2
 
   ; doc{
   ;
@@ -3951,7 +3951,7 @@ previous_key equ $+1
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header pad_,"pad",0 ; {{{2
+  header pad_,'pad',0 ; {{{2
 
   ; doc{
   ;
@@ -3967,7 +3967,7 @@ pad_address: equ $+1
   jp push_hl
 
 ; --------------------------------------------------------------
-  header tib_,"tib",0 ; {{{2
+  header tib_,'tib',0 ; {{{2
 
   ; doc{
   ;
@@ -3993,7 +3993,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
 ;  dw $0000 ; character offset within the input stream
 
 ; --------------------------------------------------------------
-  header query_,"query",0 ; {{{2
+  header query_,'query',0 ; {{{2
 
   ; doc{
   ;
@@ -4016,7 +4016,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ret
 
 ; --------------------------------------------------------------
-  header retype_,"retype",0 ; {{{2
+  header retype_,'retype',0 ; {{{2
 
   ; doc{
   ;
@@ -4040,7 +4040,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   ret
 
 ; --------------------------------------------------------------
-  header minus_cursor_,"-cursor",0 ; {{{2
+  header minus_cursor_,'-cursor',0 ; {{{2
 
   ; doc{
   ;
@@ -4056,7 +4056,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   jp emit_
 
 ; --------------------------------------------------------------
-  header backspaces_,"backspaces",0 ; {{{2
+  header backspaces_,'backspaces',0 ; {{{2
 
   ; doc{
   ;
@@ -4080,7 +4080,7 @@ tib_address: equ $+1 ; start address of the Terminal Input Buffer
   jp drop_
 
 ; --------------------------------------------------------------
-  header paren_accept_control_char_,"(accept-control-char)",0 ; {{{2
+  header paren_accept_control_char_,'(accept-control-char)',0 ; {{{2
 
   ; doc{
   ;
@@ -4128,7 +4128,7 @@ paren_accept_control_char.end:
   ret
 
 ; --------------------------------------------------------------
-  header paren_accept_ascii_char_,"(accept-ascii-char)",0 ; {{{2
+  header paren_accept_ascii_char_,'(accept-ascii-char)',0 ; {{{2
 
   ; doc{
   ;
@@ -4161,7 +4161,7 @@ paren_accept_ascii_char.no:
   jp drop_
 
 ; --------------------------------------------------------------
-  header paren_accept_key_,"(accept-key)",0 ; {{{2
+  header paren_accept_key_,'(accept-key)',0 ; {{{2
 
   ; doc{
   ;
@@ -4189,7 +4189,7 @@ paren_accept_ascii_char.no:
   jp paren_accept_ascii_char_ ; ASCII
 
 ; --------------------------------------------------------------
-  header paren_accept_,"(accept)",0 ; {{{2
+  header paren_accept_,'(accept)',0 ; {{{2
 
   ; doc{
   ;
@@ -4220,7 +4220,7 @@ paren_accept.begin:
   jp nip_
 
 ; --------------------------------------------------------------
-  header accept_,"accept",0 ; {{{2
+  header accept_,'accept',0 ; {{{2
 
   ; doc{
   ;
@@ -4231,7 +4231,7 @@ paren_accept.begin:
   jp paren_accept_
 
 ; --------------------------------------------------------------
-  header word_,"word",0 ; {{{2
+  header word_,'word',0 ; {{{2
 
   ; doc{
   ;
@@ -4285,7 +4285,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header if_,"if",immediate+compile_only ; {{{2
+  header if_,'if',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4304,7 +4304,7 @@ word.parse:
   jp push_hl ; XXX TODO -- push_a?
 
 ; --------------------------------------------------------------
-  header else_,"else",immediate+compile_only ; {{{2
+  header else_,'else',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4332,7 +4332,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header then_,"then",immediate+compile_only ; {{{2
+  header then_,'then',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4350,7 +4350,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  header builds_,"<builds",compile_only ; {{{2
+  header builds_,'<builds',compile_only ; {{{2
 
   ; doc{
   ;
@@ -4389,7 +4389,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header does_,"does>",immediate+compile_only ; {{{2
+  header does_,'does>',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4427,7 +4427,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  header while_,"while",immediate+compile_only ; {{{2
+  header while_,'while',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4448,7 +4448,7 @@ word.parse:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header repeat_,"repeat",immediate+compile_only ; {{{2
+  header repeat_,'repeat',immediate+compile_only ; {{{2
 
   ; doc{
   ;
@@ -4481,7 +4481,7 @@ word.parse:
   ret
 
 ; --------------------------------------------------------------
-  header variable_,"variable",0 ; {{{2
+  header variable_,'variable',0 ; {{{2
 
   ; doc{
   ;
@@ -4504,7 +4504,7 @@ do_variable:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header constant_,"constant",0 ; {{{2
+  header constant_,'constant',0 ; {{{2
 
   ; doc{
   ;
@@ -4537,7 +4537,7 @@ do_constant:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header dot_,".",0 ; {{{2
+  header dot_,'.',0 ; {{{2
 
   ; doc{
   ;
@@ -4563,7 +4563,7 @@ dot_code_field.do:
   jp u_dot_
 
 ; --------------------------------------------------------------
-  header cmove_,"cmove",0 ; {{{2
+  header cmove_,'cmove',0 ; {{{2
 
   ; doc{
   ;
@@ -4585,7 +4585,7 @@ cmove.end:
   jp pop_hl_de
 
 ; --------------------------------------------------------------
-  header and_,"and",0 ; {{{2
+  header and_,'and',0 ; {{{2
 
   ; doc{
   ;
@@ -4603,7 +4603,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header or_,"or",0 ; {{{2
+  header or_,'or',0 ; {{{2
 
   ; doc{
   ;
@@ -4621,7 +4621,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header xor_,"xor",0 ; {{{2
+  header xor_,'xor',0 ; {{{2
 
   ; doc{
   ;
@@ -4639,7 +4639,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header false_,"false",0 ; {{{2
+  header false_,'false',0 ; {{{2
 
   ; doc{
   ;
@@ -4651,7 +4651,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header true_,"true",0 ; {{{2
+  header true_,'true',0 ; {{{2
 
   ; doc{
   ;
@@ -4663,7 +4663,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header zero_,"0",0 ; {{{2
+  header zero_,'0',0 ; {{{2
 
   ; doc{
   ;
@@ -4675,7 +4675,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header one_,"1",0 ; {{{2
+  header one_,'1',0 ; {{{2
 
   ; doc{
   ;
@@ -4687,7 +4687,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header bl_,"bl",0 ; {{{2
+  header bl_,'bl',0 ; {{{2
 
   ; doc{
   ;
@@ -4697,7 +4697,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header count_,"count",0 ; {{{2
+  header count_,'count',0 ; {{{2
 
   ; doc{
   ;
@@ -4712,7 +4712,7 @@ cmove.end:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header find_,"find",0 ; {{{2
+  header find_,'find',0 ; {{{2
 
   ; doc{
   ;
@@ -4737,7 +4737,7 @@ find.skip_blank:
   jp paren_find_
 
 ; --------------------------------------------------------------
-  header paren_abort_,"(abort)",0 ; {{{2
+  header paren_abort_,'(abort)',0 ; {{{2
 
   ; doc{
   ;
@@ -4753,7 +4753,7 @@ find.skip_blank:
   jp quit_
 
 ; --------------------------------------------------------------
-  header abort_,"abort",0 ; {{{2
+  header abort_,'abort',0 ; {{{2
 
   ; doc{
   ;
@@ -4770,7 +4770,7 @@ find.skip_blank:
   jp paren_abort_
 
 ; --------------------------------------------------------------
-  header cold_,"cold",0 ; {{{2
+  header cold_,'cold',0 ; {{{2
 
   ; doc{
   ;
@@ -4797,7 +4797,7 @@ cold_dp: equ $+1 ; next vacant address in dictionary at cold start
   jp abort_
 
 ; --------------------------------------------------------------
-  header fence_,"fence",0 ; {{{2
+  header fence_,'fence',0 ; {{{2
 
   ; doc{
   ;
@@ -4813,7 +4813,7 @@ fence:
   dw end_of_code ; address below which `forget` will not operate.
 
 ; --------------------------------------------------------------
-  header u_slash_mod_,"u/mod",0 ; {{{2
+  header u_slash_mod_,'u/mod',0 ; {{{2
 
   ; doc{
   ;
@@ -4867,7 +4867,7 @@ l5de3h:
   jp push_de_hl
 
 ; --------------------------------------------------------------
-  header less_number_sign_,"<#",0 ; {{{2
+  header less_number_sign_,'<#',0 ; {{{2
 
   ; doc{
   ;
@@ -4881,7 +4881,7 @@ l5de3h:
   ret
 
 ; --------------------------------------------------------------
-  header number_sign_greater_,"#>",0 ; {{{2
+  header number_sign_greater_,'#>',0 ; {{{2
 
   ; doc{
   ;
@@ -4897,7 +4897,7 @@ l5de3h:
   jp minus_
 
 ; --------------------------------------------------------------
-  header number_sign_,"#",0 ; {{{2
+  header number_sign_,'#',0 ; {{{2
 
   ; doc{
   ;
@@ -4941,7 +4941,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  header number_sign_s_,"#s",0 ; {{{2
+  header number_sign_s_,'#s',0 ; {{{2
 
   ; doc{
   ;
@@ -4958,7 +4958,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  header d_dot_,"d.",0 ; {{{2
+  header d_dot_,'d.',0 ; {{{2
 
   ; doc{
   ;
@@ -4975,7 +4975,7 @@ sub_5fc2h:
   jp space_
 
 ; --------------------------------------------------------------
-  header hold_,"hold",0 ; {{{2
+  header hold_,'hold',0 ; {{{2
 
   ; doc{
   ;
@@ -4993,7 +4993,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  header sign_,"sign",0 ; {{{2
+  header sign_,'sign',0 ; {{{2
 
   ; doc{
   ;
@@ -5012,7 +5012,7 @@ sub_5fc2h:
   ret
 
 ; --------------------------------------------------------------
-  header zero_equals_,"0=",0 ; {{{2
+  header zero_equals_,'0=',0 ; {{{2
 
   ; doc{
   ;
@@ -5027,7 +5027,7 @@ sub_5fc2h:
   jp true
 
 ; --------------------------------------------------------------
-  header zero_less_,"0<",0 ; {{{2
+  header zero_less_,'0<',0 ; {{{2
 
   ; doc{
   ;
@@ -5041,7 +5041,7 @@ sub_5fc2h:
   jp true
 
 ; --------------------------------------------------------------
-  header forget_,"forget",0 ; {{{2
+  header forget_,'forget',0 ; {{{2
 
   ; doc{
   ;
@@ -5069,7 +5069,7 @@ sub_5fc2h:
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header error_,"error",0 ; {{{2
+  header error_,'error',0 ; {{{2
 
   ; doc{
   ;
@@ -5083,7 +5083,7 @@ sub_5fc2h:
   jp error_a
 
 ; --------------------------------------------------------------
-  header paren_,"(",immediate ; {{{2
+  header paren_,'(',immediate ; {{{2
 
   ; doc{
   ;
@@ -5101,7 +5101,7 @@ paren_.next:
   ret
 
 ; --------------------------------------------------------------
-  header pick_,"pick",0 ; {{{2
+  header pick_,'pick',0 ; {{{2
 
   ; doc{
   ;
@@ -5132,7 +5132,7 @@ paren_.next:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header roll_,"roll",0 ; {{{2
+  header roll_,'roll',0 ; {{{2
 
   ; doc{
   ;
@@ -5162,7 +5162,7 @@ l5f82h:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header char_,"char",0 ; {{{2
+  header char_,'char',0 ; {{{2
 
   ; doc{
   ;
@@ -5201,7 +5201,7 @@ char.return:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header bracket_char_,"[char]",immediate ; {{{2
+  header bracket_char_,'[char]',immediate ; {{{2
 
   ; doc{
   ;
@@ -5228,7 +5228,7 @@ char.return:
   ret
 
 ; --------------------------------------------------------------
-  header paper_,"paper",0 ; {{{2
+  header paper_,'paper',0 ; {{{2
 
   ; doc{
   ;
@@ -5240,7 +5240,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  header ink_,"ink",0 ; {{{2
+  header ink_,'ink',0 ; {{{2
 
   ; doc{
   ;
@@ -5252,7 +5252,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  header bright_,"bright",0 ; {{{2
+  header bright_,'bright',0 ; {{{2
 
   ; doc{
   ;
@@ -5264,7 +5264,7 @@ char.return:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  header flash_,"flash",0 ; {{{2
+  header flash_,'flash',0 ; {{{2
 
   ; doc{
   ;
@@ -5280,7 +5280,7 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  header tab_,"tab",0 ; {{{2
+  header tab_,'tab',0 ; {{{2
 
   ; doc{
   ;
@@ -5292,7 +5292,7 @@ print_a_and_tos:
   jp print_a
 
 ; --------------------------------------------------------------
-  header overprint_,"overprint",0 ; {{{2
+  header overprint_,'overprint',0 ; {{{2
 
   ; doc{
   ;
@@ -5304,7 +5304,7 @@ print_a_and_tos:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  header inverse_,"inverse",0 ; {{{2
+  header inverse_,'inverse',0 ; {{{2
 
   ; doc{
   ;
@@ -5316,7 +5316,7 @@ print_a_and_tos:
   jp print_a_and_tos
 
 ; --------------------------------------------------------------
-  header cat_,"cat",0 ; {{{2
+  header cat_,'cat',0 ; {{{2
 
   ; doc{
   ;
@@ -5331,7 +5331,7 @@ print_a_and_tos:
   jp return.bc
 
 ; --------------------------------------------------------------
-  header bsave_,"bsave",0 ; {{{2
+  header bsave_,'bsave',0 ; {{{2
 
   ; doc{
   ;
@@ -5343,7 +5343,7 @@ print_a_and_tos:
   ret
 
 ; --------------------------------------------------------------
-  header filename_store_,"filename!",0 ; {{{2
+  header filename_store_,'filename!',0 ; {{{2
 
   ; doc{
   ;
@@ -5376,7 +5376,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  header dload_,"dloaded",0 ; {{{2
+  header dload_,'dloaded',0 ; {{{2
 
   ; doc{
   ;
@@ -5395,7 +5395,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  header dsaved_,"dsaved",0 ; {{{2
+  header dsaved_,'dsaved',0 ; {{{2
 
   ; doc{
   ;
@@ -5410,7 +5410,7 @@ filename_store.move
   ret
 
 ; --------------------------------------------------------------
-  header push_hl_,"push-hl_",0 ; {{{2
+  header push_hl_,'push-hl_',0 ; {{{2
 
   ; doc{
   ;
@@ -5422,7 +5422,7 @@ filename_store.move
   dw push_hl
 
 ; --------------------------------------------------------------
-  header pop_hl_,"pop-hl_",0 ; {{{2
+  header pop_hl_,'pop-hl_',0 ; {{{2
 
   ; doc{
   ;
@@ -5434,7 +5434,7 @@ filename_store.move
   dw push_hl
 
 ; --------------------------------------------------------------
-  header push_de_hl_,"push-de-hl_",0 ; {{{2
+  header push_de_hl_,'push-de-hl_',0 ; {{{2
 
   ; doc{
   ;
@@ -5446,7 +5446,7 @@ filename_store.move
   dw push_de_hl
 
 ; --------------------------------------------------------------
-  header pop_hl_de_,"pop-hl-de_",0 ; {{{2
+  header pop_hl_de_,'pop-hl-de_',0 ; {{{2
 
   ; doc{
   ;
@@ -5458,7 +5458,7 @@ filename_store.move
   dw pop_hl_de
 
 ; --------------------------------------------------------------
-  header expand_,"expand",0 ; {{{2
+  header expand_,'expand',0 ; {{{2
 
   ; doc{
   ;
@@ -5476,7 +5476,7 @@ filename_store.move
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
-  header state_,"state",0 ; {{{2
+  header state_,'state',0 ; {{{2
 
   ; doc{
   ;
@@ -5487,7 +5487,7 @@ state:
   dw 0 ; compilation state flag (non-zero value when in compilation state)
 
 ; --------------------------------------------------------------
-  header bounds_,"bounds",0 ; {{{2
+  header bounds_,'bounds',0 ; {{{2
 
   ; doc{
   ;
@@ -5500,7 +5500,7 @@ state:
   jp swap_
 
 ; --------------------------------------------------------------
-  header left_bracket_,"[",immediate ; {{{2
+  header left_bracket_,'[',immediate ; {{{2
 
   ; doc{
   ;
@@ -5513,7 +5513,7 @@ state:
   ret
 
 ; --------------------------------------------------------------
-  header right_bracket_,"]",0 ; {{{2
+  header right_bracket_,']',0 ; {{{2
 
   ; doc{
   ;
@@ -5526,7 +5526,7 @@ state:
   ret
 
 ; --------------------------------------------------------------
-  header unused_,"unused",0 ; {{{2
+  header unused_,'unused',0 ; {{{2
 
   ; doc{
   ;
@@ -5544,7 +5544,7 @@ state:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header to_in_,"to_in",0 ; {{{2
+  header to_in_,'to_in',0 ; {{{2
 
   ; doc{
   ;
@@ -5563,7 +5563,7 @@ to_in:
   dw $0000
 
 ; --------------------------------------------------------------
-  header depth_,"depth",0 ; {{{2
+  header depth_,'depth',0 ; {{{2
 
   ; doc{
   ;
@@ -5588,7 +5588,7 @@ to_in:
   jp push_hl
 
 ; --------------------------------------------------------------
-  header dot_s_,".s",0 ; {{{2
+  header dot_s_,'.s',0 ; {{{2
 
   ; doc{
   ;
