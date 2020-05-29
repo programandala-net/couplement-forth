@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.23.0+202005291105"
+    db "0.2.0-dev.23.0+202005291110"
   endm
 
 ; --------------------------------------------------------------
@@ -1308,7 +1308,7 @@ _previous_nfa: defl 0
   ; doc{
   ;
   ; literal
-  ;  Interpretation: 
+  ;  Interpretation:
   ;    Interpretation semantics for this word are undefined.
   ;  Compilation: ( x -- )
   ;    Append the run-time semantics given below to the current definition.
@@ -1648,7 +1648,7 @@ quit.do:
   cp h
   ret nz
   jp (hl)
-  
+
 ; --------------------------------------------------------------
   header zero_exit_,"0exit",0 ; {{{2
 
@@ -1805,7 +1805,7 @@ quit.do:
     ret
   else
     jp pop_hl
-  endif  
+  endif
 
 ; --------------------------------------------------------------
   header interpret_,"interpret",0 ; {{{2
@@ -3119,6 +3119,8 @@ latest: equ $+1
   ; doc{
   ;
   ; ;code ( colon-sys -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ; XXX TODO adapt, test
 
@@ -3212,6 +3214,8 @@ linked_stream: equ $+1 ; XXX TODO make it a variable
   ; doc{
   ;
   ; do ( -- do-sys ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld de,do_do
   call compile_call_de
@@ -3314,6 +3318,8 @@ l62e0h:
   ; doc{
   ;
   ; +loop ( do-sys - ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,do_structure_id
   call structured
@@ -3340,6 +3346,8 @@ sub_57a3h:
   ; doc{
   ;
   ; loop ( do-sys -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,do_structure_id
   call structured
@@ -3697,6 +3705,8 @@ return.a:
   ; doc{
   ;
   ; begin ( -- begin-sys ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld hl,(dp)
   call push_hl
@@ -4283,6 +4293,8 @@ word.parse:
   ; doc{
   ;
   ; if ( -- if-sys ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld de,zero_branch_
   call compile_call_de
@@ -4300,6 +4312,8 @@ word.parse:
   ; doc{
   ;
   ; else ( if-sys -- if-sys ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,if_structure_id
   call structured
@@ -4326,6 +4340,8 @@ word.parse:
   ; doc{
   ;
   ; then ( if-sys -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,if_structure_id
   call structured
@@ -4342,6 +4358,8 @@ word.parse:
   ; doc{
   ;
   ; <builds ( "name" -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ; XXX TODO -- remove, adapt
   ld de,create_header
@@ -4379,6 +4397,8 @@ word.parse:
   ; doc{
   ;
   ; does> ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,builds_structure_id
   call structured
@@ -4415,6 +4435,8 @@ word.parse:
   ; doc{
   ;
   ; while ( begin-sys -- begin-sys ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,begin_structure_id
   call structured
@@ -4434,6 +4456,8 @@ word.parse:
   ; doc{
   ;
   ; repeat ( begin-sys -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ld a,begin_structure_id
   call structured
@@ -4817,6 +4841,8 @@ fence:
   ; doc{
   ;
   ; u/mod ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   call pop_hl
   ld b,h
@@ -4869,6 +4895,8 @@ l5de3h:
   ; doc{
   ;
   ; <# ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   call pad_
   call pop_hl
@@ -4881,6 +4909,8 @@ l5de3h:
   ; doc{
   ;
   ; #> ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   call pop_hl_de
   ld hl,(hlds_fvar)
@@ -4895,6 +4925,8 @@ l5de3h:
   ; doc{
   ;
   ; # ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   ; XXX TODO -- avoid fetching base every time `#s` calls `#`:
   ld hl,(base)
@@ -4937,6 +4969,8 @@ sub_5fc2h:
   ; doc{
   ;
   ; #s ( -- ) ; XXX TODO -- stack
+  ;
+  ; }doc
 
   call number_sign_
   call over_ ; XXX TODO -- over over -> 2dup
@@ -4988,9 +5022,9 @@ sub_5fc2h:
   ;
   ; sign ( n d -- ) ; XXX TODO -- stack
   ;
-  ; sign ( n -- ) ; XXX TODO -- standard
-  ;
   ; }doc
+
+  ; sign ( n -- ) ; XXX TODO -- standard
 
   call rot_ ; XXX TODO -- this is not standard
   call zero_less_
