@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.22.0+202005282158"
+    db "0.2.0-dev.23.0+202005291105"
   endm
 
 ; --------------------------------------------------------------
@@ -2135,15 +2135,15 @@ l5330h:
   ; }doc
 
   call pop_hl_de
-	; hl = address
-	; de = number
-	ld a,(hl)
-	add a,e
-	ld (hl),a
-	inc hl
-	ld a,(hl)
-	adc a,d
-	ld (hl),a
+  ; hl = address
+  ; de = number
+  ld a,(hl)
+  add a,e
+  ld (hl),a
+  inc hl
+  ld a,(hl)
+  adc a,d
+  ld (hl),a
   ret
 
 ; --------------------------------------------------------------
@@ -3076,9 +3076,9 @@ endif
   ;
   ; }doc
 
-dp: equ $+1
-  ld hl,end_of_code
-  jp push_hl
+  call do_variable
+dp:
+  dw end_of_code
 
 ; --------------------------------------------------------------
   header here_,"here",0 ; {{{2
