@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.24.0+202005291857"
+    db "0.2.0-dev.25.0+202005291906"
   endm
 
 ; --------------------------------------------------------------
@@ -75,7 +75,6 @@ true:   equ $FFFF
 
 sp_dsm: equ %0001 ; use SP with the contents of `dsp`
 ix_dsm: equ %0100 ; use IX to hold the stack pointer permanently
-hl_dsm: equ %1000 ; use HL with the contents of `dsp`
 
 ; The data stack method can be selected here, using one of the
 ; above identifiers:
@@ -453,112 +452,6 @@ pop_hl_de:
                               ; 110 total (106 average with push_hl_de)
 
 endif ; data_stack_method = sp_dsm
-
-; --------------------------------------------------------------
-if data_stack_method = hl_dsm ; {{{2
-
-push_de:
-
-                              ; T Cycles
-  push hl                     ;  11
-  push de                     ;  11
-  ld hl,(dsp)                 ;  20
-  dec hl                      ;  06
-  ld (hl),d                   ;  07
-  dec hl                      ;  06
-  ld (hl),e                   ;  07
-  ld (dsp),hl                 ;  16
-  pop de                      ;  10
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 114 total (103.5 average with pop_de)
-
-pop_de:
-
-                              ; T Cycles
-  push hl                     ;  11
-  ld hl,(dsp)                 ;  20
-  ld e,(hl)                   ;  07
-  inc hl                      ;  06
-  ld d,(hl)                   ;  07
-  inc hl                      ;  06
-  ld (dsp),hl                 ;  16
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 093 total (103.5 average with pop_de)
-
-push_hl:
-
-                              ; T Cycles
-  push hl                     ;  11
-  push de                     ;  11
-  ex de,hl                    ;  04
-  ld hl,(dsp)                 ;  20
-  dec hl                      ;  06
-  ld (hl),d                   ;  07
-  dec hl                      ;  06
-  ld (hl),e                   ;  07
-  ld (dsp),hl                 ;  16
-  pop de                      ;  10
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 118 total (107.5 average with pop_hl)
-
-pop_hl:
-
-                              ; T Cycles
-  push de                     ;  11
-  ld hl,(dsp)                 ;  20
-  ld e,(hl)                   ;  07
-  inc hl                      ;  06
-  ld d,(hl)                   ;  07
-  inc hl                      ;  06
-  ld (dsp),hl                 ;  16
-  ex de,hl                    ;  04
-  pop de                      ;  10
-  ret                         ;  10
-                              ; 097 total (107.5 average with push_hl)
-
-push_de_hl:
-
-                              ; T Cycles
-  push de                     ;  11
-  push hl                     ;  11
-  ld hl,(dsp)                 ;  20
-  dec hl                      ;  06
-  ld (hl),d                   ;  07
-  dec hl                      ;  06
-  ld (hl),e                   ;  07
-  dec hl                      ;  06
-  pop de                      ;  10
-  ld (hl),d                   ;  07
-  dec hl                      ;  06
-  ld (hl),e                   ;  07
-  ld (dsp),hl                 ;  16
-  pop hl                      ;  10
-  ex de,hl                    ;  04
-  ret                         ;  10
-                              ; 144 total (131.5 average with pop_hl_de)
-
-pop_hl_de:
-
-                              ; T Cycles
-  ld hl,(dsp)                 ;  20
-  ld e,(hl)                   ;  07
-  inc hl                      ;  06
-  ld d,(hl)                   ;  07
-  push de                     ;  11
-  inc hl                      ;  06
-  ld e,(hl)                   ;  07
-  inc hl                      ;  06
-  ld d,(hl)                   ;  07
-  inc hl                      ;  06
-  ld (dsp),hl                 ;  16
-  pop hl                      ;  10
-  ret                         ;  10
-                              ; 119 total (131.5 average with push_hl_de)
-
-endif ; data_stack_method = hl_dsm
 
 ; --------------------------------------------------------------
 if data_stack_method = ix_dsm ; {{{2
