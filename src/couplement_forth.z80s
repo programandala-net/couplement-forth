@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.25.0+202005291906"
+    db "0.2.0-dev.26.0+202005292037"
   endm
 
 ; --------------------------------------------------------------
@@ -73,14 +73,13 @@ true:   equ $FFFF
 ; Couplement Forth can use different methods to manage its data
 ; stack. Every method has a constant identifier:
 
-sp_dsm: equ %0001 ; use SP with the contents of `dsp`
-ix_dsm: equ %0100 ; use IX to hold the stack pointer permanently
+sp_dsm: equ 1 ; use SP with the address kept in `dsp`
+ix_dsm: equ 2 ; use IX to hold the stack pointer permanently
 
 ; The data stack method can be selected here, using one of the
 ; above identifiers:
 
 data_stack_method:  equ sp_dsm
-any_dsm:            equ data_stack_method ; XXX TODO -- simpler
 
 ; Some stack operations can be faster (though also larger) by manipulating the
 ; data stack directly, instead of calling the push/pop routines:
@@ -164,9 +163,6 @@ slen_fvar:
 ip_fvar: ; XXX TODO -- make it standard
   ; Address of interpreter pointer within source being compiled
   dw $0000
-dubflag_fvar:
-  ; Flag indicating double number
-  db $00
 numbit_fvar:
   ; Temporary store used during number output
   dw $0000
@@ -1002,7 +998,7 @@ error_a:
   call restore_dictionary_pointers
   ;;call cr_ ; XXX ? --- needed?
   xor a
-  ld (dubflag_fvar),a
+  ld (double_number_flag),a
   ;;check "init after an error -- before jp quit_"
   jp quit_
 
@@ -1190,10 +1186,9 @@ _previous_nfa: defl 0
   ld e,(hl)
   inc hl
   ld d,(hl)
-  inc hl
-  push hl ; return address
-  ex de,hl
-  jp push_hl
+  inc hl ; return address
+  call push_de
+  jp (hl)
 
 ; --------------------------------------------------------------
   header literal_,'literal',immediate+compile_only ; {{{2
@@ -1210,12 +1205,11 @@ _previous_nfa: defl 0
   ;
   ; }doc
 
-  ; XXX TODO -- write
+  ; XXX FIXME --
+
   ld de,lit_
   call compile_call_de
-  ; hl = dp
-  call pop_hl ; XXX TODO -- use pop_de instead
-  ex de,hl
+  call pop_de
   jp compile_de
 
 ; --------------------------------------------------------------
@@ -1602,6 +1596,7 @@ quit.do:
   ;
   ; }doc
 
+  ; XXX TODO -- faster optional alternative
   call pop_hl_de
   ex de,hl
   jp push_de_hl
@@ -1631,9 +1626,7 @@ quit.do:
       ld e,(hl)
       inc hl
       ld d,(hl)
-      ex de,hl
-      call push_hl
-      jp push_hl
+      jp push_de
     endif
   else
     call pop_hl
@@ -1652,7 +1645,7 @@ quit.do:
   ;
   ; }doc
 
-  call pop_hl ; XXX TODO -- faster: just read it, don't pop
+  call pop_hl
   ld a,h
   or l
   call nz,push_hl
@@ -1743,21 +1736,19 @@ interpret.skip_space:
   ld a,h
   or l
   jp z,l520ah
-  ld a,$01 ; XXX OLD -- not needed, because A<>0 ; XXX TODO --
-  ld (dubflag_fvar),a
+  ld a,$FF
+  ld (double_number_flag),a
   call push_hl
 l520ah:
   ld a,(state)
   and a ; executing?
   jp z,l5242h ; jump if executing
   ; compiling:
-  ld a,(dubflag_fvar)
-  cp $01 ; XXX OLD ; XXX TODO --
-;  and a ; XXX NEW ; XXX TODO --
+double_number_flag: equ $+1
+  ld a,0
+  and a
   jp nz,l521fh
-  call pop_hl_de
-  ex de,hl
-  call push_de_hl
+  call swap_
 l521fh:
   call pop_hl
   ld b,h
@@ -1770,12 +1761,11 @@ l521fh:
   ld (hl),b
   inc hl
   ld (dp),hl
-  ld a,(dubflag_fvar)
-  cp $01 ; XXX OLD ; XXX TODO --
-;  and a ; XXX NEW ; XXX TODO --
+  ld a,(double_number_flag)
+  and a
   jp nz,l5242h
   xor a
-  ld (dubflag_fvar),a
+  ld (double_number_flag),a
   jp l521fh
 l5242h:
   ld hl,(ip_fvar)
@@ -1845,6 +1835,13 @@ compile_de_at_hl:
   inc hl
   ld (dp),hl
   ret
+
+  ; XXX TODO convert this into a word
+compile_jp_de:
+  ld hl,(dp)
+  ld (hl),$C3 ; Z80 `jp`
+  inc hl
+  jp compile_de_at_hl
 
 ; --------------------------------------------------------------
   header paren_find_,'(find)',0 ; {{{2
@@ -2108,7 +2105,7 @@ l5330h:
   ; }doc
 
   call pop_hl_de
-  ex de,hl ; XXX TODO -- remove this and write pop_de_hl
+  ex de,hl
   sbc hl,de
   jp push_hl
 
@@ -2121,8 +2118,7 @@ l5330h:
   ;
   ; }doc
 
-  call pop_hl
-  ex de,hl ; XXX TODO -- remove this and write pop_de
+  call pop_de
   ld hl,$0000
   sbc hl,de
   jp push_hl
@@ -2587,18 +2583,6 @@ create_header.store_char
   call compile_jp_de
   jp save_dictionary_pointers
 
-  ; XXX TODO convert this into a word
-compile_jp_de:
-  ld hl,(dp)
-  ld (hl),$C3 ; Z80 `jp`
-  inc hl
-  ld (hl),e
-  inc hl
-  ld (hl),d
-  inc hl
-  ld (dp),hl
-  ret
-
 ; --------------------------------------------------------------
   header colon_,':',0 ; {{{2
 
@@ -2829,11 +2813,9 @@ endif
   ;
   ; }doc
 
-  ; XXX TODO -- pop_de and `ld (hl),e`
-  call pop_hl
-  ld a,l
+  call pop_de
   ld hl,(dp)
-  ld (hl),a
+  ld (hl),e
   inc hl
   ld (dp),hl
   jp save_dictionary_pointers
@@ -2847,14 +2829,8 @@ endif
   ;
   ; }doc
 
-  call pop_hl
-  ld de,(dp)
-  ex de,hl
-  ld (hl),e
-  inc hl
-  ld (hl),d
-  inc hl
-  ld (dp),hl
+  call pop_de
+  call compile_de
   jp save_dictionary_pointers
 
 ; --------------------------------------------------------------
@@ -2905,7 +2881,7 @@ endif
 
   ; doc{
   ;
-  ; @ ( a -- )
+  ; @ ( a -- x )
   ;
   ; }doc
 
@@ -2913,15 +2889,14 @@ endif
   ld e,(hl)
   inc hl
   ld d,(hl)
-  ex de,hl
-  jp push_hl ; XXX TODO -- push_de ?
+  jp push_de
 
 ; --------------------------------------------------------------
   header c_fetch_,'c@',0 ; {{{2
 
   ; doc{
   ;
-  ; c@ ( ca -- )
+  ; c@ ( ca -- c )
   ;
   ; }doc
 
@@ -3528,7 +3503,7 @@ return.a:
 
   call pop_hl_de
   if size_optimization
-    call compare_de_hl_unsigned
+    call compare_de_hl_unsigned ; XXX FIXME -- unsigned?
     jp z,true_
     jp false_
   else
@@ -3552,7 +3527,7 @@ return.a:
 
   call pop_hl_de
   if size_optimization
-    call compare_de_hl_unsigned
+    call compare_de_hl_unsigned ; XXX FIXME -- unsigned?
     jp z,false_
     jp true_
   else
@@ -3716,10 +3691,10 @@ compare_de_hl_unsigned:
   ;
   ; }doc
 
-  pop bc
   pop hl
-  push bc
-  jp push_hl
+  pop de
+  call push_de
+  jp (hl)
 
 ; --------------------------------------------------------------
   header to_r_,'>r',0 ; {{{2
@@ -3730,16 +3705,10 @@ compare_de_hl_unsigned:
   ;
   ; }doc
 
-  call pop_hl
-  pop bc
-  push hl
-  push bc
-  ret
-  ; XXX TODO -- future optimization:
-;  call pop_de
-;  pop hl
-;  push de
-;  jp (hl)
+  call pop_de
+  pop hl
+  push de
+  jp (hl)
 
 ; --------------------------------------------------------------
   header key_question_,'key?',0 ; {{{2
@@ -3807,8 +3776,7 @@ previous_key equ $+1
 
   call pop_hl_de
   call push_de_hl
-  ex de,hl
-  jp push_hl
+  jp push_de
 
 ; --------------------------------------------------------------
   header rot_,'rot',0 ; {{{2
@@ -4408,10 +4376,7 @@ do_variable:
   call create_header
   ld de,do_constant
   call compile_call_de
-  ; hl = dp
-  call pop_hl
-  ; XXX TODO two next lines could be omited if only pop_de could be used instead of pop_hl above:
-  ex de,hl ;
+  call pop_de
   ld hl,(dp)
   ld (hl),e
   inc hl
@@ -4426,8 +4391,7 @@ do_constant:
   ld e,(hl)
   inc hl
   ld d,(hl)
-  ex de,hl
-  jp push_hl
+  jp push_de
 
 ; --------------------------------------------------------------
   header dot_,'.',0 ; {{{2

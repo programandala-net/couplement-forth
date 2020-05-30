@@ -153,3 +153,10 @@ etc.
 2020-05-29: Write `u>`, `invert`.
 
 2020-05-29: Improve `=`, `<>` and similar words after Solo Forth.
+
+2020-05-29: Fix `interpret`: double numbers are not recognized.
+
+2020-05-29: Fix: `: zx 123 ; zx` doesn't return the number. This is
+a recent bug.
+
+2020-05-29: Add `compile,`.
