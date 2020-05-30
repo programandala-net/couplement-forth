@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.26.0+202005292037"
+    db "0.2.0-dev.27.0+202005302352"
   endm
 
 ; --------------------------------------------------------------
@@ -2116,6 +2116,8 @@ l5330h:
   ;
   ; negate ( n1 -- n2 )
   ;
+  ; See: `invert`, `0=`.
+  ;
   ; }doc
 
   call pop_de
@@ -2557,6 +2559,48 @@ create_header.store_char
   dec de ; XXX ? -- why this?
   ld (ip_fvar),de
   ret
+
+; --------------------------------------------------------------
+  header compile_comma_,'compile,',0 ; {{{2
+
+; doc{
+;
+; compile, ( xt -- ) "compile-comma"
+;
+; Append the execution semantics of the definition represented
+; by _xt_ to the execution semantics of the current definition.
+;
+; ``compile,`` is the compilation equivalent of `execute`.
+;
+; }doc
+
+  call pop_de
+  jp compile_call_de
+
+; --------------------------------------------------------------
+  header invert_,'invert',0 ; {{{2
+
+; doc{
+;
+; invert ( x1 -- x2 )
+;
+; Invert all bits of _x1_ giving its logical inverse _x2_.
+;
+; See: `0=`, `negate`.
+;
+; }doc
+
+  ; Credit:
+  ; Code adapted from Solo Forth, which adapted it from Z88 CamelForth.
+
+  call pop_hl
+  ld a,h
+  cpl
+  ld h,a
+  ld a,l
+  cpl
+  ld l,a
+  jp push_hl
 
 ; --------------------------------------------------------------
   header noop_,'noop',0 ; {{{2
@@ -4874,6 +4918,8 @@ sub_5fc2h:
   ; doc{
   ;
   ; 0= ( n -- f )
+  ;
+  ; See: `negate`, `invert`.
   ;
   ; }doc
 
