@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.29.0+202005311835"
+    db "0.2.0-dev.30.0+202005311910"
   endm
 
 ; --------------------------------------------------------------
@@ -934,54 +934,56 @@ wrap_print_message_at_hl.end_of_message_found:
 ; ==============================================================
 ; Errors {{{1
 
-; XXX TODO -- move to `throw`
-stack_empty_error:
-  ld a,$01
-  jr error_a
-stack_full_error:
-  ld a,$02
-  jr error_a
-undefined_word_error:
-  ; XXX TODO -- print the offending word
-  ld a,$03
-  jr error_a
-compile_only_error:
-  ; XXX TODO -- print the offending word
-  ld a,$04
-  jr error_a
+error.stack_overflow:               equ -003
+error.stack_underflow:              equ -004
+error.return_stack_overflow:        equ -005
+error.return_stack_underflow:       equ -006
+error.dictionary_overflow:          equ -008
+error.division_by_zero:             equ -010
+error.not_found:                    equ -013
+error.compilation_only:             equ -014
+error.invalid_forget:               equ -014
+error.zero_length_name:             equ -016
+error.control_structure_mismatch:   equ -022
+
+stack_overflow_error:
+  ld hl,error.stack_overflow
+  jr error_hl
+stack_underflow_error:
+  ld hl,error.stack_underflow
+  jr error_hl
+return_stack_overflow_error:
+  ld hl,error.return_stack_overflow
+  jr error_hl
+return_stack_underflow_error:
+  ld hl,error.return_stack_underflow
+  jr error_hl
 division_by_zero_error:
-  ld a,$05
-  jr error_a
-return_stack_full_error:
-  ld a,$06
-  jr error_a
-inside_fence_error:
-  ld a,$07
-  jr error_a
-break_error:
-  ld a,$08
-  jr error_a
-unstructured_error:
-  ; XXX TODO -- print the offending word
-  ld a,$09
-  jr error_a
+  ld hl,error.division_by_zero
+  jr error_hl
 not_found_error:
   ; XXX TODO -- print the offending word
-  ld a,$0A
-  jr error_a
-empty_name_error:
-  ld a,$0B
-  jr error_a
+  ld hl,error.not_found
+  jr error_hl
+compilation_only_error:
+  ; XXX TODO -- print the offending word
+  ld hl,error.compilation_only
+  jr error_hl
+invalid_forget_error:
+  ld hl,error.invalid_forget
+  jr error_hl
+zero_length_name_error:
+  ld hl,error.zero_length_name
+  jr error_hl
+control_structure_mismatch_error:
+  ; XXX TODO -- print the offending word
+  ld hl,error.control_structure_mismatch
 
-; XXX NEW routine ,$1D bytes, longer, but one byte less per message
-; XXX TODO -- convert to error_hl ?
-error_a:
-; XXX TODO -- print error number too:
-;;  push af
-;;  call cr_
-;;  call dot_
-  ld hl,error_messages
-  call print_table_message
+error_hl:
+  call push_hl
+  call print_inline_message
+  db "Error: ","#"+$80
+  call dot_
 
   ; init after an error
   ;;check "init after an error"
@@ -1003,33 +1005,6 @@ error_a:
   ld (double_number_flag),a
   ;;check "init after an error -- before jp quit_"
   jp quit_
-
-; XXX TODO -- move the messages to their own file and ram page
-error_messages:
-  db "Stack empt" ; Error number $01 ; XXX -- -4 in ANS Forth
-  db "y"+$80
-  db "Stack ful" ; Error number $02 ; XXX -- -3 in ANS Forth
-  db "l"+$80
-  db "Undefined wor" ; Error number $03 ; XXX -- -13 in ANS Forth
-  db "d"+$80
-  db "Interpreting a compile-only wor" ; Error number $04 ; XXX -- -14 in ANS Forth
-  db "d"+$80
-  db "Division by zer" ; Error number $05 ; XXX -- -10 in ANS Forth
-  db "o"+$80
-  db "Return stack ful" ; Error number $06 ; XXX -- not used -- -5 in ANS Forth
-  db "l"+$80
-  db "Inside fenc" ; Error number $07 ; XXX -- -15 in ANS Forth "invalid FORGET"
-  db "e"+$80
-  db "Brea" ; Error number $08 ; XXX -- not used, not in ANS Forth
-  db "k"+$80
-  db "Unstructure" ; Error number $09 ; XXX -- -10 in ANS Forth
-  db "d"+$80
-  db "Not foun" ; Error number $0A ; XXX -- used only by `;` -- (-13 in ANS Forth?)
-  db "d"+$80
-  db "Attempt to use zero-lenght string as a nam" ; Error number $0B ; XXX -- -16 in ANS Forth
-  db "e"+$80
-;  db "Return stack empt" ; XXX -- not used yet ; xxx -- -6 in ANS Forth
-;  db "y"+$80
 
 ; ==============================================================
 ; Entry points  {{{1
@@ -1077,7 +1052,7 @@ structured:
   ; a = flow structure code to compare
   call pop_hl
   cp l
-  jp nz,unstructured_error
+  jp nz,control_structure_mismatch_error
   ret
 
 ; ==============================================================
@@ -1793,7 +1768,7 @@ flags_field: equ $+1
   ; it's not a compile word
   ld a,(state)
   and a ; compiling?
-  jp z,compile_only_error
+  jp z,compilation_only_error
 
 interpret.execute:
   ; execute the word
@@ -2188,7 +2163,7 @@ l5400h:
   ld a,(de)
   cp "0" ; any invalid digit?
 ;;  check "undefined 1"
-  jp c,undefined_word_error
+  jp c,not_found_error
   ld c,a
   ld a,(base)
   ld b,$0A
@@ -2197,7 +2172,7 @@ l5400h:
   add a,"0"
   cp c
   check "undefined 2"
-  jp c,undefined_word_error
+  jp c,not_found_error
 l5415h:
   ld a,c
   cp $3A
@@ -2250,7 +2225,7 @@ l5477h:
   add a,$37
   cp c
   check "undefined 3"
-  jp c,undefined_word_error
+  jp c,not_found_error
   ld a,c
   sub $37
   jp l541ch
@@ -2501,7 +2476,7 @@ create_header.skip_blanks:
   cp space_char
   jr z,create_header.skip_blanks
   cp cr_char
-  jp z,empty_name_error
+  jp z,zero_length_name_error
 
   ld hl,(dp)
   ; hl=ffa of the new header
@@ -2641,7 +2616,7 @@ create_header.store_char
   ; XXX -- this check was useless:
 ;  ld a,(state)
 ;  and a ; compiling?
-;  jp nz,compile_only_error
+;  jp nz,compilation_only_error
   call right_bracket_
   call create_header
   ld l,colon_structure_id
@@ -4964,10 +4939,10 @@ sub_5fc2h:
   ld a,h
   or l
   check "undefined 4"
-  jp z,undefined_word_error
+  jp z,not_found_error
   ld hl,(fence)
   sbc hl,de
-  jp nc,inside_fence_error
+  jp nc,invalid_forget_error
   ex de,hl
   dec hl
   ld b,(hl)
@@ -4982,14 +4957,12 @@ sub_5fc2h:
 
 ; doc{
 ;
-; error ( n -- )
+; error ( -n -- )
 ;
 ; }doc
 
-  ; XXX TODO --- rename "throw"
   call pop_hl
-  ld a,l
-  jp error_a
+  jp error_hl
 
 ; --------------------------------------------------------------
   header paren_,'(',immediate ; {{{2
@@ -5120,7 +5093,7 @@ char.return:
 
   ld a,(state)
   and a ; compiling?
-  jp z,compile_only_error ; error if not compiling
+  jp z,compilation_only_error ; error if not compiling
 
   call char_
   call pop_hl
@@ -5514,10 +5487,10 @@ to_in:
 ; }doc
 
   call pop_hl_de
+  ex de,hl
   ld a,d
   or e
-  ld a,l
-  jp nz,error_a
+  jp nz,error_hl
   ret
 
 ; --------------------------------------------------------------
@@ -5538,14 +5511,14 @@ to_in:
   call pop_hl
   ld a,h
   or l
-  jp nz,stack_full_error
+  jp nz,stack_overflow_error
   call sp0_
   call sp_fetch_
   call less_than_
   call pop_hl
   ld a,h
   or l
-  jp nz,stack_empty_error
+  jp nz,stack_underflow_error
   ret
 
 ; --------------------------------------------------------------

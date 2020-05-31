@@ -62,8 +62,6 @@ Benchmark the data stack code.
 Move all vars into the code, to save space and time.  Choose the point
 where the variable is fetch more often.
 
-Standard error numbers.
-
 Make links point to count byte, to make vocabulary searching faster.
 
 Change conditional relative jumps to absolute jumps,
@@ -128,7 +126,7 @@ interpretation mode. non-immediate and compile-only words (e.g.
 
 2020-05-28: Convert 0x80-terminated strings to counted strings.
 
-2020-05-28: Remove error messages. Make error handling standard.
+2020-05-28: Make error handling standard.
 
 2020-05-28: Rewrite everything related to parsing. Make it standard.
 
@@ -160,3 +158,5 @@ etc.
 a recent bug.
 
 2020-05-31: Use `?error`.
+
+2020-05-31: Fix `negate`.
