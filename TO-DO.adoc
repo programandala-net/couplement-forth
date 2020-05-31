@@ -1,6 +1,6 @@
 = Couplement Forth TO-DO
 :author: Marcos Cruz (programandala.net)
-:revdate: 2020-05-30
+:revdate: 2020-05-31
 
 // This file is part of
 // Couplement Forth
@@ -158,3 +158,5 @@ etc.
 
 2020-05-29: Fix: `: zx 123 ; zx` doesn't return the number. This is
 a recent bug.
+
+2020-05-31: Use `?error`.

@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.28.0+202005300031"
+    db "0.2.0-dev.29.0+202005311835"
   endm
 
 ; --------------------------------------------------------------
@@ -351,11 +351,13 @@ tib_end:
 pad_start:
   defs $FF
 
+data_stack_limit:
 data_stack_max_top:
   ; The data stack grows from bottom (high memory) to top (low memory)
   defs $0100
 data_stack_bottom:
 
+return_stack_limit:
 return_stack_max_top:
   ; The return stack grows from bottom (high memory) to top (low memory)
   defs $0100
@@ -2093,7 +2095,7 @@ l5330h:
   call to_r_
   call minus_
   call r_from_
-  jp u_less_
+  jp u_less_than_
 
 ; --------------------------------------------------------------
   header minus_,'-',0 ; {{{2
@@ -3642,7 +3644,7 @@ return.a:
   jp sub_57a3h
 
 ; --------------------------------------------------------------
-  header less_,'<',0 ; {{{2
+  header less_than_,'<',0 ; {{{2
 
 ; doc{
 ;
@@ -3663,7 +3665,7 @@ l5a4fh:
   jp true_
 
 ; --------------------------------------------------------------
-  header greater_,'>',0 ; {{{2
+  header greater_than_,'>',0 ; {{{2
 
 ; doc{
 ;
@@ -3673,10 +3675,10 @@ l5a4fh:
 
   ; XXX TODO -- direct version, no swap
   call swap_
-  jp less_
+  jp less_than_
 
 ; --------------------------------------------------------------
-  header u_less_,'u<',0
+  header u_less_than_,'u<',0
 
 ; doc{
 ;
@@ -4089,7 +4091,7 @@ paren_accept_ascii_char.no:
     call to_r_
     call minus_
     call r_from_
-    call u_less_
+    call u_less_than_
   endif
   call zero_branch_
   dw paren_accept_control_char_ ; not ASCII
@@ -4818,7 +4820,7 @@ l5de3h:
   ld hl,$0009
   call push_hl
   call over_
-  call less_
+  call less_than_
   call zero_branch_
   dw branch_5e39
   ld hl,$0007
@@ -5488,11 +5490,63 @@ to_in:
   else
     ld de,(dsp)
   endif
+  and a
   sbc hl,de
-  ; XXX TODO -- test this:
   srl h
   rr l
   jp push_hl
+
+; --------------------------------------------------------------
+  header question_error_,'?error',0 ; {{{2
+
+; doc{
+;
+; ?error ( f n -- ) "question-error"
+;
+; If _f_ is non-zero, throw error code _n_
+;
+; Definition:
+
+; ----
+; : ?error ( f n -- ) swap if error else drop then ;
+; ----
+
+; }doc
+
+  call pop_hl_de
+  ld a,d
+  or e
+  ld a,l
+  jp nz,error_a
+  ret
+
+; --------------------------------------------------------------
+  header question_stack_,'?stack',0 ; {{{2
+
+; doc{
+;
+; ?stack ( -- ) "question-stack"
+;
+; Throw an error if the data stack is out of bounds.
+;
+; }doc
+
+  call sp_fetch_
+  call lit_
+  dw data_stack_limit
+  call less_than_
+  call pop_hl
+  ld a,h
+  or l
+  jp nz,stack_full_error
+  call sp0_
+  call sp_fetch_
+  call less_than_
+  call pop_hl
+  ld a,h
+  or l
+  jp nz,stack_empty_error
+  ret
 
 ; --------------------------------------------------------------
   header dot_s_,'.s',0 ; {{{2
