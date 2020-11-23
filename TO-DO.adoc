@@ -1,6 +1,6 @@
 = Couplement Forth TO-DO
 :author: Marcos Cruz (programandala.net)
-:revdate: 2020-05-31
+:revdate: 2020-06-12
 
 // This file is part of
 // Couplement Forth
@@ -132,7 +132,7 @@ interpretation mode. non-immediate and compile-only words (e.g.
 
 2020-05-28: Replace inner variable `etib_fvar` with standard `>in`.
 
-2020-05-28: Fix "[" and "]" cannot be typed.
+2020-05-28: Fix: "[" and "]" cannot be typed.
 
 2020-05-28: Remove routines: save_dictionary_pointers and
 restore_dictionary_pointers.
@@ -160,3 +160,5 @@ a recent bug.
 2020-05-31: Use `?error`.
 
 2020-05-31: Fix `negate`.
+
+2020-06-12: Create a `<#` bufer above `here` and move `pad` above it.

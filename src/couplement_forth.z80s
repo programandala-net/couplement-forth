@@ -1679,6 +1679,8 @@ quit.do:
 ;
 ; }doc
 
+  ; XXX TODO -- factor
+
   ld hl,(tib_address)
   dec hl
 interpret.skip_space:
