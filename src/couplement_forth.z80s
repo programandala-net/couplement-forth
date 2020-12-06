@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.30.0+202005311910"
+    db "0.2.0-dev.30.0+202011262104"
   endm
 
 ; --------------------------------------------------------------
@@ -1064,7 +1064,7 @@ _previous_nfa: defl 0
 
     ; Create a word header in the dictionary
 
-    ; label = label-format name (with a "_" suffix)
+    ; label_ = label-format name (with a "_" suffix)
     ; name = string with the actual name
     ; flags = byte with the precedence and compile-only bits combined
 
