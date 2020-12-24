@@ -1,6 +1,6 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2020-12-06
+:revdate: 2020-12-24
 
 // This file is part of
 // Couplement Forth
@@ -16,7 +16,11 @@ Couplement Forth is a small and experimental STC (Subroutine-Threaded
 Code) Forth system under development for ZX Spectrum, with a BASIC
 file interface easy to adapt to any DOS.
 
-Home page: http://programandala.net/en.program.couplement_forth.html
+Home page and repository:
+
+- Home page: http://programandala.net/en.program.couplement_forth.html
+- Fossil repository: http://fossil.programandala.net/couplement_forth
+- GitHub mirror: http://github.com/programandala-net/couplement-forth
 
 == Origin
 
@@ -49,8 +53,11 @@ keyboard.
 
 A Git repository was created on 2016-03-12 from the development
 backups, in order to make future development easier and preserve the
-evolution of the code. On 2020-12-06 the repository was converted
-to http://fossil-scm.org[Fossil], keeping GitHub only as a mirror.
+evolution of the code. On 2020-12-06 the Git repository was converted
+to a http://fossil.programandala.net/couplement_forth[Fossil
+repository], keeping
+http://github.com/programandala-net/couplement-forth[GitHub] as a
+mirror.
 
 Most ideas noted for Couplement Forth have already been implemented in
 http://programandala.net/en.program.solo_forth.html[Solo Forth], a DTC
