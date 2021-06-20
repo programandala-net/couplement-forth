@@ -3,20 +3,20 @@
 ; This file is part of
 ; Couplement Forth
 ; (http://programandala.net/en.program.couplement_forth.html),
-; by Marcos Cruz (programandala.net), 2015, 2016, 2020.
+; by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2021.
 
 ; Couplement Forth is an experimental subroutine-threaded Forth
 ; system under development for the ZX Spectrum.
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.30.0+202012062153"
+    db "0.2.0-dev.31.0+20210620T1409CEST"
   endm
 
 ; --------------------------------------------------------------
 ; License
 
-; Copyright (C) 2015,2016,2020 Marcos Cruz (programandala.net)
+; Copyright (C) 2015,2016,2020,2021 Marcos Cruz (programandala.net)
 
 ; You may do whatever you want with this work, so long as you
 ; retain all copyright notices, all credit notices, and this
@@ -73,8 +73,9 @@ true:   equ $FFFF
 ; Couplement Forth can use different methods to manage its data
 ; stack. Every method has a constant identifier:
 
-sp_dsm: equ 1 ; use SP with the address kept in `dsp`
-ix_dsm: equ 2 ; use IX to hold the stack pointer permanently
+sp_dsm:  equ 1 ; use SP with the address kept in `dsp`
+ix_dsm:  equ 2 ; use IX to hold the stack pointer permanently
+ixl_dsm: equ 3 ; use IXl to hold the stack pointer permanently
 
 ; The data stack method can be selected here, using one of the
 ; above identifiers:
@@ -354,6 +355,7 @@ pad_start:
 data_stack_limit:
 data_stack_max_top:
   ; The data stack grows from bottom (high memory) to top (low memory)
+  ; XXX TODO adapt the size to the ixl method
   defs $0100
 data_stack_bottom:
 
@@ -367,11 +369,16 @@ return_stack_bottom:
 ; Data stack manipulation {{{1
 
 init_data_stack:
-  if data_stack_method = ix_dsm
-    ld ix,(sp0)
-  else
+  if data_stack_method = sp_dsm
     ld hl,(sp0)
     ld (dsp),hl
+  endif
+  if data_stack_method = ix_dsm
+    ld ix,(sp0)
+  endif
+  if data_stack_method = ixl_dsm
+    ; XXX TODO
+    ld ix,(sp0)
   endif
   ret
 
@@ -517,6 +524,77 @@ pop_hl_de:
                       ; 126 total (126 average with push_hl_de)
 
 endif ; data_stack_method = ix_dsm
+
+; --------------------------------------------------------------
+if data_stack_method = ixl_dsm ; {{{2
+
+; Credit:
+; Idea borrowed from Alone Coder:
+; https://spectrumcomputing.co.uk/forums/viewtopic.php?p=68998#p68998
+
+push_de:
+                      ; T Cycles
+  ld (ix+127),d       ;  19
+  db dd
+  dec ix              ;  10 ; dec ixl
+  ld (ix-128),e       ;  19
+  ret                 ;  10
+                      ; 058 total (58 average with pop_de)
+
+pop_de:
+                      ; T Cycles
+  ld e,(ix-128)       ;  19
+  db dd
+  inc ix              ;  10 ; inc ixl
+  ld d,(ix+127)       ;  19
+  ret                 ;  10
+                      ; 058 total (58 average with push_de)
+
+push_hl:
+                      ; T Cycles
+  ld (ix+127),h       ;  19
+  db dd
+  dec ix              ;  10 ; dec ixl
+  ld (ix-128),l       ;  19
+  ret                 ;  10
+                      ; 058 total (58 average with pop_hl)
+
+pop_hl:
+                      ; T Cycles
+  ld l,(ix-128)       ;  19
+  db dd
+  inc ix              ;  10 ; inc ixl
+  ld h,(ix+127)       ;  19
+  ret                 ;  10
+                      ; 058 total (58 average with push_hl)
+
+push_de_hl:
+                      ; T Cycles
+  ld (ix+127),d       ;  19
+  db dd
+  dec ix              ;  10 ; dec ixl
+  ld (ix-128),e       ;  19
+  ld (ix+127),h       ;  19
+  db dd
+  dec ix              ;  10 ; dec ixl
+  ld (ix-128),l       ;  19
+  ret                 ;  10
+                      ; 106 total (106 average with pop_de_hl)
+
+pop_hl_de:
+                      ; T Cycles
+  ld l,(ix-128)       ;  19
+  db dd
+  inc ix              ;  10 ; inc ixl
+  ld h,(ix+127)       ;  19
+  ld e,(ix-128)       ;  19
+  db dd
+  inc ix              ;  10 ; inc ixl
+  ld d,(ix+127)       ;  19
+  ret                 ;  10
+                      ; 106 total (106 average with push_hl_de)
+
+endif ; data_stack_method = ixl_dsm
 
 ; ==============================================================
 ; Keyboard input {{{1
