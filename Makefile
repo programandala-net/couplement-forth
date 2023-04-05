@@ -5,7 +5,7 @@
 # (http://programandala.net/en.program.couplement_forth.html),
 # by Marcos Cruz (programandala.net), 2015, 2016, 2020.
 
-# Last modified: 202012241759.
+# Last modified: 20230405T1421+0200.
 # See change log at the end of the file.
 
 # ==============================================================
@@ -28,33 +28,6 @@ bin/couplement_forth.tap: src/couplement_forth.z80s
 		$< $@ src/couplement_forth.symbols.z80s
 
 # ==============================================================
-# Online documentation {{{1
-
-# Online documentation displayed on the Fossil repository.
-
-.PHONY: wwwdoc
-wwwdoc: wwwreadme
-
-.PHONY: cleanwww
-cleanwww:
-	rm -f \
-		doc/www/* \
-		tmp/README.*
-
-.PHONY: wwwreadme
-wwwreadme: doc/www/README.html
-
-doc/www/README.html: tmp/README.html
-	echo "<div class='fossil-doc' data-title='README'>" > $@;\
-	cat $< >> $@;\
-	echo "</div>" >> $@
-
-tmp/README.html: README.adoc
-	asciidoctor \
-		--embedded \
-		--out-file=$@ $<
-
-# ==============================================================
 # Change log {{{1
 
 # 2015-01-01: First version
@@ -67,3 +40,5 @@ tmp/README.html: README.adoc
 #
 # 2020-12-24: Build an online version of the README file for the Fossil
 # repository.
+#
+# 2023-04-05: Remove online documentation rule, after migration to Mercurial.

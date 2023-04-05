@@ -1,11 +1,11 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2020-12-24
+:revdate: 2023-04-05
 
 // This file is part of
 // Couplement Forth
 // (http://programandala.net/en.program.couplement_forth.html),
-// by Marcos Cruz (programandala.net), 2015, 2016, 2020.
+// by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2023.
 //
 // This file is written in Asciidoctor format
 // (http://asciidoctor.org).
@@ -16,11 +16,8 @@ Couplement Forth is a small and experimental STC (Subroutine-Threaded
 Code) Forth system under development for ZX Spectrum, with a BASIC
 file interface easy to adapt to any DOS.
 
-Home page and repository:
-
 - Home page: http://programandala.net/en.program.couplement_forth.html
-- Fossil repository: http://fossil.programandala.net/couplement_forth
-- GitHub mirror: http://github.com/programandala-net/couplement-forth
+- GitHub: http://github.com/programandala-net/couplement-forth
 
 == Origin
 
@@ -51,20 +48,10 @@ Couplement Forth is usable, but many common words and are still
 missing, and there's no disk support yet: the only input is the
 keyboard.
 
-A Git repository was created on 2016-03-12 from the development
-backups, in order to make future development easier and preserve the
-evolution of the code. On 2020-12-06 the Git repository was converted
-to a http://fossil.programandala.net/couplement_forth[Fossil
-repository], keeping
-http://github.com/programandala-net/couplement-forth[GitHub] as a
-mirror.
-
 Most ideas noted for Couplement Forth have already been implemented in
 http://programandala.net/en.program.solo_forth.html[Solo Forth], a DTC
 (Direct-Threaded Code) Forth system under active development for ZX
 Spectrum 128 with G+DOS, +3DOS or TR-DOS, with a huge library.
-
-== Future
 
 Couplement Forth will evolve slowly, as a test system to try and
 benchmark a subroutine-threaded Forth in the Z80 processor.
@@ -85,3 +72,18 @@ benchmark a subroutine-threaded Forth in the Z80 processor.
 A Makefile is provided. The only requirement is the
 http://pasmo.speccy.org/[Pasmo assembler]. Do `make` and a TAP file
 will be created in the <bin> directory.
+
+== History of the repository
+
+- 2016-03-12: A Git repository was created out of the development
+  backups, in order to make future development easier and preserve the
+  evolution of the code.
+
+- 2020-12-06: The Git repository was converted to
+  https://fossil-scm.org[Fossil], keeping
+  http://github.com/programandala-net/couplement-forth[GitHub] as a
+  mirror.
+
+- 2023-04-05: The repository was converted
+  https://mercurial-scm.org[Mercurial], enabling a better interaction
+  with GitHub.
