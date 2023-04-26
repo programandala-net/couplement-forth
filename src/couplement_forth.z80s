@@ -3,20 +3,20 @@
 ; This file is part of
 ; Couplement Forth
 ; (http://programandala.net/en.program.couplement_forth.html),
-; by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2021.
+; by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2021, 2023.
 
 ; Couplement Forth is an experimental subroutine-threaded Forth
 ; system under development for the ZX Spectrum.
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.32.0+20210620T2052CEST"
+    db "0.2.0-dev.0.32.1+20230426T0759CEST"
   endm
 
 ; --------------------------------------------------------------
 ; License
 
-; Copyright (C) 2015,2016,2020,2021 Marcos Cruz (programandala.net)
+; Copyright (C) 2015,2016,2020,2021,2023 Marcos Cruz (programandala.net)
 
 ; You may do whatever you want with this work, so long as you
 ; retain all copyright notices, all credit notices, and this
@@ -5036,7 +5036,7 @@ sub_5fc2h:
 
 ; doc{
 ;
-; 0= ( n -- f )
+; 0= ( x -- f )
 ;
 ; See: `negate`, `invert`.
 ;
@@ -5045,7 +5045,7 @@ sub_5fc2h:
   call pop_hl
   ld a,l
   or h
-  jp z,false
+  jp nz,false
   jp true
 
 ; --------------------------------------------------------------
