@@ -10,7 +10,7 @@
 
   macro version
     ; After Semantic Versioning (http://semver.org)
-    db "0.2.0-dev.31.0+20210620T1409CEST"
+    db "0.2.0-dev.32.0+20210620T2052CEST"
   endm
 
 ; --------------------------------------------------------------
@@ -80,12 +80,13 @@ ixl_dsm: equ 3 ; use IXl to hold the stack pointer permanently
 ; The data stack method can be selected here, using one of the
 ; above identifiers:
 
-data_stack_method:  equ sp_dsm
+data_stack_method:  equ ixl_dsm
 
 ; Some stack operations can be faster (though also larger) by manipulating the
 ; data stack directly, instead of calling the push/pop routines:
 
-faster_stack_operations: equ true
+; XXX WARNING: Faster stack operations are not supported by the IXl method yet.
+faster_stack_operations: equ false
 
 ; --------------------------------------------------------------
 ; Size {{{2
@@ -352,12 +353,21 @@ tib_end:
 pad_start:
   defs $FF
 
+if data_stack_method=ixl_dsm
+  defs $0080
+endif
 data_stack_limit:
 data_stack_max_top:
   ; The data stack grows from bottom (high memory) to top (low memory)
-  ; XXX TODO adapt the size to the ixl method
-  defs $0100
+  if data_stack_method=ixl_dsm
+    defs $0080
+  else
+    defs $0100
+  endif
 data_stack_bottom:
+if data_stack_method=ixl_dsm
+  defs $007F
+endif
 
 return_stack_limit:
 return_stack_max_top:
@@ -372,12 +382,7 @@ init_data_stack:
   if data_stack_method = sp_dsm
     ld hl,(sp0)
     ld (dsp),hl
-  endif
-  if data_stack_method = ix_dsm
-    ld ix,(sp0)
-  endif
-  if data_stack_method = ixl_dsm
-    ; XXX TODO
+  else
     ld ix,(sp0)
   endif
   ret
@@ -535,7 +540,7 @@ if data_stack_method = ixl_dsm ; {{{2
 push_de:
                       ; T Cycles
   ld (ix+127),d       ;  19
-  db dd
+  db $DD
   dec ix              ;  10 ; dec ixl
   ld (ix-128),e       ;  19
   ret                 ;  10
@@ -544,7 +549,7 @@ push_de:
 pop_de:
                       ; T Cycles
   ld e,(ix-128)       ;  19
-  db dd
+  db $DD
   inc ix              ;  10 ; inc ixl
   ld d,(ix+127)       ;  19
   ret                 ;  10
@@ -553,7 +558,7 @@ pop_de:
 push_hl:
                       ; T Cycles
   ld (ix+127),h       ;  19
-  db dd
+  db $DD
   dec ix              ;  10 ; dec ixl
   ld (ix-128),l       ;  19
   ret                 ;  10
@@ -562,7 +567,7 @@ push_hl:
 pop_hl:
                       ; T Cycles
   ld l,(ix-128)       ;  19
-  db dd
+  db $DD
   inc ix              ;  10 ; inc ixl
   ld h,(ix+127)       ;  19
   ret                 ;  10
@@ -571,11 +576,11 @@ pop_hl:
 push_de_hl:
                       ; T Cycles
   ld (ix+127),d       ;  19
-  db dd
+  db $DD
   dec ix              ;  10 ; dec ixl
   ld (ix-128),e       ;  19
   ld (ix+127),h       ;  19
-  db dd
+  db $DD
   dec ix              ;  10 ; dec ixl
   ld (ix-128),l       ;  19
   ret                 ;  10
@@ -584,11 +589,11 @@ push_de_hl:
 pop_hl_de:
                       ; T Cycles
   ld l,(ix-128)       ;  19
-  db dd
+  db $DD
   inc ix              ;  10 ; inc ixl
   ld h,(ix+127)       ;  19
   ld e,(ix-128)       ;  19
-  db dd
+  db $DD
   inc ix              ;  10 ; inc ixl
   ld d,(ix+127)       ;  19
   ret                 ;  10
@@ -1292,7 +1297,21 @@ _previous_nfa: defl 0
       ld (ix),h
       dec ix
       ld (ix),l
-    else
+    endif
+    if data_stack_method = ixl_dsm
+      ld l,(ix-128)
+      db $DD
+      inc ix
+      ld h,(ix+127)
+      inc hl
+      inc hl
+      inc hl
+      ld (ix+127),h
+      db $DD
+      dec ix
+      ld (ix-128),l
+    endif
+    if data_stack_method = sp_dsm
       ld hl,(dsp)
       ld e,(hl)
       inc hl
@@ -1335,7 +1354,20 @@ _previous_nfa: defl 0
       ld (ix),h
       dec ix
       ld (ix),l
-    else
+    endif
+    if data_stack_method = ixl_dsm
+      ld l,(ix-128)
+      db $DD
+      inc ix
+      ld h,(ix+127)
+      dec hl
+      dec hl
+      ld (ix+127),h
+      db $DD
+      dec ix
+      ld (ix-128),l
+    endif
+    if data_stack_method = sp_dsm
       ld hl,(dsp)
       ld e,(hl)
       inc hl
@@ -1376,7 +1408,20 @@ _previous_nfa: defl 0
       ld (ix),h
       dec ix
       ld (ix),l
-    else
+    endif
+    if data_stack_method = ixl_dsm
+      ld l,(ix-128)
+      db $DD
+      inc ix
+      ld h,(ix+127)
+      inc hl
+      inc hl
+      ld (ix+127),h
+      db $DD
+      dec ix
+      ld (ix-128),l
+    endif
+    if data_stack_method = sp_dsm
       ld hl,(dsp)
       ld e,(hl)
       inc hl
@@ -1416,7 +1461,20 @@ _previous_nfa: defl 0
       ld (ix),h
       dec ix
       ld (ix),l
-    else
+    endif
+    if data_stack_method = ixl_dsm
+      ld l,(ix-128)
+      db $DD
+      inc ix
+      ld h,(ix+127)
+      db $DD
+      dec hl
+      ld (ix+127),h
+      db $DD
+      dec ix
+      ld (ix),l
+    endif
+    if data_stack_method = sp_dsm
       ld hl,(dsp)
       ld e,(hl)
       inc hl
