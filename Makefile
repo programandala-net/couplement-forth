@@ -3,22 +3,22 @@
 # This file is part of
 # Couplement Forth
 # (http://programandala.net/en.program.couplement_forth.html),
-# by Marcos Cruz (programandala.net), 2015, 2016, 2020.
+# by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2023, 2025.
 
-# Last modified: 20230405T1421+0200.
+# Last modified: 20250224T1643+0100.
 # See change log at the end of the file.
 
-# ==============================================================
 # Config {{{1
+# ==============================================================
 
 VPATH = ./:./src
 MAKEFLAGS = --no-print-directory
 
+# Main {{{1
+# ==============================================================
+
 .PHONY: all
 all: tap wwwdoc
-
-# ==============================================================
-# Main {{{1
 
 .PHONY: tap
 tap: bin/couplement_forth.tap
@@ -27,8 +27,15 @@ bin/couplement_forth.tap: src/couplement_forth.z80s
 	pasmo -I src --name "CplmntFth" --tapbas \
 		$< $@ src/couplement_forth.symbols.z80s
 
+# README {{{1
 # ==============================================================
+
+readme_title = Couplement Forth
+
+include Makefile.readme
+
 # Change log {{{1
+# ==============================================================
 
 # 2015-01-01: First version
 #
@@ -42,3 +49,6 @@ bin/couplement_forth.tap: src/couplement_forth.z80s
 # repository.
 #
 # 2023-04-05: Remove online documentation rule, after migration to Mercurial.
+#
+# 2025-02-24: Include <Makefile.readme> to build a Commonmark version of
+# <README.adoc>.
