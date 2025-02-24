@@ -8,7 +8,9 @@ interface easy to adapt to any DOS.
 
 - Home page: <http://programandala.net/en.program.couplement_forth.html>
 
-- GitHub: <http://github.com/programandala-net/couplement-forth>
+- SourceHut: <https://hg.sr.ht/~programandala_net/couplement_forth>
+
+- GitHub mirror: <http://github.com/programandala-net/couplement-forth>
 
 ## Origin
 
@@ -65,3 +67,6 @@ created in the \<bin\> directory.
 - 2023-04-05: The repository was converted
   [Mercurial](https://mercurial-scm.org), enabling a better interaction
   with GitHub.
+
+- 2024-08-04: The repository was uploaded to
+  [SourceHut](https://hg.sr.ht/~programandala_net/couplement_forth/).

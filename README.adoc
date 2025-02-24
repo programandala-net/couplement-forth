@@ -1,11 +1,11 @@
 = Couplement Forth
 :author: Marcos Cruz (programandala.net)
-:revdate: 2023-04-05
+:revdate: 2025-02-24
 
 // This file is part of
 // Couplement Forth
 // (http://programandala.net/en.program.couplement_forth.html),
-// by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2023.
+// by Marcos Cruz (programandala.net), 2015, 2016, 2020, 2023, 2025.
 //
 // This file is written in Asciidoctor format
 // (http://asciidoctor.org).
@@ -17,7 +17,8 @@ Code) Forth system under development for ZX Spectrum, with a BASIC
 file interface easy to adapt to any DOS.
 
 - Home page: http://programandala.net/en.program.couplement_forth.html
-- GitHub: http://github.com/programandala-net/couplement-forth
+- SourceHut: https://hg.sr.ht/~programandala_net/couplement_forth
+- GitHub mirror: http://github.com/programandala-net/couplement-forth
 
 == Origin
 
@@ -87,3 +88,6 @@ will be created in the <bin> directory.
 - 2023-04-05: The repository was converted
   https://mercurial-scm.org[Mercurial], enabling a better interaction
   with GitHub.
+
+- 2024-08-04: The repository was uploaded to
+  https://hg.sr.ht/~programandala_net/couplement_forth/[SourceHut].
